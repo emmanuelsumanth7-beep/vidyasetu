@@ -1,0 +1,599 @@
+TECHNICAL ARCHITECTURE DOCUMENT
+Tech Stack, Database Schema, Hardware & API Design
+This document is the technical companion to the Product Specification (roles, login, UX) and the Build Roadmap. It defines exactly what to build with: the stack, the database schema table by table, the hardware components, and the API/notification architecture that ties it together.
+1. Technology Stack
+Layer
+Choice
+Why
+Mobile app (parent/student/teacher)
+React Native
+One codebase for Android + iOS; supports the per-school white-label branding needed for a branded app per school
+Admin dashboard (Principal/Clerk)
+Next.js (React)
+Fast to build, deploys cleanly to Vercel, good for data-heavy admin screens
+Marketing website
+Next.js on Vercel
+SEO-friendly, free/cheap hosting, separate from the app itself
+Backend API
+Node.js + Express
+Same language as the frontend/app; handles real-time (Socket.io) naturally for GPS and live attendance
+Database
+PostgreSQL (Amazon RDS)
+Relational data (students → classes → attendance → fees) fits a relational model; RDS gives managed backups
+File storage
+Amazon S3
+Report cards, photos, ID card scans — never stored on the app server's own disk
+Push notifications
+Firebase Cloud Messaging (FCM)
+Free, industry standard, already scoped in the original proposal
+Real-time updates
+Socket.io (over the Node.js backend)
+Live GPS bus location, instant attendance/fee sync with no polling delay
+SMS/OTP
+MSG91 (or equivalent India-focused provider)
+DLT-compliant, ~₹0.15–0.20/OTP, used by major Indian consumer apps
+Hosting
+AWS EC2 (API) + RDS (DB) + S3 (files) + Vercel (web)
+As detailed in the Build Roadmap
+2. Database Schema
+Every table below (except schools and otp_requests) carries a school_id column, directly or via a parent table — this is what keeps every school's data isolated on the shared platform. Primary keys are UUIDs unless noted.
+schools
+One row per school on the platform.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+name
+text
+
+address
+text
+
+logo_url
+text
+S3 URL, used for the branded app
+primary_color
+text
+Hex code, used for the branded app theme
+created_at
+timestamp
+
+users
+Every login-capable account: Principal, Teacher, Clerk, Parent, Accountant, etc.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+school_id
+UUID (FK → schools)
+
+role
+enum
+principal, teacher, clerk, parent, student, accountant, librarian, transport_manager
+name
+text
+
+phone_number
+text
+Used for OTP login; unique per school
+email
+text, nullable
+Optional, staff only
+password_hash
+text, nullable
+Bcrypt; staff login only, parents use OTP
+is_active
+boolean
+True immediately on creation — see Product Spec Section 2
+created_at
+timestamp
+
+classes
+e.g. “Grade 5-A”.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+school_id
+UUID (FK → schools)
+
+name
+text
+
+class_teacher_id
+UUID (FK → users)
+The Class In-Charge — full access to this class
+teacher_subject_assignments
+Captures subject-teacher (limited) access to classes a teacher is not in-charge of.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+teacher_id
+UUID (FK → users)
+
+class_id
+UUID (FK → classes)
+
+subject
+text
+Scopes marks/homework/diary access to this subject only
+students
+One row per student.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+school_id
+UUID (FK → schools)
+
+class_id
+UUID (FK → classes)
+
+user_id
+UUID (FK → users), nullable
+If the student has their own login
+name
+text
+
+roll_number
+text
+
+dob
+date
+
+photo_url
+text
+Used to disambiguate twins on the parent's Select Child screen
+rfid_card_uid
+text, nullable
+Linked once a card is issued
+parent_student_links
+Many-to-many: supports twins/multiple children under one parent, and multiple guardians per child.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+parent_user_id
+UUID (FK → users)
+
+student_id
+UUID (FK → students)
+
+relationship
+enum
+father, mother, guardian
+attendance
+One row per student per day.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+student_id
+UUID (FK → students)
+
+date
+date
+
+status
+enum
+present, absent, leave
+marked_by
+UUID (FK → users)
+Must be the class's in-charge teacher, enforced at the API layer
+marked_at
+timestamp
+
+source
+enum
+manual, rfid — set once RFID hardware is added (Phase 6 of the Build Roadmap)
+homework
+Homework/assignments.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+class_id
+UUID (FK → classes)
+
+subject
+text
+
+teacher_id
+UUID (FK → users)
+
+description
+text
+
+due_date
+date
+
+created_at
+timestamp
+
+marks
+Exam/term marks per student per subject.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+student_id
+UUID (FK → students)
+
+subject
+text
+
+exam_name
+text
+
+marks_obtained
+numeric
+
+max_marks
+numeric
+
+teacher_id
+UUID (FK → users)
+Enforced: only the subject teacher for that subject/class can write here
+term
+text
+
+fee_structure
+The school's standard fee amounts — edited only by the Principal, read by everyone else.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+school_id
+UUID (FK → schools)
+
+fee_head
+text
+e.g. tuition, transport, lab
+amount
+numeric
+
+applicable_class_id
+UUID (FK → classes), nullable
+Null = applies to all classes
+updated_by
+UUID (FK → users)
+Always a Principal
+updated_at
+timestamp
+Clerk reads this same row — no separate sync needed
+fee_receipts
+Actual payments collected — supports custom, overridden amounts.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+student_id
+UUID (FK → students)
+
+fee_head
+text
+
+amount
+numeric
+Defaults to fee_structure.amount but is editable per receipt
+is_custom_amount
+boolean
+True if overridden from the standard amount
+collected_by
+UUID (FK → users)
+Clerk or Principal
+payment_mode
+text
+cash, card, UPI, etc.
+receipt_number
+text
+
+created_at
+timestamp
+
+notices
+Announcements, with mandatory audience targeting.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+school_id
+UUID (FK → schools)
+
+title
+text
+
+body
+text
+
+audience
+enum
+all, staff_only — required field, no default
+posted_by
+UUID (FK → users)
+
+created_at
+timestamp
+
+diary_entries
+Subject-wise diary, visible to students of that class/subject.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+class_id
+UUID (FK → classes)
+
+subject
+text
+
+teacher_id
+UUID (FK → users)
+
+content
+text
+
+date
+date
+
+leave_applications
+Parent-submitted leave requests.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+student_id
+UUID (FK → students)
+
+from_date
+date
+
+to_date
+date
+
+reason
+text
+
+status
+enum
+pending, approved, rejected
+reviewed_by
+UUID (FK → users), nullable
+The class in-charge teacher
+created_at
+timestamp
+Always visible to the Principal regardless of status — no separate flag needed, Principal simply has read access to this whole table
+timetable
+The master school timetable, bulk-uploaded by the Clerk.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+class_id
+UUID (FK → classes)
+
+day_of_week
+text
+
+period_number
+integer
+
+subject
+text
+
+teacher_id
+UUID (FK → users)
+
+rfid_devices
+Physical reader units installed at the school.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+school_id
+UUID (FK → schools)
+
+device_uid
+text
+Unique hardware identifier, paired with an API key
+location_description
+text
+e.g. “Main Gate”
+last_synced_at
+timestamp
+
+rfid_scans
+Raw card-tap events, including offline-queued ones.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+device_id
+UUID (FK → rfid_devices)
+
+card_uid
+text
+
+student_id
+UUID (FK → students), nullable
+Resolved server-side from card_uid
+scanned_at
+timestamp
+The actual tap time, set by the device
+synced_at
+timestamp
+When it reached the server — may be later than scanned_at if the device was offline
+buses
+School transport fleet.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+school_id
+UUID (FK → schools)
+
+vehicle_number
+text
+
+driver_user_id
+UUID (FK → users)
+
+bus_locations
+Latest (and optionally historical) GPS position per bus.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+bus_id
+UUID (FK → buses)
+
+latitude
+numeric
+
+longitude
+numeric
+
+recorded_at
+timestamp
+Pushed to parents/admin via Socket.io as it updates
+otp_requests
+Short-lived OTP verification records — not tied to a school.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+phone_number
+text
+
+otp_code_hash
+text
+Never store the raw code
+purpose
+enum
+login, switch_account
+expires_at
+timestamp
+Short-lived, e.g. 5–10 minutes
+verified_at
+timestamp, nullable
+
+audit_logs
+Sensitive-action trail — who changed a mark, processed a fee, first logged in, etc.
+Field
+Type
+Notes
+id
+UUID (PK)
+
+user_id
+UUID (FK → users)
+
+action
+text
+e.g. fee_receipt_created, mark_updated, first_login
+target_table
+text
+
+target_id
+UUID
+
+created_at
+timestamp
+
+3. Hardware Components
+3.1 RFID Attendance
+Component
+Role
+RFID card
+One per student/staff member, UID linked to their record in the students table
+RFID reader + ESP32
+Reads the card UID, sends it to the backend over Wi-Fi/Ethernet
+Local storage on device
+Queues scans if the internet is down, syncs automatically once reconnected — this is what rfid_scans.synced_at captures
+3.2 GPS Bus Tracking
+Component
+Role
+Driver's own phone
+No dedicated hardware — runs the driver-facing view of the mobile app
+Location permission + background tracking
+Requested when the driver taps “Start Trip”; must handle Android/iOS background location rules correctly
+Socket.io connection
+Streams position updates to the backend, which pushes them to every parent/admin watching that route
+4. API & Access Control Architecture
+Every API request carries a JWT containing the user's role and school_id (see the earlier authentication discussion). Two layers of enforcement sit in front of every route:
+	•	School isolation: every query is automatically scoped to the caller's school_id — no cross-school data can ever be returned, even by mistake.
+	•	Role/scope check: middleware verifies the role (Principal/Teacher/Clerk/etc.) and, for teachers, whether the requested class is their in-charge class (full access) or a subject-only assignment (restricted to teacher_subject_assignments).
+Representative endpoint groups
+POST   /auth/send-otp
+POST   /auth/verify-otp
+POST   /auth/switch-account
+
+GET    /students/:id
+POST   /attendance
+GET    /attendance?class_id=&date=
+
+POST   /homework
+POST   /marks
+GET    /report-card/:studentId/print   → generates a PDF
+
+GET    /fees/structure
+PUT    /fees/structure        (Principal only)
+POST   /fees/receipt          (Clerk or Principal, custom amount allowed)
+
+POST   /notices               (audience: all | staff_only)
+POST   /leave-applications
+PUT    /leave-applications/:id/review
+
+POST   /rfid/scan              (device API key, not a user JWT)
+WS     /gps/bus/:busId          (Socket.io channel, live position)
+5. Print & PDF Generation
+	•	Server-side PDF generation (e.g., a headless-Chrome-based renderer) for report cards, absentee lists, and fee receipts — not the browser's raw print dialog, so formatting stays consistent regardless of device.
+	•	Every list/report screen calls the same underlying “generate PDF” endpoint for its data, so the print feature is one reusable service, not rebuilt per screen.
+6. Non-Functional Requirements Checklist
+	•	Real-time: attendance, fee updates, and fee-structure changes propagate within seconds (Socket.io), not on a polling delay.
+	•	Security: bcrypt password hashing for staff, OTP-only for parents, short-lived JWTs, rate-limited login attempts, audit log for sensitive actions.
+	•	Data isolation: every table scoped by school_id, enforced at the query layer, not just the UI.
+	•	Backups: automated daily RDS snapshots, S3 versioning for uploaded files.
+	•	Offline resilience: RFID devices queue and sync scans; the mobile app should gracefully handle brief connectivity loss without losing in-progress actions.
+	•	Extensibility: permissions and feature flags stored as data, not hard-coded (see Product Spec Section 14).

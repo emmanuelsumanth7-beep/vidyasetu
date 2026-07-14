@@ -1,0 +1,147 @@
+PRODUCT SPECIFICATION
+Roles, Permissions, Login Flow & UX Requirements — School/College Platform
+This document translates the product requirements discussed into a build-ready specification: exactly who can do what, how login and account-switching work (including the twins/multi-child case), and the UX standards the app must meet for a largely non-technical parent audience. Every section marked “DECISION NEEDED” is an assumption made to keep this specification complete — confirm or change it before development starts on that part.
+1. Roles Overview
+The platform has the following account types. Every account belongs to exactly one school (school_id) except where noted.
+Role
+Who creates this account
+Scope
+Principal
+Created during school onboarding (first account on the platform for that school)
+Full access — entire school
+Teacher
+Added by Principal
+Full access to own in-charge class; subject-only access to other classes taught
+Clerk
+Added by Principal
+Admissions, fees, notices, RFID card issuance — school-wide but non-academic
+Parent
+Auto-created when Clerk admits a student
+Own child/children only
+Student
+Auto-created alongside parent record
+Own record only
+Accountant / Librarian / Transport Manager
+Added by Principal
+Scoped to their function, school-wide
+2. Staff Onboarding Flow — Principal First
+When a school is first set up on the platform, only the Principal's account exists. No Teacher, Clerk, or other staff account exists until the Principal creates it.
+	•	Principal logs in (the very first login for that school) and goes to Admin → Staff → Add Teacher / Add Clerk / etc.
+	•	Principal enters the staff member's name, phone number, and role/class assignment (e.g., “Class In-Charge: Grade 5-A”, “Subject Teacher: Science, Grades 6–8”).
+	•	The account is created in an active state immediately — there is no separate “pending activation” step.
+	•	The moment the record is saved, that phone number can request an OTP and log straight into their portal. No waiting period, no email confirmation step, no manual approval queue.
+DECISION NEEDED: Should the Principal be notified/see a log of every staff login for security awareness (e.g., “Teacher X logged in for the first time on [date]”)? Recommended yes, but confirm.
+3. Parent Login Flow — Including Twins & Multiple Children
+3.1 Standard login
+	•	Screen 1: Parent selects their child's Class (dropdown) and enters their phone number, then taps “Send OTP.”
+	•	Screen 2: Parent enters the OTP received by SMS and taps “Verify.”
+	•	On success, the system looks up which student(s) match that phone number + class combination.
+3.2 Resolution logic after OTP verification
+Case
+What happens
+Exactly one student matches the phone number + class selected
+Parent is taken straight into that child's dashboard — no extra screen.
+Twins in the same class, same parent phone number (the special case)
+Two students match the same phone + class. Show a “Select Child” screen with each child's photo, name, and roll number side by side so the parent can tell them apart at a glance — do not rely on name alone.
+Parent has another child in a different class (not the one selected at login)
+That child does not appear at this step, since a specific class was selected. They become available via Switch Account after login (see Section 4), because the system already knows every child linked to that phone number.
+3.3 Why class + phone number, not phone number alone
+Asking for class up front gets a parent with only one child straight to their dashboard in two taps, with no extra selection screen in the common case. The trade-off is that a parent with two children in different classes must pick one class at login and use Switch Account for the other — which is what Section 4 is for.
+4. Switch Account
+A persistent “Switch Account” option (recommended: always visible, e.g., a profile icon or a menu item in the same place on every screen so parents don't have to hunt for it) lets a parent move between children without re-entering their phone number every time.
+Scenario
+OTP required?
+Behavior
+Switching to another child registered under the SAME phone number
+No
+Instant switch — tap the child's name/photo in the Switch Account list, the view changes immediately. The phone number was already verified this session.
+Switching to a child registered under a DIFFERENT phone number (e.g., the other parent/guardian's number)
+Yes
+Treated as a fresh login — enter the new phone number, receive and verify a new OTP.
+The Switch Account screen should show every child linked to the verified phone number as a simple list: photo, name, class — tap to switch. This list is what surfaces the “other class” child from Section 3.2's third case.
+5. Teacher Access — Class In-Charge vs Subject Teacher
+A teacher can be Class In-Charge for exactly one class, and a Subject Teacher in any number of other classes. Access is different in each case — this distinction must be enforced at the permission level, not just hidden in the UI.
+Action
+In own in-charge class
+In other classes (subject teacher only)
+Mark daily attendance
+Yes, full class
+No — daily attendance stays with that class's own in-charge
+Enter marks
+Yes, all subjects she teaches there
+Yes, but only for her own subject
+Post homework
+Yes, all subjects she teaches there
+Yes, but only for her own subject
+Post diary entries
+Yes
+Yes, but only under her own subject heading
+View attendance
+Yes, edit
+Yes, read-only (to know who's present when assigning work)
+View full student profile
+Yes
+No — sees only what's needed for her subject
+Handle leave applications
+Yes
+No
+Message parents
+Yes, any parent in that class
+No — stays with the in-charge teacher
+DECISION NEEDED: Should period-wise attendance (each subject teacher marking presence for her own period) be supported later, in addition to the daily attendance taken by the in-charge teacher? Not required for v1 per this spec, but flag if the school expects it.
+6. Principal — Exclusive Capabilities
+	•	Full read/write access to every class, student, teacher, and record in the school — no exceptions.
+	•	Can perform every action a Clerk can perform (fee collection, receipts, admissions, notices) — Clerk's permissions are a subset of the Principal's, not a separate silo.
+	•	Can view the diary of any class, for any subject, at any time.
+	•	Controls the school's fee structure directly: tuition amounts, transport fee, any other fee heads. The moment the Principal updates a fee amount, the Clerk sees the updated amount immediately — both roles read from the same fee structure record, so there is no separate sync step and no risk of the Clerk working from stale numbers.
+	•	Creates announcements with a mandatory audience selector: “Everyone (parents + students + staff)” or “Staff/Teachers only.” This is not optional at the point of posting — the Principal must explicitly choose before an announcement can be sent, so an internal staff message can never accidentally reach every parent.
+	•	Sees every leave application submitted school-wide (see Section 8), regardless of what the class teacher has decided.
+7. Clerk — Role & Fee Receipts
+The Clerk is the primary day-to-day operator for admissions, fees, and RFID card issuance.
+	•	Fee receipts support a custom, editable amount — not locked to the standard fee structure. This covers partial payments, one-off charges (uniform, damaged book fines, etc.), and part-payments across two visits. The field defaults to the standard due amount but the Clerk can override it for a specific receipt.
+	•	The base fee structure itself (what the “standard amount” is) is controlled by the Principal (Section 6) — the Clerk works against whatever the Principal has set, always current.
+	•	Issues and manages RFID cards for newly admitted students and staff.
+	•	Drafts notices; school-wide publishing may require Principal approval (recommended, matches the “announcement audience” control in Section 6).
+8. Leave Application Workflow
+	•	Parent submits a leave request for their child through the app (date range + reason).
+	•	The request first reaches the Class Teacher (in-charge) for that child's class — she approves or rejects it.
+	•	Regardless of the Class Teacher's decision, the request and its status are also visible in the Principal's account — the Principal always has full visibility into every leave request across the school, even ones already resolved by a teacher.
+DECISION NEEDED: Should the Principal only view leave requests, or also be able to override a Class Teacher's decision? Recommended: Principal can override, matching the “exclusive access” requirement, but confirm this is desired — some schools prefer the class teacher's decision to be final to avoid undermining her authority in front of parents.
+9. Diary — Visibility Rules
+	•	Each subject teacher posts diary entries under her own subject heading.
+	•	Diary entries are visible directly to students of that class (and, by natural extension, to their parents through the same app — confirm if parents should see this or if it is intentionally student-only).
+	•	The Principal can open the diary of any class, across all subjects, at any time — a single combined view, not one screen per subject.
+10. Real-Time Sync Requirements
+Nothing in daily operations should feel delayed. Concretely:
+	•	Attendance marked by a teacher should appear in the Principal's dashboard and trigger the parent's push notification within seconds, not minutes.
+	•	A fee payment recorded by the Clerk should be reflected in the Principal's collection view immediately.
+	•	A fee structure change made by the Principal should be visible to the Clerk on their very next screen load — no manual refresh, no cache delay.
+Technically, this means using push-based updates (e.g., WebSockets) for these specific views rather than the client polling every few minutes, and writing these specific records straight to the database rather than queuing them for batch processing. GPS bus location can tolerate a few seconds of delay — attendance, fees, and announcements should not.
+11. Print Functionality
+A “Print” option should be available consistently across the platform, not just in one or two screens. Specifically confirmed as required:
+	•	Absentee list — printable daily/class-wise list of absent students
+	•	Marks / grade sheets — printable report cards and class mark sheets
+As a general design rule: any screen showing a list, table, or report (fee collection summary, student list, notice history, etc.) should carry the same Print affordance, generating a clean, correctly-paginated printable version rather than printing raw on-screen UI elements (buttons, menus) along with the data.
+12. Teacher Timetable Entry — A Seamless Experience
+The master school timetable is uploaded once by the Clerk/Admin via the Excel template described in the earlier build roadmap — that stays a spreadsheet-based, bulk operation.
+What must be seamless for the teacher is her own personal schedule confirmation/view: rather than any form-filling, this should be a simple visual weekly grid (days across the top, periods down the side) that is pre-filled from the master timetable the moment the Clerk uploads it. The teacher taps a period to see or confirm the class/subject, rather than typing anything in — she is confirming, not re-entering, data that already exists elsewhere in the system.
+13. UI/UX Principles — Designed for a Non-Technical, Low-Literacy Parent Audience
+	•	No passwords for parents — phone number + OTP only, exactly as specified in Section 3.
+	•	Large tap targets and icons paired with short text labels — never icon-only navigation.
+	•	Flat navigation — no more than two menu levels deep to reach any common action (view attendance, pay fees, message teacher).
+	•	Color-coded status everywhere it helps (e.g., green = present/paid, red = absent/due) — color plus text, never color alone, for accessibility.
+	•	Plain-language error and confirmation messages (“That code didn't match — please try again”, not technical error codes).
+	•	Confirmation prompts before irreversible actions (e.g., submitting a leave request, recording a fee payment).
+	•	Regional language toggle on the login screen itself, before any other interaction.
+	•	A short, skippable first-time walkthrough (3–4 screens max) shown only on a parent's very first login.
+14. Extensibility — Adding New Options Later Without a Rebuild
+Since new requirements will keep coming up as the school actually uses the platform, the system should be built so that adding a new option is a configuration change, not a rewrite:
+	•	Roles and permissions should be stored as data (a permissions table) rather than hard-coded in application logic — adding a new role or adjusting what an existing role can do becomes a data update, not a redeploy.
+	•	Each major feature (Diary, Fees, Leave, Announcements, GPS, RFID) should be built as its own module with a clear boundary, so a new feature can be added alongside the others without touching unrelated code.
+	•	Feature flags at the school level allow rolling out a new option to one school first (e.g., the pilot school) before enabling it everywhere.
+15. Open Decisions to Confirm Before Development
+	•	Login notification visibility: should the Principal see a log of staff first-logins? (Section 2)
+	•	Period-wise attendance in addition to daily attendance by the in-charge teacher? (Section 5)
+	•	Can the Principal override a Class Teacher's leave decision, or is the teacher's decision final? (Section 8)
+	•	Should parents see diary entries, or is the diary intentionally student-only? (Section 9)
+	•	Should school-wide notices drafted by the Clerk require Principal approval before publishing? (Section 7)

@@ -1,0 +1,327 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model School {
+  id           String   @id @default(uuid())
+  name         String
+  address      String
+  logoUrl      String?
+  primaryColor String?
+  createdAt    DateTime @default(now())
+
+  users             User[]
+  classes           Class[]
+  students          Student[]
+  feeStructures     FeeStructure[]
+  notices           Notice[]
+  rfidDevices       RfidDevice[]
+  buses             Bus[]
+  documentApprovals DocumentApproval[]
+  Message           Message[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  schoolId     String
+  school       School   @relation(fields: [schoolId], references: [id])
+  role         String // principal, teacher, clerk, parent, student, accountant, librarian, transport_manager
+  name         String
+  phoneNumber  String
+  email        String?
+  passwordHash String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  classesInCharge           Class[]
+  subjectAssignments        TeacherSubjectAssignment[]
+  markedAttendances         Attendance[]
+  homeworksGiven            Homework[]
+  marksGiven                Marks[]
+  feeStructuresUpdated      FeeStructure[]
+  feeReceiptsCollected      FeeReceipt[]
+  noticesPosted             Notice[]
+  diaryEntries              DiaryEntry[]
+  leaveApplicationsReviewed LeaveApplication[]
+  timetables                Timetable[]
+  busDriven                 Bus[]
+  auditLogs                 AuditLog[]
+  sentMessages              Message[]                  @relation("SentMessages")
+  receivedMessages          Message[]                  @relation("ReceivedMessages")
+  parentLinks               ParentStudentLink[]
+  students                  Student[]                  @relation("StudentLogin")
+  submittedDocuments        DocumentApproval[]         @relation("SubmittedDocuments")
+  signedDocuments           DocumentApproval[]         @relation("SignedDocuments")
+}
+
+model Class {
+  id             String @id @default(uuid())
+  schoolId       String
+  school         School @relation(fields: [schoolId], references: [id])
+  name           String
+  classTeacherId String
+  classTeacher   User   @relation(fields: [classTeacherId], references: [id])
+
+  subjectAssignments TeacherSubjectAssignment[]
+  students           Student[]
+  homeworks          Homework[]
+  feeStructures      FeeStructure[]
+  diaryEntries       DiaryEntry[]
+  timetables         Timetable[]
+}
+
+model TeacherSubjectAssignment {
+  id        String @id @default(uuid())
+  teacherId String
+  teacher   User   @relation(fields: [teacherId], references: [id])
+  classId   String
+  class     Class  @relation(fields: [classId], references: [id])
+  subject   String
+}
+
+model Student {
+  id          String    @id @default(uuid())
+  schoolId    String
+  school      School    @relation(fields: [schoolId], references: [id])
+  classId     String
+  class       Class     @relation(fields: [classId], references: [id])
+  userId      String?
+  user        User?     @relation("StudentLogin", fields: [userId], references: [id])
+  name        String
+  rollNumber  String
+  dob         DateTime?
+  photoUrl    String?
+  rfidCardUid String?   @unique
+
+  bloodGroup        String?
+  aadhaar           String?
+  gender            String?
+  emergencyContact  String?
+  medicalConditions String?
+  allergies         String?
+  transportRoute    String?
+  house             String?
+  section           String?
+
+  parentLinks       ParentStudentLink[]
+  attendances       Attendance[]
+  marks             Marks[]
+  feeReceipts       FeeReceipt[]
+  leaveApplications LeaveApplication[]
+  rfidScans         RfidScan[]
+}
+
+model ParentStudentLink {
+  id           String  @id @default(uuid())
+  parentUserId String
+  parent       User    @relation(fields: [parentUserId], references: [id])
+  studentId    String
+  student      Student @relation(fields: [studentId], references: [id])
+  relationship String // father, mother, guardian
+}
+
+model Attendance {
+  id         String   @id @default(uuid())
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id])
+  date       DateTime
+  status     String // present, absent, leave
+  markedById String
+  markedBy   User     @relation(fields: [markedById], references: [id])
+  markedAt   DateTime @default(now())
+  source     String   @default("manual") // manual, rfid
+}
+
+model Homework {
+  id          String   @id @default(uuid())
+  classId     String
+  class       Class    @relation(fields: [classId], references: [id])
+  subject     String
+  teacherId   String
+  teacher     User     @relation(fields: [teacherId], references: [id])
+  description String
+  dueDate     DateTime
+  createdAt   DateTime @default(now())
+}
+
+model Marks {
+  id            String  @id @default(uuid())
+  studentId     String
+  student       Student @relation(fields: [studentId], references: [id])
+  subject       String
+  examName      String
+  marksObtained Float
+  maxMarks      Float
+  teacherId     String
+  teacher       User    @relation(fields: [teacherId], references: [id])
+  term          String?
+}
+
+model FeeStructure {
+  id                String   @id @default(uuid())
+  schoolId          String
+  school            School   @relation(fields: [schoolId], references: [id])
+  feeHead           String
+  amount            Float
+  applicableClassId String?
+  applicableClass   Class?   @relation(fields: [applicableClassId], references: [id])
+  updatedById       String
+  updatedBy         User     @relation(fields: [updatedById], references: [id])
+  updatedAt         DateTime @updatedAt
+}
+
+model FeeReceipt {
+  id             String   @id @default(uuid())
+  studentId      String
+  student        Student  @relation(fields: [studentId], references: [id])
+  feeHead        String
+  amount         Float
+  isCustomAmount Boolean  @default(false)
+  collectedById  String
+  collectedBy    User     @relation(fields: [collectedById], references: [id])
+  paymentMode    String
+  receiptNumber  String
+  createdAt      DateTime @default(now())
+}
+
+model Notice {
+  id         String   @id @default(uuid())
+  schoolId   String
+  school     School   @relation(fields: [schoolId], references: [id])
+  title      String
+  body       String
+  audience   String // all, staff_only
+  postedById String
+  postedBy   User     @relation(fields: [postedById], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model DiaryEntry {
+  id        String   @id @default(uuid())
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id])
+  subject   String
+  teacherId String
+  teacher   User     @relation(fields: [teacherId], references: [id])
+  content   String
+  date      DateTime @default(now())
+}
+
+model LeaveApplication {
+  id           String   @id @default(uuid())
+  studentId    String
+  student      Student  @relation(fields: [studentId], references: [id])
+  fromDate     DateTime
+  toDate       DateTime
+  reason       String
+  status       String   @default("pending") // pending, approved, rejected
+  reviewedById String?
+  reviewedBy   User?    @relation(fields: [reviewedById], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model Timetable {
+  id           String @id @default(uuid())
+  classId      String
+  class        Class  @relation(fields: [classId], references: [id])
+  dayOfWeek    String
+  periodNumber Int
+  subject      String
+  teacherId    String
+  teacher      User   @relation(fields: [teacherId], references: [id])
+}
+
+model RfidDevice {
+  id                  String     @id @default(uuid())
+  schoolId            String
+  school              School     @relation(fields: [schoolId], references: [id])
+  deviceUid           String     @unique
+  locationDescription String
+  lastSyncedAt        DateTime?
+  scans               RfidScan[]
+}
+
+model RfidScan {
+  id        String     @id @default(uuid())
+  deviceId  String
+  device    RfidDevice @relation(fields: [deviceId], references: [id])
+  cardUid   String
+  studentId String?
+  student   Student?   @relation(fields: [studentId], references: [id])
+  scannedAt DateTime
+  syncedAt  DateTime   @default(now())
+}
+
+model Bus {
+  id            String        @id @default(uuid())
+  schoolId      String
+  school        School        @relation(fields: [schoolId], references: [id])
+  vehicleNumber String
+  driverUserId  String
+  driverUser    User          @relation(fields: [driverUserId], references: [id])
+  locations     BusLocation[]
+}
+
+model BusLocation {
+  id         String   @id @default(uuid())
+  busId      String
+  bus        Bus      @relation(fields: [busId], references: [id])
+  latitude   Float
+  longitude  Float
+  recordedAt DateTime @default(now())
+}
+
+model OtpRequest {
+  id          String    @id @default(uuid())
+  phoneNumber String
+  otpCodeHash String
+  purpose     String // login, switch_account
+  expiresAt   DateTime
+  verifiedAt  DateTime?
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  action      String
+  targetTable String?
+  targetId    String?
+  createdAt   DateTime @default(now())
+}
+
+model DocumentApproval {
+  id            String    @id @default(uuid())
+  schoolId      String
+  school        School    @relation(fields: [schoolId], references: [id])
+  title         String
+  content       String
+  status        String    @default("pending") // pending, signed, rejected
+  submittedById String
+  submittedBy   User      @relation("SubmittedDocuments", fields: [submittedById], references: [id])
+  signedById    String?
+  signedBy      User?     @relation("SignedDocuments", fields: [signedById], references: [id])
+  signedAt      DateTime?
+  createdAt     DateTime  @default(now())
+}
+
+model Message {
+  id         String    @id @default(uuid())
+  schoolId   String
+  school     School    @relation(fields: [schoolId], references: [id])
+  senderId   String
+  sender     User      @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User      @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  content    String
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+}

@@ -1,0 +1,7 @@
+
+> backend@1.0.0 start
+> node src/index.js
+
+Server running on port 3001 bound to all interfaces
+[Mock] Sending OTP to 7483292660
+[Mock] Sending OTP to 7483575296

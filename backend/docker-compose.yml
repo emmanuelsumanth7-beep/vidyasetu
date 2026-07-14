@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: vidyasetu
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=${DATABASE_URL:-postgresql://user:password@db:5432/vidyasetu}
+      - JWT_SECRET=${JWT_SECRET:-supersecretjwtkey}
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - api_data:/app/prisma
+
+volumes:
+  api_data:
+  db_data:
