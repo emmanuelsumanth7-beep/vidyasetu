@@ -69,6 +69,7 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}, isForm
       memoryTokenCache = token;
       memoryTokenExpiry = Date.now() + 50 * 60 * 1000; // Cache for 50 minutes (Firebase tokens last 60m)
     }
+    }
   }
   
   // 3. Attach MFA Token if available
