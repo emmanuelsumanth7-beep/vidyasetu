@@ -59,8 +59,10 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}, isForm
   }
   
   // 2. Fallback to real Firebase Auth Token
-  if (!token && auth.currentUser) {
-    if (memoryTokenCache && Date.now() < memoryTokenExpiry) {
+  if (!token) {
+    await auth.authStateReady(); // Wait for Firebase to hydrate from IndexedDB
+    if (auth.currentUser) {
+      if (memoryTokenCache && Date.now() < memoryTokenExpiry) {
       token = memoryTokenCache;
     } else {
       token = await auth.currentUser.getIdToken();
