@@ -39,6 +39,9 @@ export const api = {
   }
 };
 
+let memoryTokenCache: string | null = null;
+let memoryTokenExpiry: number = 0;
+
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   // Try to get the latest Firebase ID Token
   let token = null;
@@ -49,7 +52,13 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   
   // 2. Fallback to real Firebase Auth Token
   if (!token && auth.currentUser) {
-    token = await auth.currentUser.getIdToken();
+    if (memoryTokenCache && Date.now() < memoryTokenExpiry) {
+      token = memoryTokenCache;
+    } else {
+      token = await auth.currentUser.getIdToken();
+      memoryTokenCache = token;
+      memoryTokenExpiry = Date.now() + 50 * 60 * 1000; // Cache for 50 minutes (Firebase tokens last 60m)
+    }
   }
   
   // 3. Attach MFA Token if available
