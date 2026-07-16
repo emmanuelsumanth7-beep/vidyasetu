@@ -20,7 +20,8 @@ router.use('/auth/mfa', authenticate, mfaRouter);
 
 const authorize = (roles = []) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    const uppercaseRoles = roles.map(r => r.toUpperCase());
+    if (!req.user || !uppercaseRoles.includes(req.user.role)) {
       return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
     }
     next();
@@ -201,15 +202,15 @@ router.post('/auth/sync', authenticate, async (req, res) => {
 
   try {
     let user = req.user;
-    const requestedRole = req.body.role || 'parent';
+    const requestedRoleStr = (req.body.role || 'parent').toUpperCase();
+    
+    // Map string to Enum (fallback to PARENT if invalid)
+    const validRoles = ['SUPER_ADMIN', 'PRINCIPAL', 'VICE_PRINCIPAL', 'TEACHER', 'CLERK', 'ACCOUNTANT', 'LIBRARIAN', 'NURSE', 'DRIVER', 'WARDEN', 'PARENT', 'STUDENT', 'ALUMNUS'];
+    const requestedRole = validRoles.includes(requestedRoleStr) ? requestedRoleStr : 'PARENT';
 
-    // If user doesn't exist, we can automatically create a generic parent account for them,
-    // or they have to be pre-registered by the school. 
-    // For this prototype, we'll auto-register them as a parent if they don't exist.
     if (!user) {
       const schoolId = 'fcbde93f-767f-40da-af8f-306caf98676a';
       
-      // Ensure school exists
       let school = await prisma.school.findUnique({ where: { id: schoolId } });
       if (!school) {
         school = await prisma.school.create({
@@ -217,6 +218,7 @@ router.post('/auth/sync', authenticate, async (req, res) => {
         });
       }
 
+      // Create User and the corresponding profile based on role
       user = await prisma.user.create({
         data: {
           name: `New User (${requestedRole})`,
@@ -225,9 +227,27 @@ router.post('/auth/sync', authenticate, async (req, res) => {
           schoolId: school.id
         }
       });
+      
+      // Auto-provision profile based on role
+      if (requestedRole === 'TEACHER') {
+        await prisma.teacherProfile.create({
+          data: { userId: user.id, schoolId: school.id, employeeCode: `T-${Date.now()}`, dateOfJoining: new Date() }
+        });
+      } else if (requestedRole === 'PARENT') {
+        await prisma.parentProfile.create({
+          data: { userId: user.id, schoolId: school.id }
+        });
+      } else if (requestedRole === 'STUDENT') {
+        await prisma.studentProfile.create({
+          data: { userId: user.id, schoolId: school.id, admissionNumber: `S-${Date.now()}`, admissionDate: new Date(), dob: new Date(), gender: 'OTHER' }
+        });
+      } else {
+        await prisma.staffProfile.create({
+          data: { userId: user.id, schoolId: school.id, employeeCode: `E-${Date.now()}`, dateOfJoining: new Date() }
+        });
+      }
     }
     
-    // Log the action
     await prisma.auditLog.create({
       data: {
         userId: user.id,

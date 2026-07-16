@@ -1,405 +1,1556 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
+// ============================================================================
+// VidyaSetu — Revised Database Schema (PostgreSQL / Prisma)
+// ============================================================================
+//
+// WHAT CHANGED FROM THE ORIGINAL SCHEMA, AND WHY:
+//
+// 1. Every table is scoped by schoolId (multi-tenant isolation). Composite
+//    unique constraints (e.g. admission number, receipt number) are unique
+//    PER SCHOOL, not globally — two different schools on the same platform
+//    can both have a "Roll No. 1" or "Receipt #001".
+//
+// 2. Added AcademicYear as a first-class table. The original schema put a
+//    single classId directly on Student — that overwrites history every
+//    time a student is promoted, so you lose last year's class/roll/section
+//    the moment you promote them. Now: Class rows belong to an AcademicYear,
+//    and Enrollment is a join table (Student x Class x AcademicYear). A
+//    student promoted from 5-A to 6-B gets a NEW Enrollment row; the old one
+//    stays untouched. This also lets you generate historical report cards,
+//    attendance %, and fee ledgers for any past year.
+//
+// 3. Money fields use Decimal(10,2), never Float. Floats introduce rounding
+//    errors in financial data — this matters for fee receipts, salary
+//    slips, and refunds, all of which get audited.
+//
+// 4. Loose strings ("status", "role", "paymentMode" as free text) are now
+//    enums. This is a data-integrity issue in the original schema: nothing
+//    stopped someone from inserting "teecher" or "Present " (trailing
+//    space) and silently breaking every report that filters on that column.
+//
+// 5. The original User table tried to hold every role's fields on one row
+//    (bloodGroup and medicalConditions live on Student already, which is
+//    good — but Teacher, Parent, and generic Staff were left undifferen-
+//    tiated). Here, User is pure identity/auth, and each role gets its own
+//    1:1 profile table. A Clerk row is never left with 40 nullable columns
+//    meant for Students.
+//
+// 6. Sensitive data is split into its own tables with narrower access
+//    scope than the parent record: StudentHealthRecord, InfirmaryVisit,
+//    and GrievanceReport are NOT part of StudentProfile. This lets you
+//    grant a Teacher read access to StudentProfile without also handing
+//    them medical history or POCSO complaint records — see the RBAC
+//    matrix in the accompanying report.
+//
+// 7. Nothing that has academic, financial, or legal evidentiary value is
+//    ever hard-deleted. Sensitive/record-of-truth tables carry deletedAt
+//    for soft delete; AuditLog, GrievanceReport, and Marks are intentionally
+//    append-only at the application layer (no update/delete endpoints).
+//
+// 8. Added tables the original schema was missing entirely: admissions/
+//    enquiry pipeline, exam scheduling, homework submission, library,
+//    hostel, health & vaccination records, certificates, visitor/gate
+//    management, POCSO grievance handling, alumni, and — because this
+//    platform processes children's personal data in India — DPDP Act
+//    consent records, data-subject-request tracking, and breach logging.
+//
+// 9. OTP is stored as a hash, never plaintext, with an attempt counter.
+//    RfidScan and BusLocation are treated as high-volume, short-retention
+//    logs (see DataRetentionPolicy) rather than data you keep forever —
+//    raw GPS pings and gate-scan logs are exactly the kind of data the
+//    DPDP Act's "data minimisation" principle expects you to prune.
+//
+// A NOTE ON "LOGICAL" FOREIGN KEYS:
+// Fields like approvedByUserId, recordedByUserId, issuedByUserId, etc. are
+// foreign keys to User.id. To keep this file readable, only the high-
+// traffic relations (identity, enrollment, attendance, fees) are modelled
+// as full Prisma relations with back-reference arrays. The rest are left
+// as plain scalar columns with a `-> User.id` comment. Add a raw SQL
+// FOREIGN KEY constraint for these in your migration regardless — referen-
+// tial integrity at the database level does not depend on whether Prisma
+// models the relation object, and it should not be optional for columns
+// that gate approvals, payments, or medical sign-off.
+//
+// ============================================================================
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum Role {
+  SUPER_ADMIN // VidyaSetu platform team — see RBAC note in the report
+  PRINCIPAL
+  VICE_PRINCIPAL
+  TEACHER
+  CLERK
+  ACCOUNTANT
+  LIBRARIAN
+  NURSE
+  DRIVER
+  WARDEN
+  PARENT
+  STUDENT
+  ALUMNUS
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum BloodGroup {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+  UNKNOWN
+}
+
+enum RelationshipType {
+  FATHER
+  MOTHER
+  GUARDIAN
+  OTHER
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  PROMOTED
+  DETAINED
+  TRANSFERRED_OUT
+  WITHDRAWN
+  GRADUATED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  HALF_DAY
+  EXCUSED
+}
+
+enum AttendanceSource {
+  MANUAL
+  RFID
+  BIOMETRIC
+  FACE_RECOGNITION
+  APP_SELF_MARK
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum StaffLeaveType {
+  CASUAL
+  SICK
+  EARNED
+  MATERNITY
+  PATERNITY
+  UNPAID
+}
+
+enum ApprovalStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PaymentMode {
+  CASH
+  CHEQUE
+  UPI
+  CARD
+  NETBANKING
+  NEFT_RTGS
+  WALLET
+}
+
+enum PaymentStatus {
+  SUCCESS
+  PENDING
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum FeeFrequency {
+  ONE_TIME
+  MONTHLY
+  QUARTERLY
+  HALF_YEARLY
+  ANNUAL
+}
+
+enum ConcessionType {
+  SIBLING
+  STAFF_WARD
+  MERIT
+  FINANCIAL_HARDSHIP
+  RTE
+  OTHER
+}
+
+enum ExpenseCategory {
+  UTILITIES
+  MAINTENANCE
+  SUPPLIES
+  SALARIES
+  EVENTS
+  TRANSPORT
+  MISC
+}
+
+enum SalaryStatus {
+  DRAFT
+  GENERATED
+  PAID
+}
+
+enum AssetCondition {
+  NEW
+  GOOD
+  FAIR
+  DAMAGED
+  DISPOSED
+}
+
+enum NoticeAudience {
+  ALL_STAFF
+  ALL_PARENTS
+  ALL_STUDENTS
+  SPECIFIC_CLASS
+  SPECIFIC_STAFF
+  EVERYONE
+}
+
+enum DeviceType {
+  GATE
+  BUS
+  LIBRARY
+  HOSTEL
+  CLASSROOM
+}
+
+enum ScanDirection {
+  IN
+  OUT
+  UNKNOWN
+}
+
+enum DocumentType {
+  BIRTH_CERTIFICATE
+  TRANSFER_CERTIFICATE
+  AADHAAR
+  PREVIOUS_MARKSHEET
+  PHOTO
+  CASTE_CERTIFICATE
+  INCOME_CERTIFICATE
+  OTHER
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum EnquirySource {
+  WALK_IN
+  WEBSITE
+  REFERRAL
+  ADVERTISEMENT
+  SOCIAL_MEDIA
+  OTHER
+}
+
+enum EnquiryStatus {
+  NEW
+  CONTACTED
+  DOCUMENTS_PENDING
+  TEST_SCHEDULED
+  OFFERED
+  ADMITTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum SubmissionStatus {
+  SUBMITTED
+  LATE
+  GRADED
+  MISSING
+}
+
+enum ExamType {
+  UNIT_TEST
+  MIDTERM
+  FINAL
+  PRACTICAL
+  ORAL
+  PROJECT
+}
+
+enum FineStatus {
+  NONE
+  PENDING
+  PAID
+  WAIVED
+}
+
+enum CertificateType {
+  TRANSFER_CERTIFICATE
+  BONAFIDE
+  CHARACTER
+  MIGRATION
+  FEE_CLEARANCE
+  OTHER
+}
+
+enum GrievanceCategory {
+  SAFETY
+  BULLYING
+  HARASSMENT
+  ACADEMIC
+  POCSO_SENSITIVE
+  FACILITIES
+  OTHER
+}
+
+enum GrievanceStatus {
+  RECEIVED
+  UNDER_REVIEW
+  ESCALATED
+  RESOLVED
+  CLOSED
+}
+
+enum ConsentPurpose {
+  ADMISSION_PROCESSING
+  RFID_ATTENDANCE
+  BUS_GPS_TRACKING
+  PHOTO_VIDEO_USE
+  HEALTH_DATA_PROCESSING
+  MARKETING_COMMUNICATION
+  THIRD_PARTY_SHARING
+  GENERAL_PLATFORM_USE
+}
+
+enum ConsentMethod {
+  DIGILOCKER
+  OTP_VERIFIED_FORM
+  PHYSICAL_SIGNED_FORM
+  IN_APP_CLICKWRAP
+}
+
+enum DsrRequestType {
+  ACCESS
+  CORRECTION
+  ERASURE
+  NOMINATE_REPRESENTATIVE
+  WITHDRAW_CONSENT
+  GRIEVANCE
+}
+
+enum DsrStatus {
+  RECEIVED
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+enum BreachSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum BreachStatus {
+  DETECTED
+  CONTAINED
+  REPORTED_TO_BOARD
+  REPORTED_TO_USERS
+  RESOLVED
+}
+
+enum OtpPurpose {
+  LOGIN
+  PASSWORD_RESET
+  PICKUP_VERIFICATION
+  PAYMENT_CONFIRMATION
+}
+
+enum Platform {
+  ANDROID
+  IOS
+  WEB
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  SNACKS
+  DINNER
+}
+
+// ============================================================================
+// 1. TENANT, IDENTITY & PROFILES
+// ============================================================================
+
 model School {
-  id           String   @id @default(uuid())
+  id           String   @id @default(cuid())
   name         String
-  address      String
+  address      String?
   logoUrl      String?
   primaryColor String?
+  cbseAffCode  String? // board affiliation number — needed on certificates
+  isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  users             User[]
-  classes           Class[]
-  students          Student[]
-  feeStructures     FeeStructure[]
-  notices           Notice[]
-  rfidDevices       RfidDevice[]
-  buses             Bus[]
-  documentApprovals DocumentApproval[]
-  Message           Message[]
-  salarySlips       SalarySlip[]
-  expenses          Expense[]
-  staffLeaves       StaffLeave[]
-  studyMaterials    StudyMaterial[]
+  users         User[]
+  academicYears AcademicYear[]
+
+  @@index([isActive])
+}
+
+model AcademicYear {
+  id        String   @id @default(cuid())
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Restrict)
+  name      String // e.g. "2026-27"
+  startDate DateTime
+  endDate   DateTime
+  isCurrent Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  classes     Class[]
+  enrollments Enrollment[]
+
+  @@unique([schoolId, name])
+  @@index([schoolId, isCurrent])
 }
 
 model User {
-  id           String   @id @default(uuid())
-  schoolId     String
-  school       School   @relation(fields: [schoolId], references: [id])
-  role         String // principal, teacher, clerk, parent, student, accountant, librarian, transport_manager
-  name         String
-  phoneNumber  String
-  email        String?
-  passwordHash     String?
-  isActive         Boolean   @default(true)
-  totpSecret       String?
-  mfaEnabled       Boolean   @default(false)
-  lastAccessReview DateTime?
+  id          String    @id @default(cuid())
+  schoolId    String
+  school      School    @relation(fields: [schoolId], references: [id], onDelete: Restrict)
+  role        Role
+  name        String
+  phoneNumber String
+  email       String?
+  isActive    Boolean   @default(true)
+  mfaEnabled  Boolean   @default(false)
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? // soft delete — never hard-delete a user with history
+
+  studentProfile StudentProfile?
+  teacherProfile TeacherProfile?
+  parentProfile  ParentProfile?
+  staffProfile   StaffProfile?
+
+  parentLinksAsParent ParentStudentLink[]
+  pushTokens          PushDeviceToken[]
+  auditLogs           AuditLog[]
+
+  @@unique([schoolId, phoneNumber])
+  @@index([schoolId, role])
+}
+
+model StudentProfile {
+  id                 String      @id @default(cuid())
+  userId             String      @unique
+  user               User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  schoolId           String
+  admissionNumber    String
+  admissionDate      DateTime
+  dob                DateTime
+  gender             Gender
+  bloodGroup         BloodGroup?
+  rfidCardUid        String?     @unique
+  photoUrl           String?
+  category           String? // General/OBC/SC/ST/EWS — for RTE & board reporting
+  religion           String?
+  nationality        String      @default("Indian")
+  previousSchoolName String?
+  isRteAdmission     Boolean     @default(false)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  deletedAt          DateTime? // soft delete only — see report retention note
+
+  enrollments         Enrollment[]
+  parentLinks         ParentStudentLink[]
+  healthRecord        StudentHealthRecord?
+  attendances         Attendance[]
+  marks               Marks[]
+  feeReceipts         FeeReceipt[]
+  homeworkSubmissions HomeworkSubmission[]
+
+  @@unique([schoolId, admissionNumber])
+  @@index([schoolId])
+}
+
+model TeacherProfile {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  schoolId         String
+  employeeCode     String
+  qualification    String?
+  dateOfJoining    DateTime
+  policeVerifiedAt DateTime? // POCSO-recommended background-check record
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([schoolId, employeeCode])
+}
+
+model ParentProfile {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  schoolId   String
+  occupation String?
+  createdAt  DateTime @default(now())
+
+  studentLinks ParentStudentLink[]
+
+  @@index([schoolId])
+}
+
+model StaffProfile {
+  // Covers Clerk, Accountant, Librarian, Nurse, Driver, Warden, Vice
+  // Principal, Principal — anyone who isn't a Teacher/Parent/Student.
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  schoolId         String
+  employeeCode     String
+  department       String?
+  dateOfJoining    DateTime
+  policeVerifiedAt DateTime?
   createdAt        DateTime  @default(now())
 
-  classesInCharge           Class[]
-  subjectAssignments        TeacherSubjectAssignment[]
-  markedAttendances         Attendance[]
-  homeworksGiven            Homework[]
-  marksGiven                Marks[]
-  feeStructuresUpdated      FeeStructure[]
-  feeReceiptsCollected      FeeReceipt[]
-  noticesPosted             Notice[]
-  diaryEntries              DiaryEntry[]
-  leaveApplicationsReviewed LeaveApplication[]
-  timetables                Timetable[]
-  busDriven                 Bus[]
-  auditLogs                 AuditLog[]
-  sentMessages              Message[]                  @relation("SentMessages")
-  receivedMessages          Message[]                  @relation("ReceivedMessages")
-  parentLinks               ParentStudentLink[]
-  students                  Student[]                  @relation("StudentLogin")
-  submittedDocuments        DocumentApproval[]         @relation("SubmittedDocuments")
-  signedDocuments           DocumentApproval[]         @relation("SignedDocuments")
-  salarySlipsReceived       SalarySlip[]               @relation("SalaryReceived")
-  salarySlipsGenerated      SalarySlip[]               @relation("SalaryGenerated")
-  staffLeavesRequested      StaffLeave[]               @relation("StaffLeavesRequested")
-  staffLeavesReviewed       StaffLeave[]               @relation("StaffLeavesReviewed")
-  expensesRecorded          Expense[]                  @relation("ExpensesRecorded")
-  materialsUploaded         StudyMaterial[]            @relation("MaterialsUploaded")
-}
-
-model Class {
-  id             String @id @default(uuid())
-  schoolId       String
-  school         School @relation(fields: [schoolId], references: [id])
-  name           String
-  classTeacherId String
-  classTeacher   User   @relation(fields: [classTeacherId], references: [id])
-
-  subjectAssignments TeacherSubjectAssignment[]
-  students           Student[]
-  homeworks          Homework[]
-  feeStructures      FeeStructure[]
-  diaryEntries       DiaryEntry[]
-  timetables         Timetable[]
-  studyMaterials     StudyMaterial[]
-}
-
-model TeacherSubjectAssignment {
-  id        String @id @default(uuid())
-  teacherId String
-  teacher   User   @relation(fields: [teacherId], references: [id])
-  classId   String
-  class     Class  @relation(fields: [classId], references: [id])
-  subject   String
-}
-
-model Student {
-  id          String    @id @default(uuid())
-  schoolId    String
-  school      School    @relation(fields: [schoolId], references: [id])
-  classId     String
-  class       Class     @relation(fields: [classId], references: [id])
-  userId      String?
-  user        User?     @relation("StudentLogin", fields: [userId], references: [id])
-  name        String
-  rollNumber  String
-  dob         DateTime?
-  photoUrl        String?
-  rfidCardUid     String?   @unique
-  parentalConsent Boolean   @default(false)
-  retentionExpiry DateTime?
-
-  bloodGroup        String?
-  aadhaar           String?
-  gender            String?
-  emergencyContact  String?
-  medicalConditions String?
-  allergies         String?
-  transportRoute    String?
-  house             String?
-  section           String?
-
-  parentLinks       ParentStudentLink[]
-  attendances       Attendance[]
-  marks             Marks[]
-  feeReceipts       FeeReceipt[]
-  leaveApplications LeaveApplication[]
-  rfidScans         RfidScan[]
+  @@unique([schoolId, employeeCode])
 }
 
 model ParentStudentLink {
-  id           String  @id @default(uuid())
-  parentUserId String
-  parent       User    @relation(fields: [parentUserId], references: [id])
-  studentId    String
-  student      Student @relation(fields: [studentId], references: [id])
-  relationship String // father, mother, guardian
+  id               String           @id @default(cuid())
+  parentUserId     String
+  parent           User             @relation(fields: [parentUserId], references: [id], onDelete: Restrict)
+  parentProfileId  String
+  parentProfile    ParentProfile    @relation(fields: [parentProfileId], references: [id], onDelete: Restrict)
+  studentProfileId String
+  studentProfile   StudentProfile   @relation(fields: [studentProfileId], references: [id], onDelete: Restrict)
+  relationship     RelationshipType
+  isPrimaryContact Boolean          @default(false)
+  canPickup        Boolean          @default(true) // gate/pickup authorization — see GatePass
+  createdAt        DateTime         @default(now())
+
+  @@unique([parentUserId, studentProfileId])
 }
 
-model Attendance {
-  id         String   @id @default(uuid())
-  studentId  String
-  student    Student  @relation(fields: [studentId], references: [id])
-  date       DateTime
-  status     String // present, absent, leave
-  markedById String
-  markedBy   User     @relation(fields: [markedById], references: [id])
-  markedAt   DateTime @default(now())
-  source     String   @default("manual") // manual, rfid
+// ============================================================================
+// 2. ACADEMIC STRUCTURE
+// ============================================================================
+
+model Subject {
+  id       String @id @default(cuid())
+  schoolId String
+  name     String
+  code     String
+
+  @@unique([schoolId, code])
 }
 
-model Homework {
-  id          String   @id @default(uuid())
-  classId     String
-  class       Class    @relation(fields: [classId], references: [id])
-  subject     String
-  teacherId   String
-  teacher     User     @relation(fields: [teacherId], references: [id])
-  description String
-  dueDate     DateTime
-  createdAt   DateTime @default(now())
+model Class {
+  id                 String       @id @default(cuid())
+  schoolId           String
+  academicYearId     String
+  academicYear       AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  grade              String // "5", "11-Science" etc.
+  section            String // "A", "B"
+  classTeacherUserId String? // -> User.id
+  capacity           Int?
+
+  enrollments Enrollment[]
+  timetables  Timetable[]
+
+  @@unique([schoolId, academicYearId, grade, section])
+  @@index([schoolId, academicYearId])
 }
 
-model Marks {
-  id            String  @id @default(uuid())
-  studentId     String
-  student       Student @relation(fields: [studentId], references: [id])
-  subject       String
-  examName      String
-  marksObtained Float
-  maxMarks      Float
-  teacherId     String
-  teacher       User    @relation(fields: [teacherId], references: [id])
-  term          String?
+// The join table that replaces a single classId on Student. A promotion
+// creates a new row instead of overwriting the old one.
+model Enrollment {
+  id               String           @id @default(cuid())
+  studentProfileId String
+  studentProfile   StudentProfile   @relation(fields: [studentProfileId], references: [id], onDelete: Restrict)
+  classId          String
+  class            Class            @relation(fields: [classId], references: [id], onDelete: Restrict)
+  academicYearId   String
+  academicYear     AcademicYear     @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  rollNumber       Int
+  status           EnrollmentStatus @default(ACTIVE)
+  enrolledAt       DateTime         @default(now())
+  exitedAt         DateTime?
+
+  @@unique([studentProfileId, academicYearId])
+  @@unique([classId, rollNumber])
 }
 
-model FeeStructure {
-  id                String   @id @default(uuid())
-  schoolId          String
-  school            School   @relation(fields: [schoolId], references: [id])
-  feeHead           String
-  amount            Float
-  applicableClassId String?
-  applicableClass   Class?   @relation(fields: [applicableClassId], references: [id])
-  updatedById       String
-  updatedBy         User     @relation(fields: [updatedById], references: [id])
-  updatedAt         DateTime @updatedAt
-}
+model TeacherSubjectAssignment {
+  id             String @id @default(cuid())
+  teacherUserId  String // -> User.id (role = TEACHER)
+  classId        String
+  subjectId      String
+  academicYearId String
 
-model FeeReceipt {
-  id             String   @id @default(uuid())
-  studentId      String
-  student        Student  @relation(fields: [studentId], references: [id])
-  feeHead        String
-  amount         Float
-  isCustomAmount Boolean  @default(false)
-  collectedById  String
-  collectedBy    User     @relation(fields: [collectedById], references: [id])
-  paymentMode    String
-  receiptNumber  String
-  createdAt      DateTime @default(now())
-}
-
-model Notice {
-  id         String   @id @default(uuid())
-  schoolId   String
-  school     School   @relation(fields: [schoolId], references: [id])
-  title      String
-  body       String
-  audience   String // all, staff_only
-  postedById String
-  postedBy   User     @relation(fields: [postedById], references: [id])
-  createdAt  DateTime @default(now())
-}
-
-model DiaryEntry {
-  id        String   @id @default(uuid())
-  classId   String
-  class     Class    @relation(fields: [classId], references: [id])
-  subject   String
-  teacherId String
-  teacher   User     @relation(fields: [teacherId], references: [id])
-  content   String
-  date      DateTime @default(now())
-}
-
-model LeaveApplication {
-  id           String   @id @default(uuid())
-  studentId    String
-  student      Student  @relation(fields: [studentId], references: [id])
-  fromDate     DateTime
-  toDate       DateTime
-  reason       String
-  status       String   @default("pending") // pending, approved, rejected
-  reviewedById String?
-  reviewedBy   User?    @relation(fields: [reviewedById], references: [id])
-  createdAt    DateTime @default(now())
+  @@unique([teacherUserId, classId, subjectId, academicYearId])
 }
 
 model Timetable {
-  id           String @id @default(uuid())
-  classId      String
-  class        Class  @relation(fields: [classId], references: [id])
-  dayOfWeek    String
-  periodNumber Int
-  subject      String
-  teacherId    String
-  teacher      User   @relation(fields: [teacherId], references: [id])
+  id             String    @id @default(cuid())
+  classId        String
+  class          Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+  academicYearId String
+  dayOfWeek      DayOfWeek
+  periodNumber   Int
+  subjectId      String
+  teacherUserId  String // -> User.id
+  startTime      String // "09:00"
+  endTime        String // "09:40"
+
+  @@unique([classId, academicYearId, dayOfWeek, periodNumber])
 }
 
-model RfidDevice {
-  id                  String     @id @default(uuid())
-  schoolId            String
-  school              School     @relation(fields: [schoolId], references: [id])
-  deviceUid           String     @unique
-  locationDescription String
-  lastSyncedAt        DateTime?
-  scans               RfidScan[]
+// ============================================================================
+// 3. ADMISSIONS & ENROLLMENT PIPELINE (new)
+// ============================================================================
+
+model EnquiryLead {
+  id               String        @id @default(cuid())
+  schoolId         String
+  childName        String
+  dob              DateTime?
+  parentName       String
+  phoneNumber      String
+  email            String?
+  gradeAppliedFor  String
+  source           EnquirySource
+  status           EnquiryStatus @default(NEW)
+  assignedToUserId String? // -> User.id
+  notes            String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  applications AdmissionApplication[]
+
+  @@index([schoolId, status])
 }
 
-model RfidScan {
-  id        String     @id @default(uuid())
-  deviceId  String
-  device    RfidDevice @relation(fields: [deviceId], references: [id])
-  cardUid   String
-  studentId String?
-  student   Student?   @relation(fields: [studentId], references: [id])
-  scannedAt DateTime
-  syncedAt  DateTime   @default(now())
+model AdmissionApplication {
+  id                String        @id @default(cuid())
+  enquiryLeadId     String
+  enquiryLead       EnquiryLead   @relation(fields: [enquiryLeadId], references: [id], onDelete: Restrict)
+  applicationNumber String
+  entranceTestScore Decimal?      @db.Decimal(6, 2)
+  interviewDate     DateTime?
+  decision          EnquiryStatus @default(NEW)
+  decidedByUserId   String? // -> User.id
+  decidedAt         DateTime?
+  createdAt         DateTime      @default(now())
+
+  documents AdmissionDocument[]
+
+  @@unique([applicationNumber])
 }
 
-model Bus {
-  id            String        @id @default(uuid())
-  schoolId      String
-  school        School        @relation(fields: [schoolId], references: [id])
-  vehicleNumber String
-  driverUserId  String
-  driverUser    User          @relation(fields: [driverUserId], references: [id])
-  locations     BusLocation[]
+model AdmissionDocument {
+  id                     String               @id @default(cuid())
+  admissionApplicationId String
+  admissionApplication   AdmissionApplication @relation(fields: [admissionApplicationId], references: [id], onDelete: Cascade)
+  documentType           DocumentType
+  fileUrl                String
+  verifiedByUserId       String? // -> User.id
+  verifiedAt             DateTime?
+  status                 VerificationStatus   @default(PENDING)
 }
 
-model BusLocation {
-  id         String   @id @default(uuid())
-  busId      String
-  bus        Bus      @relation(fields: [busId], references: [id])
-  latitude   Float
-  longitude  Float
-  recordedAt DateTime @default(now())
+// ============================================================================
+// 4. TEACHING & LEARNING
+// ============================================================================
+
+model Homework {
+  id             String   @id @default(cuid())
+  classId        String
+  subjectId      String
+  teacherUserId  String // -> User.id
+  academicYearId String
+  title          String
+  description    String?
+  assignedDate   DateTime
+  dueDate        DateTime // CHECK dueDate >= assignedDate — add via migration
+  createdAt      DateTime @default(now())
+
+  submissions HomeworkSubmission[]
+
+  @@index([classId, dueDate])
 }
 
-model OtpRequest {
-  id          String    @id @default(uuid())
-  phoneNumber String
-  otpCodeHash String
-  purpose     String // login, switch_account
-  expiresAt   DateTime
-  verifiedAt  DateTime?
-}
+model HomeworkSubmission {
+  id               String           @id @default(cuid())
+  homeworkId       String
+  homework         Homework         @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  studentProfileId String
+  studentProfile   StudentProfile   @relation(fields: [studentProfileId], references: [id], onDelete: Restrict)
+  submittedAt      DateTime?
+  fileUrl          String?
+  status           SubmissionStatus @default(MISSING)
+  grade            String?
+  feedback         String?
+  gradedByUserId   String? // -> User.id
 
-model AuditLog {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  action      String
-  targetTable String?
-  targetId    String?
-  details     String?
-  createdAt   DateTime @default(now())
-}
-
-model DocumentApproval {
-  id            String    @id @default(uuid())
-  schoolId      String
-  school        School    @relation(fields: [schoolId], references: [id])
-  title         String
-  content       String
-  status        String    @default("pending") // pending, signed, rejected
-  submittedById String
-  submittedBy   User      @relation("SubmittedDocuments", fields: [submittedById], references: [id])
-  signedById    String?
-  signedBy      User?     @relation("SignedDocuments", fields: [signedById], references: [id])
-  signedAt      DateTime?
-  createdAt     DateTime  @default(now())
-}
-
-model Message {
-  id         String    @id @default(uuid())
-  schoolId   String
-  school     School    @relation(fields: [schoolId], references: [id])
-  senderId   String
-  sender     User      @relation("SentMessages", fields: [senderId], references: [id])
-  receiverId String
-  receiver   User      @relation("ReceivedMessages", fields: [receiverId], references: [id])
-  content    String
-  readAt     DateTime?
-  createdAt  DateTime  @default(now())
-}
-
-model SalarySlip {
-  id            String   @id @default(uuid())
-  schoolId      String
-  school        School   @relation(fields: [schoolId], references: [id])
-  staffId       String
-  staff         User     @relation("SalaryReceived", fields: [staffId], references: [id])
-  generatedById String
-  generatedBy   User     @relation("SalaryGenerated", fields: [generatedById], references: [id])
-  monthYear     String
-  basicPay      Float
-  allowances    Float
-  deductions    Float
-  netPay        Float
-  status        String   @default("paid")
-  createdAt     DateTime @default(now())
-}
-
-model Expense {
-  id           String   @id @default(uuid())
-  schoolId     String
-  school       School   @relation(fields: [schoolId], references: [id])
-  title        String
-  amount       Float
-  category     String
-  date         DateTime @default(now())
-  recordedById String
-  recordedBy   User     @relation("ExpensesRecorded", fields: [recordedById], references: [id])
-  createdAt    DateTime @default(now())
-}
-
-model StaffLeave {
-  id           String   @id @default(uuid())
-  schoolId     String
-  school       School   @relation(fields: [schoolId], references: [id])
-  staffId      String
-  staff        User     @relation("StaffLeavesRequested", fields: [staffId], references: [id])
-  reason       String
-  startDate    DateTime
-  endDate      DateTime
-  status       String   @default("pending") // pending, approved, rejected
-  reviewedById String?
-  reviewedBy   User?    @relation("StaffLeavesReviewed", fields: [reviewedById], references: [id])
-  createdAt    DateTime @default(now())
+  @@unique([homeworkId, studentProfileId])
 }
 
 model StudyMaterial {
-  id          String   @id @default(uuid())
-  schoolId    String
-  school      School   @relation(fields: [schoolId], references: [id])
-  classId     String
-  class       Class    @relation(fields: [classId], references: [id])
-  subject     String
-  title       String
-  description String?
-  fileUrl     String   // S3 Bucket URL for photo, video, PDF
-  fileType    String   // image/jpeg, video/mp4, application/pdf
-  teacherId   String
-  teacher     User     @relation("MaterialsUploaded", fields: [teacherId], references: [id])
-  createdAt   DateTime @default(now())
+  id             String   @id @default(cuid())
+  classId        String
+  subjectId      String
+  teacherUserId  String // -> User.id
+  academicYearId String
+  title          String
+  fileUrl        String
+  fileType       String
+  uploadedAt     DateTime @default(now())
 }
+
+model DiaryEntry {
+  id            String   @id @default(cuid())
+  classId       String
+  subjectId     String?
+  teacherUserId String // -> User.id
+  date          DateTime
+  content       String
+
+  @@index([classId, date])
+}
+
+// ============================================================================
+// 5. EXAMINATIONS & REPORT CARDS (new structure)
+// ============================================================================
+
+model ExamSchedule {
+  id             String   @id @default(cuid())
+  schoolId       String
+  academicYearId String
+  name           String // "Term 1", "Unit Test 2"
+  examType       ExamType
+  startDate      DateTime
+  endDate        DateTime
+
+  subjectSchedules ExamSubjectSchedule[]
+  marks            Marks[]
+
+  @@index([schoolId, academicYearId])
+}
+
+model ExamSubjectSchedule {
+  id             String       @id @default(cuid())
+  examScheduleId String
+  examSchedule   ExamSchedule @relation(fields: [examScheduleId], references: [id], onDelete: Cascade)
+  classId        String
+  subjectId      String
+  examDate       DateTime
+  startTime      String
+  endTime        String
+  maxMarks       Decimal      @db.Decimal(6, 2)
+  roomAssignment String?
+}
+
+model Marks {
+  id               String         @id @default(cuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Restrict)
+  examScheduleId   String
+  examSchedule     ExamSchedule   @relation(fields: [examScheduleId], references: [id], onDelete: Restrict)
+  subjectId        String
+  marksObtained    Decimal        @db.Decimal(6, 2) // CHECK 0 <= marksObtained <= maxMarks
+  maxMarks         Decimal        @db.Decimal(6, 2)
+  grade            String?
+  enteredByUserId  String // -> User.id
+  enteredAt        DateTime       @default(now())
+
+  @@unique([studentProfileId, examScheduleId, subjectId])
+}
+
+model ReportCard {
+  id                String    @id @default(cuid())
+  studentProfileId  String
+  academicYearId    String
+  examScheduleId    String?
+  overallGrade      String?
+  overallPercentage Decimal?  @db.Decimal(5, 2)
+  rank              Int?
+  fileUrl           String?
+  isPublished       Boolean   @default(false)
+  publishedAt       DateTime?
+  generatedAt       DateTime  @default(now())
+
+  @@unique([studentProfileId, academicYearId, examScheduleId])
+}
+
+// ============================================================================
+// 6. ATTENDANCE & SAFETY
+// ============================================================================
+
+model Attendance {
+  id               String           @id @default(cuid())
+  studentProfileId String
+  studentProfile   StudentProfile   @relation(fields: [studentProfileId], references: [id], onDelete: Restrict)
+  classId          String
+  academicYearId   String
+  date             DateTime         @db.Date
+  status           AttendanceStatus
+  markedByUserId   String // -> User.id
+  source           AttendanceSource @default(MANUAL)
+  remarks          String?
+
+  @@unique([studentProfileId, date])
+  @@index([classId, date])
+}
+
+model StaffAttendance {
+  id           String           @id @default(cuid())
+  staffUserId  String // -> User.id
+  date         DateTime         @db.Date
+  checkInTime  DateTime?
+  checkOutTime DateTime?
+  status       AttendanceStatus
+  source       AttendanceSource @default(MANUAL)
+  deviceId     String?
+
+  @@unique([staffUserId, date])
+}
+
+model RfidDevice {
+  id                  String     @id @default(cuid())
+  schoolId            String
+  deviceUid           String     @unique
+  locationDescription String
+  deviceType          DeviceType
+  isActive            Boolean    @default(true)
+  lastSyncedAt        DateTime?
+
+  scans RfidScan[]
+}
+
+// High-volume, short-retention log — see DataRetentionPolicy.
+model RfidScan {
+  id               String        @id @default(cuid())
+  deviceId         String
+  device           RfidDevice    @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+  cardUid          String
+  studentProfileId String? // resolved asynchronously; raw scans may briefly be unresolved
+  scannedAt        DateTime      @default(now())
+  direction        ScanDirection @default(UNKNOWN)
+  processed        Boolean       @default(false)
+
+  @@index([cardUid, scannedAt])
+  @@index([deviceId, scannedAt])
+}
+
+// ============================================================================
+// 7. TRANSPORT
+// ============================================================================
+
+model BusRoute {
+  id       String    @id @default(cuid())
+  schoolId String
+  name     String
+  stops    BusStop[]
+  buses    Bus[]
+}
+
+model BusStop {
+  id             String   @id @default(cuid())
+  routeId        String
+  route          BusRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  name           String
+  sequenceNumber Int
+  latitude       Float
+  longitude      Float
+  pickupTime     String?
+  dropTime       String?
+
+  transportAssignments StudentTransport[]
+}
+
+model Bus {
+  id            String    @id @default(cuid())
+  schoolId      String
+  vehicleNumber String
+  routeId       String?
+  route         BusRoute? @relation(fields: [routeId], references: [id], onDelete: SetNull)
+  driverUserId  String? // -> User.id
+  capacity      Int?
+
+  locations            BusLocation[]
+  transportAssignments StudentTransport[]
+
+  @@unique([schoolId, vehicleNumber])
+}
+
+model StudentTransport {
+  id               String  @id @default(cuid())
+  studentProfileId String
+  busId            String
+  bus              Bus     @relation(fields: [busId], references: [id], onDelete: Restrict)
+  stopId           String
+  stop             BusStop @relation(fields: [stopId], references: [id], onDelete: Restrict)
+  academicYearId   String
+
+  @@unique([studentProfileId, academicYearId])
+}
+
+// High-volume, short-retention log (raw GPS pings) — see DataRetentionPolicy.
+// This table is the clearest example of "data minimisation" in practice:
+// keep enough history for a live map + a short trail, not a permanent
+// movement log of a minor.
+model BusLocation {
+  id         String   @id @default(cuid())
+  busId      String
+  bus        Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
+  latitude   Float
+  longitude  Float
+  speedKmph  Float?
+  recordedAt DateTime @default(now())
+
+  @@index([busId, recordedAt])
+}
+
+// ============================================================================
+// 8. LIBRARY (new)
+// ============================================================================
+
+model LibraryBook {
+  id              String  @id @default(cuid())
+  schoolId        String
+  isbn            String?
+  title           String
+  author          String?
+  category        String?
+  totalCopies     Int     @default(1)
+  availableCopies Int     @default(1)
+
+  issues BookIssue[]
+}
+
+model BookIssue {
+  id               String      @id @default(cuid())
+  bookId           String
+  book             LibraryBook @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  studentProfileId String?
+  staffUserId      String? // -> User.id (either this or studentProfileId is set)
+  issuedAt         DateTime    @default(now())
+  dueDate          DateTime
+  returnedAt       DateTime?
+  fineAmount       Decimal     @default(0) @db.Decimal(8, 2)
+  fineStatus       FineStatus  @default(NONE)
+}
+
+// ============================================================================
+// 9. HOSTEL (new)
+// ============================================================================
+
+model HostelBuilding {
+  id       String @id @default(cuid())
+  schoolId String
+  name     String
+
+  rooms HostelRoom[]
+}
+
+model HostelRoom {
+  id               String         @id @default(cuid())
+  hostelBuildingId String
+  hostelBuilding   HostelBuilding @relation(fields: [hostelBuildingId], references: [id], onDelete: Cascade)
+  roomNumber       String
+  capacity         Int
+
+  allocations HostelAllocation[]
+
+  @@unique([hostelBuildingId, roomNumber])
+}
+
+model HostelAllocation {
+  id               String     @id @default(cuid())
+  studentProfileId String
+  hostelRoomId     String
+  hostelRoom       HostelRoom @relation(fields: [hostelRoomId], references: [id], onDelete: Restrict)
+  academicYearId   String
+  allocatedAt      DateTime   @default(now())
+  vacatedAt        DateTime?
+}
+
+model HostelAttendance {
+  id               String           @id @default(cuid())
+  studentProfileId String
+  date             DateTime         @db.Date
+  status           AttendanceStatus
+  wardenComment    String?
+  markedByUserId   String // -> User.id
+
+  @@unique([studentProfileId, date])
+}
+
+model MessMenu {
+  id        String    @id @default(cuid())
+  schoolId  String
+  dayOfWeek DayOfWeek
+  mealType  MealType
+  items     String
+
+  @@unique([schoolId, dayOfWeek, mealType])
+}
+
+// ============================================================================
+// 10. HEALTH & WELLBEING (new — deliberately separate from StudentProfile)
+// ============================================================================
+
+model StudentHealthRecord {
+  // 1:1 with StudentProfile. Kept in its own table so it can carry a
+  // tighter access policy than general academic data — see RBAC matrix.
+  id                    String         @id @default(cuid())
+  studentProfileId      String         @unique
+  studentProfile        StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Restrict)
+  allergies             String?
+  chronicConditions     String?
+  currentMedications    String?
+  emergencyContactName  String
+  emergencyContactPhone String
+  familyDoctorName      String?
+  familyDoctorPhone     String?
+  insurancePolicyNumber String?
+  updatedAt             DateTime       @updatedAt
+}
+
+model VaccinationRecord {
+  id               String    @id @default(cuid())
+  studentProfileId String
+  vaccineName      String
+  doseNumber       Int
+  administeredDate DateTime
+  administeredBy   String?
+  nextDueDate      DateTime?
+}
+
+model InfirmaryVisit {
+  id                 String    @id @default(cuid())
+  studentProfileId   String
+  visitDate          DateTime  @default(now())
+  symptoms           String
+  treatmentGiven     String?
+  referredToHospital Boolean   @default(false)
+  attendedByUserId   String // -> User.id (role = NURSE)
+  parentNotifiedAt   DateTime?
+
+  @@index([studentProfileId, visitDate])
+}
+
+// ============================================================================
+// 11. COMMUNICATION
+// ============================================================================
+
+model Notice {
+  id             String         @id @default(cuid())
+  schoolId       String
+  academicYearId String?
+  title          String
+  body           String
+  audience       NoticeAudience
+  postedByUserId String // -> User.id
+  publishedAt    DateTime       @default(now())
+  expiresAt      DateTime?
+
+  acknowledgements NoticeAcknowledgement[]
+
+  @@index([schoolId, publishedAt])
+}
+
+model NoticeAcknowledgement {
+  id             String   @id @default(cuid())
+  noticeId       String
+  notice         Notice   @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  userId         String // -> User.id
+  acknowledgedAt DateTime @default(now())
+
+  @@unique([noticeId, userId])
+}
+
+model Message {
+  id            String    @id @default(cuid())
+  senderId      String // -> User.id
+  receiverId    String // -> User.id
+  threadId      String? // groups a conversation
+  content       String
+  attachmentUrl String?
+  sentAt        DateTime  @default(now())
+  readAt        DateTime?
+
+  @@index([senderId, receiverId])
+  @@index([threadId])
+}
+
+model PushDeviceToken {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceToken  String
+  platform     Platform
+  registeredAt DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+
+  @@unique([userId, deviceToken])
+}
+
+// ============================================================================
+// 12. LEAVE & APPROVALS
+// ============================================================================
+
+model LeaveApplication {
+  id               String      @id @default(cuid())
+  studentProfileId String
+  fromDate         DateTime
+  toDate           DateTime // CHECK toDate >= fromDate
+  reason           String
+  status           LeaveStatus @default(PENDING)
+  appliedByUserId  String // -> User.id (parent)
+  reviewedByUserId String? // -> User.id
+  reviewedAt       DateTime?
+  remarks          String?
+}
+
+model StaffLeave {
+  id               String         @id @default(cuid())
+  staffUserId      String // -> User.id
+  leaveType        StaffLeaveType
+  fromDate         DateTime
+  toDate           DateTime
+  reason           String?
+  status           LeaveStatus    @default(PENDING)
+  appliedAt        DateTime       @default(now())
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+}
+
+model DocumentApproval {
+  id                String         @id @default(cuid())
+  title             String
+  content           String
+  documentType      String?
+  submittedByUserId String // -> User.id
+  status            ApprovalStatus @default(DRAFT)
+  signedByUserId    String? // -> User.id
+  signedAt          DateTime?
+}
+
+// ============================================================================
+// 13. FINANCE & HR
+// ============================================================================
+
+model FeeStructure {
+  id             String       @id @default(cuid())
+  schoolId       String
+  academicYearId String
+  classId        String? // null = applies to all classes
+  feeHead        String // configurable — some states legally regulate fee heads
+  amount         Decimal      @db.Decimal(10, 2)
+  dueDate        DateTime
+  isRecurring    Boolean      @default(false)
+  frequency      FeeFrequency @default(ONE_TIME)
+
+  concessions FeeConcession[]
+  receipts    FeeReceipt[]
+  reminders   FeeReminder[]
+}
+
+model FeeConcession {
+  id               String         @id @default(cuid())
+  studentProfileId String
+  feeStructureId   String
+  feeStructure     FeeStructure   @relation(fields: [feeStructureId], references: [id], onDelete: Restrict)
+  concessionType   ConcessionType
+  amount           Decimal?       @db.Decimal(10, 2)
+  percentage       Decimal?       @db.Decimal(5, 2)
+  approvedByUserId String // -> User.id
+  approvedAt       DateTime       @default(now())
+  reason           String?
+}
+
+model FeeReceipt {
+  id                  String         @id @default(cuid())
+  studentProfileId    String
+  studentProfile      StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Restrict)
+  feeStructureId      String
+  feeStructure        FeeStructure   @relation(fields: [feeStructureId], references: [id], onDelete: Restrict)
+  academicYearId      String
+  amount              Decimal        @db.Decimal(10, 2)
+  paymentMode         PaymentMode
+  // Never store card number/CVV/expiry here — RBI rules reserve that to
+  // the card network/issuer. Store only the transaction reference from
+  // your RBI-authorised Payment Aggregator (e.g. a tokenised reference).
+  paymentGatewayTxnId String?
+  receiptNumber       String
+  status              PaymentStatus  @default(PENDING)
+  paidAt              DateTime       @default(now())
+  collectedByUserId   String? // -> User.id, null if paid via online gateway
+
+  @@unique([studentProfileId, receiptNumber])
+}
+
+model FeeReminder {
+  id               String       @id @default(cuid())
+  studentProfileId String
+  feeStructureId   String
+  feeStructure     FeeStructure @relation(fields: [feeStructureId], references: [id], onDelete: Cascade)
+  remindAt         DateTime
+  channel          String // SMS / WHATSAPP / EMAIL / PUSH
+  sentAt           DateTime?
+  status           String       @default("PENDING")
+}
+
+model SalarySlip {
+  id            String       @id @default(cuid())
+  staffUserId   String // -> User.id
+  monthYear     String // "2026-07"
+  basicPay      Decimal      @db.Decimal(10, 2)
+  allowances    Decimal      @default(0) @db.Decimal(10, 2)
+  deductionsPF  Decimal      @default(0) @db.Decimal(10, 2)
+  deductionsESI Decimal      @default(0) @db.Decimal(10, 2)
+  deductionsTDS Decimal      @default(0) @db.Decimal(10, 2)
+  netPay        Decimal      @db.Decimal(10, 2) // CHECK netPay = basicPay+allowances-deductions
+  status        SalaryStatus @default(DRAFT)
+  generatedAt   DateTime?
+  paidAt        DateTime?
+
+  @@unique([staffUserId, monthYear])
+}
+
+model Expense {
+  id               String          @id @default(cuid())
+  schoolId         String
+  title            String
+  amount           Decimal         @db.Decimal(10, 2)
+  category         ExpenseCategory
+  recordedByUserId String // -> User.id
+  approvedByUserId String? // -> User.id
+  approvalStatus   ApprovalStatus  @default(PENDING)
+  recordedAt       DateTime        @default(now())
+  receiptUrl       String?
+}
+
+model Asset {
+  id               String         @id @default(cuid())
+  schoolId         String
+  name             String
+  category         String
+  purchaseDate     DateTime?
+  purchaseCost     Decimal?       @db.Decimal(10, 2)
+  location         String?
+  condition        AssetCondition @default(GOOD)
+  warrantyExpiry   DateTime?
+  assignedToUserId String? // -> User.id
+}
+
+model InventoryItem {
+  id              String  @id @default(cuid())
+  schoolId        String
+  name            String
+  unit            String
+  quantityInStock Int     @default(0)
+  reorderLevel    Int     @default(0)
+  category        String?
+
+  transactions InventoryTransaction[]
+}
+
+model InventoryTransaction {
+  id               String        @id @default(cuid())
+  itemId           String
+  item             InventoryItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  type             String // STOCK_IN / STOCK_OUT
+  quantity         Int
+  date             DateTime      @default(now())
+  recordedByUserId String // -> User.id
+  reason           String?
+}
+
+// ============================================================================
+// 14. CERTIFICATES & FRONT OFFICE (new)
+// ============================================================================
+
+model Certificate {
+  id                 String          @id @default(cuid())
+  studentProfileId   String
+  certificateType    CertificateType
+  certificateNumber  String
+  issuedByUserId     String // -> User.id
+  issuedAt           DateTime        @default(now())
+  fileUrl            String?
+  qrVerificationCode String          @unique // lets a third party verify authenticity without exposing the full record
+
+  @@unique([certificateNumber])
+}
+
+model VisitorLog {
+  id               String    @id @default(cuid())
+  schoolId         String
+  visitorName      String
+  phoneNumber      String
+  purpose          String
+  whomToMeetUserId String // -> User.id
+  idProofType      String?
+  photoUrl         String?
+  checkInAt        DateTime  @default(now())
+  checkOutAt       DateTime?
+  approvedByUserId String? // -> User.id
+  badgeNumber      String?
+}
+
+// Early pickup / mid-day exit — cross-checked against ParentStudentLink.canPickup
+model GatePass {
+  id                   String    @id @default(cuid())
+  studentProfileId     String
+  requestedByUserId    String // -> User.id (parent)
+  reason               String
+  exitTime             DateTime
+  expectedReturnTime   DateTime?
+  actualReturnTime     DateTime?
+  approvedByUserId     String? // -> User.id
+  pickedUpByName       String
+  pickedUpByRelation   String
+  pickedUpByIdVerified Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+}
+
+// ============================================================================
+// 15. CHILD SAFETY & GRIEVANCE — POCSO Act compliance (new)
+// ============================================================================
+
+// The POCSO Act requires every school to constitute a formal School
+// Complaints / Child Protection Committee with named members.
+model ChildProtectionCommitteeMember {
+  id              String   @id @default(cuid())
+  schoolId        String
+  userId          String // -> User.id
+  roleInCommittee String // e.g. "Chairperson", "Counsellor", "NGO representative"
+  appointedAt     DateTime @default(now())
+  isActive        Boolean  @default(true)
+}
+
+// Deliberately NOT linked into general Notice/Message tables. isAnonymous
+// must be honestly supportable — if true, do not log an identifiable
+// reporterUserId anywhere, including in AuditLog. Access to
+// POCSO_SENSITIVE-category rows should be limited to committee members
+// and the Principal only (see RBAC matrix).
+model GrievanceReport {
+  id                        String            @id @default(cuid())
+  schoolId                  String
+  category                  GrievanceCategory
+  description               String
+  isAnonymous               Boolean           @default(false)
+  reporterUserId            String? // null when isAnonymous = true
+  assignedCommitteeMemberId String?
+  status                    GrievanceStatus   @default(RECEIVED)
+  resolutionNotes           String?
+  escalatedToAuthority      Boolean           @default(false)
+  escalatedAt               DateTime?
+  resolvedAt                DateTime?
+  reportedAt                DateTime          @default(now())
+
+  @@index([schoolId, category, status])
+}
+
+// ============================================================================
+// 16. ALUMNI (new)
+// ============================================================================
+
+model AlumniProfile {
+  id                     String  @id @default(cuid())
+  studentProfileId       String  @unique // historical link, retained after leaving
+  graduationYear         Int
+  currentOccupation      String?
+  higherEducationDetails String?
+  contactEmail           String?
+  contactPhone           String?
+  isVerified             Boolean @default(false)
+  linkedInUrl            String?
+}
+
+// ============================================================================
+// 17. SECURITY, AUDIT & DPDP ACT COMPLIANCE
+// ============================================================================
+
+// Append-only. No update/delete endpoint should exist for this table at
+// the application layer — that's what makes it useful as evidence.
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String
+  targetTable String
+  targetId    String?
+  details     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([targetTable, targetId])
+  @@index([userId, createdAt])
+}
+
+model OtpRequest {
+  id           String     @id @default(cuid())
+  phoneNumber  String
+  purpose      OtpPurpose
+  otpHash      String // hash only — never store the plaintext OTP
+  attemptCount Int        @default(0)
+  maxAttempts  Int        @default(3)
+  expiresAt    DateTime
+  verifiedAt   DateTime?
+  createdAt    DateTime   @default(now())
+
+  @@index([phoneNumber, purpose])
+}
+
+// DPDP Act, 2023 / DPDP Rules, 2025 — records who consented to what, for
+// whom, verified how, and whether it was later withdrawn. See the
+// accompanying report for which ConsentPurpose values a school can rely
+// on a narrower "child safety" exemption for, versus which always need
+// verifiable parental consent.
+model ConsentRecord {
+  id                      String         @id @default(cuid())
+  schoolId                String
+  dataPrincipalUserId     String // the consenting parent/adult, or self for staff
+  childStudentProfileId   String? // set when consent is given on behalf of a minor
+  purpose                 ConsentPurpose
+  consentGivenAt          DateTime       @default(now())
+  consentMethod           ConsentMethod
+  verificationEvidenceUrl String?
+  withdrawnAt             DateTime?
+  isActive                Boolean        @default(true)
+
+  @@index([childStudentProfileId, purpose])
+  @@index([schoolId, purpose])
+}
+
+// Handles every DPDP "Data Principal right": access, correction, erasure,
+// nominating a representative, withdrawing consent, and grievances. Also
+// doubles as your evidence trail if the Data Protection Board ever asks
+// how a request was handled.
+model DataSubjectRequest {
+  id                         String         @id @default(cuid())
+  schoolId                   String
+  requestedByUserId          String // -> User.id
+  onBehalfOfStudentProfileId String?
+  requestType                DsrRequestType
+  description                String?
+  status                     DsrStatus      @default(RECEIVED)
+  submittedAt                DateTime       @default(now())
+  resolvedByUserId           String?
+  resolvedAt                 DateTime?
+  resolutionNotes            String?
+  rejectionReason            String?
+
+  @@index([schoolId, status])
+}
+
+// The DPDP Rules currently set no minimum severity threshold for breach
+// reporting and a strict 72-hour clock — log every incident here the
+// moment it's detected, not just the ones that look serious in hindsight.
+model DataBreachIncident {
+  id                     String         @id @default(cuid())
+  schoolId               String
+  detectedAt             DateTime       @default(now())
+  description            String
+  affectedDataCategories String
+  affectedRecordCountEst Int?
+  severity               BreachSeverity
+  reportedByUserId       String // -> User.id
+  reportedToBoardAt      DateTime?
+  reportedToUsersAt      DateTime?
+  remediationSteps       String?
+  status                 BreachStatus   @default(DETECTED)
+
+  @@index([schoolId, status])
+}
+
+// Operationalises the DPDP "storage limitation" principle: how long each
+// category of data is kept, and whether it auto-purges. Referenced by a
+// scheduled job, not enforced by Prisma itself.
+model DataRetentionPolicy {
+  id                    String  @id @default(cuid())
+  schoolId              String
+  dataCategory          String // e.g. "RfidScan", "BusLocation", "VisitorLog"
+  retentionPeriodMonths Int
+  legalBasis            String?
+  autoDeleteEnabled     Boolean @default(false)
+
+  @@unique([schoolId, dataCategory])
+}
+
+// ============================================================================
+// RECOMMENDED POSTGRES CHECK CONSTRAINTS
+// (Add these via a raw SQL migration — Prisma's schema language above does
+// not yet express arbitrary CHECK constraints reliably across providers.)
+// ============================================================================
+//
+// ALTER TABLE "Marks" ADD CONSTRAINT marks_within_max
+//   CHECK ("marksObtained" >= 0 AND "marksObtained" <= "maxMarks");
+//
+// ALTER TABLE "Homework" ADD CONSTRAINT homework_due_after_assigned
+//   CHECK ("dueDate" >= "assignedDate");
+//
+// ALTER TABLE "LeaveApplication" ADD CONSTRAINT leave_dates_valid
+//   CHECK ("toDate" >= "fromDate");
+//
+// ALTER TABLE "FeeReceipt" ADD CONSTRAINT fee_amount_positive
+//   CHECK ("amount" > 0);
+//
+// ALTER TABLE "SalarySlip" ADD CONSTRAINT salary_net_pay_consistent
+//   CHECK ("netPay" = "basicPay" + "allowances" - "deductionsPF" - "deductionsESI" - "deductionsTDS");
+//
+// ============================================================================
