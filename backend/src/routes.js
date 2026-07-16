@@ -201,6 +201,7 @@ router.post('/auth/sync', authenticate, async (req, res) => {
 
   try {
     let user = req.user;
+    const requestedRole = req.body.role || 'parent';
 
     // If user doesn't exist, we can automatically create a generic parent account for them,
     // or they have to be pre-registered by the school. 
@@ -218,8 +219,8 @@ router.post('/auth/sync', authenticate, async (req, res) => {
 
       user = await prisma.user.create({
         data: {
-          name: 'New User (Firebase)',
-          role: 'parent',
+          name: `New User (${requestedRole})`,
+          role: requestedRole,
           phoneNumber: phoneNumber,
           schoolId: school.id
         }

@@ -12,6 +12,9 @@ import { useRouter } from 'next/navigation';
 import { Shield, ArrowRight, Smartphone, Key, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/lib/LanguageContext';
+import { auth } from '@/lib/firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
+import { api } from '@/lib/api';
 
 export default function ArchitecturalLogin() {
   const router = useRouter();
@@ -47,6 +50,19 @@ export default function ArchitecturalLogin() {
   const [otpCode, setOtpCode] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+
+  useEffect(() => {
+    // Initialize invisible recaptcha for Firebase Auth
+    if (typeof window !== 'undefined' && !window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {
+          // reCAPTCHA solved
+        }
+      });
+    }
+  }, []);
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,18 +70,24 @@ export default function ArchitecturalLogin() {
     setIsLoading(true);
     
     try {
-      // 1. Try real Firebase OTP
-      if (typeof window !== 'undefined' && (window as any).recaptchaVerifier) {
-        // Assume auth is imported properly from firebase
-        // await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
-      }
+      if (!window.recaptchaVerifier) throw new Error("Recaptcha not initialized");
+      // Format phone number to E.164 if missing +91
+      const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`;
+      
+      const confResult = await signInWithPhoneNumber(auth, formattedPhone, window.recaptchaVerifier);
+      setConfirmationResult(confResult);
       setOtpSent(true);
       setIsLoading(false);
     } catch (err: any) {
-      console.error("Firebase Auth failed (likely CORS/Capacitor restriction), falling back to mock:", err);
-      // MOCK FIREBASE OTP: INSTANT EXECUTION (0ms DELAY)
-      setOtpSent(true);
+      console.error(err);
+      setError(err.message || 'Failed to send OTP. Please try again.');
       setIsLoading(false);
+      // Reset recaptcha if failed so they can try again
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.render().then((widgetId: any) => {
+          window.grecaptcha.reset(widgetId);
+        });
+      }
     }
   };
 
@@ -74,43 +96,23 @@ export default function ArchitecturalLogin() {
     setError('');
     setIsLoading(true);
     try {
-      // 1. Try Real Backend Verification
-      // const res = await api.postUnauth('/auth/verify', { phone: phoneNumber, code: otpCode, role });
-      // const realUser = res.user;
-      throw new Error("Simulating CORS error for real backend");
-    } catch (err: any) {
-      console.warn("Real API failed, instantly falling back to robust mock logic for Demo", err);
-      // MOCK VERIFICATION: INSTANT FALLBACK
-      const mockUser = {
-        id: `demo-${role}-123`,
-        name: `Demo ${role.charAt(0).toUpperCase() + role.slice(1)}`,
-        role: role.toLowerCase(),
-        phone: phoneNumber
-      };
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('DEV_BYPASS_TOKEN', `MOCK_OTP_TOKEN_${role.toUpperCase()}`);
-      router.push('/dashboard');
-    }
-  };
-
-  const handleDevBypass = async (role: string) => {
-    try {
-      setIsLoading(true);
-      const fakeToken = `DEV_BYPASS_${role.toUpperCase()}`;
-      localStorage.setItem('DEV_BYPASS_TOKEN', fakeToken);
+      if (!confirmationResult) throw new Error("Please request a code first.");
       
-      // MOCK NETWORK CALL: INSTANT EXECUTION (0ms DELAY)
-      const mockUser = {
-        id: `dev-${role}`,
-        name: `Dev ${role.charAt(0).toUpperCase() + role.slice(1)}`,
-        role: role.toLowerCase(),
-        phone: '+919999999999'
-      };
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      router.push('/dashboard');
+      // 1. Verify code with Firebase
+      await confirmationResult.confirm(otpCode);
+      
+      // 2. Sync with Backend to get Role/User Data
+      const res = await api.post('/auth/sync', { role });
+      
+      // 3. Store user and navigate
+      localStorage.setItem('user', JSON.stringify(res.user));
+      localStorage.removeItem('DEV_BYPASS_TOKEN'); // Ensure dev bypass is clear
+      
+      // Force hard navigation to prevent chunk loading issues on first load
+      window.location.href = '/dashboard';
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Dev Bypass failed');
+      setError(err.message || 'Invalid OTP code.');
       setIsLoading(false);
     }
   };
@@ -332,25 +334,6 @@ export default function ArchitecturalLogin() {
                   </form>
                 )
               )}
-
-              {/* DEVELOPER QUICK LOGIN BYPASS */}
-              <div className="mt-4 border-t border-white/20 pt-4">
-                <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-2">{t.devBypass}</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  <button type="button" onClick={() => handleDevBypass('principal')} className="py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-white/5 border border-white/10 text-white/90 hover:bg-white/20 transition-all backdrop-blur-sm">
-                    {t.principal}
-                  </button>
-                  <button type="button" onClick={() => handleDevBypass('teacher')} className="py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-white/5 border border-white/10 text-white/90 hover:bg-white/20 transition-all backdrop-blur-sm">
-                    {t.teacher}
-                  </button>
-                  <button type="button" onClick={() => handleDevBypass('parent')} className="py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-white/5 border border-white/10 text-white/90 hover:bg-white/20 transition-all backdrop-blur-sm">
-                    {t.parent}
-                  </button>
-                  <button type="button" onClick={() => handleDevBypass('clerk')} className="py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest bg-white/5 border border-white/10 text-white/90 hover:bg-white/20 transition-all backdrop-blur-sm">
-                    {t.clerk}
-                  </button>
-                </div>
-              </div>
 
               {error && (
                 <motion.div 
