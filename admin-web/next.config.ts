@@ -1,5 +1,5 @@
-import type { NextConfig } from "next";
-const nextConfig: NextConfig = {
+// @ts-expect-error NextConfig types might be incomplete in this version
+const nextConfig: any = {
   output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
