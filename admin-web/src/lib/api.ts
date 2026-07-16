@@ -15,6 +15,14 @@ export const api = {
     });
   },
   
+  async postFormData(endpoint: string, formData: FormData) {
+    return fetchWithAuth(endpoint, {
+      method: 'POST',
+      body: formData,
+      headers: { 'Content-Type': 'multipart/form-data' } // We will let fetch set the boundary, so actually we need to REMOVE Content-Type inside fetchWithAuth if it's FormData.
+    }, true);
+  },
+  
   async delete(endpoint: string) {
     return fetchWithAuth(endpoint, { method: 'DELETE' });
   },
@@ -42,7 +50,7 @@ export const api = {
 let memoryTokenCache: string | null = null;
 let memoryTokenExpiry: number = 0;
 
-async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
+async function fetchWithAuth(endpoint: string, options: RequestInit = {}, isFormData: boolean = false) {
   // Try to get the latest Firebase ID Token
   let token = null;
   // 1. Check for Developer Bypass Token
@@ -67,12 +75,17 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
     mfaToken = localStorage.getItem('mfa_token');
   }
   
-  const headers = {
-    'Content-Type': 'application/json',
+  const headers: any = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(mfaToken ? { 'x-mfa-token': mfaToken } : {}),
     ...options.headers,
   };
+
+  if (!isFormData && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
+  } else if (isFormData) {
+    delete headers['Content-Type']; // Let browser set boundary automatically
+  }
 
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
