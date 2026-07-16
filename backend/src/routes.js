@@ -75,7 +75,8 @@ router.post('/auth/sync', authenticate, async (req, res) => {
     await prisma.auditLog.create({
       data: {
         userId: user.id,
-        action: 'firebase_login_sync'
+        action: 'firebase_login_sync',
+        targetTable: 'User'
       }
     });
 
