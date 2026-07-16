@@ -136,8 +136,9 @@ export default function PayrollDashboard() {
               {slips.length === 0 ? (
                 <div className="p-12 text-center text-ink-secondary">No salary slips generated yet.</div>
               ) : (
-                <table className="w-full text-left">
-                  <thead className="bg-gray-50/50 border-b border-gray-100">
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full text-left min-w-[500px]">
+                    <thead className="bg-gray-50/50 border-b border-gray-100">
                     <tr>
                       <th className="p-4 text-xs font-bold text-ink-secondary uppercase tracking-wider">Staff</th>
                       <th className="p-4 text-xs font-bold text-ink-secondary uppercase tracking-wider">Month</th>
@@ -162,7 +163,8 @@ export default function PayrollDashboard() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               )}
             </div>
           </div>

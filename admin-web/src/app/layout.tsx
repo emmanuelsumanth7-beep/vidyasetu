@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Outfit, Space_Mono } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from '@/lib/LanguageContext';
@@ -21,6 +21,14 @@ export const metadata: Metadata = {
   description: 'Command Desk for Institution Management',
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -28,7 +36,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${outfit.variable} ${spaceMono.variable}`}>
-      <body className="antialiased">
+      <body className="antialiased overflow-x-hidden w-full">
         <LanguageProvider>
           <script dangerouslySetInnerHTML={{ __html: `
           if ('serviceWorker' in navigator) {

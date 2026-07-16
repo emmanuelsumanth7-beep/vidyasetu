@@ -1,10 +1,11 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { SocketProvider } from '@/components/SocketProvider';
 import { useEffect, useState } from 'react';
 import { FloatingNav } from '@/components/layout/FloatingNav';
 import { MobileNav } from '@/components/layout/MobileNav';
+import { clearUserSession, readUserSession, type ClientUser } from '@/lib/session';
 import { 
   LayoutDashboard, 
   Users, 
@@ -21,38 +22,40 @@ import {
   MessageSquare,
   Award,
   BookMarked,
-  LogOut
+  LogOut,
+  type LucideIcon
 } from 'lucide-react';
+
+type NavItem = {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+};
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user] = useState<ClientUser | null>(() => readUserSession());
 
   useEffect(() => {
-    const userStr = localStorage.getItem('user');
-    if (!userStr) {
+    if (!user) {
       router.push('/');
-    } else {
-      setUser(JSON.parse(userStr));
     }
-  }, [router]);
+  }, [router, user]);
 
   const handleSignOut = (e: React.MouseEvent) => {
     e.preventDefault();
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    clearUserSession();
     router.push('/');
   };
 
   if (!user) return <div className="h-screen w-full flex items-center justify-center text-ink-secondary bg-canvas font-data">Loading workspace...</div>;
 
   // Role-based Navigation mapping
-  let navItems: any[] = [];
+  let navItems: NavItem[] = [];
   if (user.role === 'principal' || user.role === 'admin') {
     navItems = [
       { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
@@ -116,14 +119,14 @@ export default function DashboardLayout({
         <div className="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-[120px]">
           
           {/* Topbar for Mobile */}
-          <header className="md:hidden flex items-center justify-between px-4 h-16 bg-gradient-to-r from-indigo-50 via-white to-purple-50 shrink-0 shadow-sm border-b border-indigo-100 relative z-10">
+          <header className="md:hidden flex items-center justify-between px-3 h-16 bg-gradient-to-r from-indigo-50 via-white to-purple-50 shrink-0 shadow-sm border-b border-indigo-100 relative z-10 w-full">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-                <BookOpen size={16} />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+                <BookOpen size={14} />
               </div>
-              <span className="font-bold text-xl tracking-tight text-indigo-950 font-display">Vidya Setu</span>
+              <span className="font-bold text-lg sm:text-xl tracking-tight text-indigo-950 font-display truncate max-w-[120px] sm:max-w-none">Vidya Setu</span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <span className="text-xs font-semibold text-interactive-blue uppercase tracking-wider">{user.role}</span>
               <div className="w-9 h-9 rounded-full bg-hover-subtle flex items-center justify-center text-ink-primary font-bold">
                 {user.name.charAt(0)}
@@ -135,7 +138,7 @@ export default function DashboardLayout({
           </header>
 
           {/* Scrollable Main Content */}
-          <main className="flex-1 overflow-y-auto p-4 md:p-10 pb-24 md:pb-10 relative">
+          <main className="flex-1 overflow-y-auto px-2 py-4 sm:p-4 md:p-10 pb-24 md:pb-10 relative w-full overflow-x-hidden">
             
             {/* Desktop Top Area: Title & Greeting. 
                 Instead of a full-width header bar, it's just content placed directly on the canvas. */}

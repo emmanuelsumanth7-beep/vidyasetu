@@ -222,8 +222,9 @@ export default function FeesDashboard() {
                 </p>
               </div>
             ) : (
-              <table className="w-full text-left">
-                <thead className="bg-white/50 border-b border-white/50">
+              <div className="overflow-x-auto w-full">
+                <table className="w-full text-left min-w-[700px]">
+                  <thead className="bg-white/50 border-b border-white/50">
                   <tr>
                     <th className="p-5 text-xs font-bold text-gray-500 uppercase tracking-widest">Receipt #</th>
                     {user?.role !== 'parent' && <th className="p-5 text-xs font-bold text-gray-500 uppercase tracking-widest">Student</th>}
@@ -265,6 +266,7 @@ export default function FeesDashboard() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </div>

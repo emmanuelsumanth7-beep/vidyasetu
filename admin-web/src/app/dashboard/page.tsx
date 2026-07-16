@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/lib/LanguageContext';
+import { readUserSession } from '@/lib/session';
 import { 
   Users, UserSquare2, CalendarCheck, UserMinus, 
   CheckSquare, Award, BookOpen, FileText, 
@@ -75,8 +76,8 @@ export default function DashboardOverview() {
   const [copilotLoading, setCopilotLoading] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) setUser(JSON.parse(storedUser));
+    const storedUser = readUserSession();
+    if (storedUser) setUser(storedUser);
   }, []);
 
   if (!user) {
@@ -158,7 +159,7 @@ export default function DashboardOverview() {
       </AnimatePresence>
 
       {/* 1. Greeting & Context Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[24px] shadow-sm border border-gray-100">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-[16px] sm:rounded-[24px] shadow-sm border border-gray-100">
         <div>
           <h2 className="text-2xl font-bold text-ink-primary font-display tracking-tight">
             {t('welcomeBack')}, {user.name.split(' ')[0]}
@@ -194,7 +195,7 @@ export default function DashboardOverview() {
       </div>
 
       {/* 2. Priority Insight Row (Hero Tiles) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {user.role === 'principal' && (
           <>
             <div className="bg-white p-6 rounded-[24px] shadow-sm border border-emerald-100 flex flex-col justify-between group hover:shadow-md hover:-translate-y-1 transition-all duration-300">
@@ -273,7 +274,7 @@ export default function DashboardOverview() {
                 {style.title}
               </h3>
               
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
                 <AnimatePresence>
                   {categoryModules.map((module, i) => {
                     const Icon = module.icon;
@@ -283,10 +284,10 @@ export default function DashboardOverview() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.04, duration: 0.25, ease: 'easeOut' }}
-                        className="bg-white rounded-[20px] p-5 flex flex-col items-start gap-4 cursor-pointer shadow-sm border border-gray-100 group hover:shadow-md hover:-translate-y-1 transition-all duration-200"
+                        className="bg-white rounded-[16px] sm:rounded-[20px] p-3 sm:p-5 flex flex-col items-start gap-2 sm:gap-4 cursor-pointer shadow-sm border border-gray-100 group hover:shadow-md hover:-translate-y-1 transition-all duration-200 relative overflow-hidden"
                         onClick={() => router.push(module.href)}
                       >
-                        <div className="w-16 h-16 relative transition-transform duration-200 group-hover:scale-105">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 relative transition-transform duration-200 group-hover:scale-105">
                           <Icon />
                           {module.id === 'salary' && (
                             <div className="absolute top-1 right-1 text-gray-800 bg-white/80 backdrop-blur-md rounded-full p-0.5">
@@ -300,7 +301,7 @@ export default function DashboardOverview() {
                           Using min-h-[3rem] (48px) ensures two-line wrapping fits without truncating ascenders.
                           leading-snug prevents overlapping descenders/ascenders.
                         */}
-                        <span className="text-sm font-semibold font-display text-ink-primary leading-snug min-h-[3rem] flex items-center">
+                        <span className="text-[11px] sm:text-sm font-semibold font-display text-ink-primary leading-tight min-h-[2rem] sm:min-h-[3rem] flex items-center">
                           {t('mod_' + module.id)}
                         </span>
                         
