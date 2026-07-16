@@ -69,7 +69,7 @@ export default function DashboardLayout({
       { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart },
       { name: 'Settings', href: '/dashboard/settings', icon: Settings },
     ];
-  } else if (user.role === 'teacher') {
+  } else if (user.role === 'teacher' || user.role === 'staff') {
     navItems = [
       { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
       { name: 'Approvals', href: '/dashboard/approvals', icon: CheckSquare },

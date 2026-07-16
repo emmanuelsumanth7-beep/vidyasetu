@@ -41,12 +41,12 @@ const DASHBOARD_MODULES: Module[] = [
   { id: 'staff_attendance', title: 'Staff Attendance', icon: BiometricsIcon, color: '', bgHex: '', category: 'admin', href: '#', allowedRoles: ['principal', 'clerk'] },
 
   // Academic Operations (Emerald/Teal)
-  { id: 'attendance', title: 'Take Attendance', icon: AttendanceIcon, color: '', bgHex: '', category: 'academics', href: '/dashboard/attendance', allowedRoles: ['principal', 'teacher'] },
-  { id: 'absent', title: 'Absent Info', icon: AbsentInfoIcon, color: '', bgHex: '', category: 'academics', href: '/dashboard/attendance', allowedRoles: ['principal', 'teacher'] },
-  { id: 'classes', title: 'Classes & Timetable', icon: CalendarIcon, color: '', bgHex: '', category: 'academics', href: '/dashboard/classes', allowedRoles: ['principal', 'teacher', 'student', 'parent'] },
-  { id: 'work_done', title: 'Work Done', icon: DocumentIcon, color: '', bgHex: '', category: 'academics', href: '#', allowedRoles: ['teacher'] },
-  { id: 'homework', title: 'Homework Upload', icon: Upload, color: '', bgHex: '', category: 'academics', href: '/dashboard/homework', allowedRoles: ['teacher', 'principal'] },
-  { id: 'study_material', title: 'Study Material Upload', icon: StudyMaterialIcon, color: '', bgHex: '', category: 'academics', href: '/dashboard/study-material', allowedRoles: ['principal', 'teacher'] },
+  { id: 'attendance', title: 'Take Attendance', icon: AttendanceIcon, color: '', bgHex: '', category: 'academics', href: '/dashboard/attendance', allowedRoles: ['principal', 'teacher', 'staff'] },
+  { id: 'absent', title: 'Absent Info', icon: AbsentInfoIcon, color: '', bgHex: '', category: 'academics', href: '/dashboard/attendance', allowedRoles: ['principal', 'teacher', 'staff'] },
+  { id: 'classes', title: 'Classes & Timetable', icon: CalendarIcon, color: '', bgHex: '', category: 'academics', href: '/dashboard/classes', allowedRoles: ['principal', 'teacher', 'staff', 'student', 'parent'] },
+  { id: 'work_done', title: 'Work Done', icon: DocumentIcon, color: '', bgHex: '', category: 'academics', href: '#', allowedRoles: ['teacher', 'staff'] },
+  { id: 'homework', title: 'Homework Upload', icon: Upload, color: '', bgHex: '', category: 'academics', href: '/dashboard/homework', allowedRoles: ['teacher', 'staff', 'principal'] },
+  { id: 'study_material', title: 'Study Material Upload', icon: StudyMaterialIcon, color: '', bgHex: '', category: 'academics', href: '/dashboard/study-material', allowedRoles: ['principal', 'teacher', 'staff'] },
 
   // Student Ecosystem (Amber/Cyan)
   { id: 'exam_marks', title: 'Exam Marks', icon: GradesIcon, color: '', bgHex: '', category: 'ecosystem', href: '/dashboard/grades', allowedRoles: ['principal', 'teacher', 'student', 'parent'] },

@@ -44,7 +44,7 @@ export default function ArchitecturalLogin() {
     sysAuth: tFunc('sysAuth')
   };
 
-  const [role, setRole] = useState<'parent' | 'staff'>('parent');
+  const [role, setRole] = useState<'parent' | 'teacher'>('parent');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState('');
@@ -115,8 +115,8 @@ export default function ArchitecturalLogin() {
       localStorage.setItem('user', JSON.stringify(res.user));
       localStorage.removeItem('DEV_BYPASS_TOKEN'); // Ensure dev bypass is clear
       
-      // Force hard navigation to prevent chunk loading issues on first load
-      window.location.href = '/dashboard';
+      // Soft navigation preserves the Firebase Auth state in memory
+      router.push('/dashboard');
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Invalid OTP code.');
@@ -212,8 +212,8 @@ export default function ArchitecturalLogin() {
               {t.guardian}
             </button>
             <button
-              onClick={() => { setRole('staff'); setOtpSent(false); setError(''); }}
-              className={`flex-1 py-3 text-sm font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${role === 'staff' ? 'bg-white/20 shadow-lg text-white' : 'text-white/50 hover:text-white/80'}`}
+              onClick={() => { setRole('teacher'); setOtpSent(false); setError(''); }}
+              className={`flex-1 py-3 text-sm font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${role === 'teacher' ? 'bg-white/20 shadow-lg text-white' : 'text-white/50 hover:text-white/80'}`}
             >
               {t.faculty}
             </button>
