@@ -1685,7 +1685,7 @@ export const CalculatorIcon = () => (
     <rect x="62" y="222" width="118" height="52" rx="9" fill="url(#billBack)"/>
     <rect x="56" y="208" width="118" height="52" rx="9" fill="url(#billFront)"/>
     <circle cx="100" cy="234" r="14" fill="#FFFFFF" opacity="0.3"/>
-    <text x="100" y="245">
+    <text x="100" y="245"></text>
     <line x1="128" y1="230" x2="146" y2="230" stroke="#FFFFFF" strokeWidth="3" opacity="0.4"/>
   </g>
 
@@ -1866,7 +1866,7 @@ export const DocumentIcon = () => (
 
   
   <circle cx="100" cy="100" r="98" fill="url(#bgGrad)"/>
-  <circle cx="100" cy="100" r="98" fill="none" stroke="#E8B84B" strokeWidth="1.5">
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#E8B84B" strokeWidth="1.5"/>
 
   
   <rect x="66" y="66" width="48" height="3" rx="1.5" fill="#D9D2C0"/>
