@@ -261,6 +261,94 @@ router.post('/upload', authenticate, upload, (req, res) => {
   });
 });
 
+// ==========================================
+// STUDY MATERIALS ROUTES
+// ==========================================
+
+router.get('/study-materials', authenticate, async (req, res) => {
+  const { prisma, user } = req;
+  try {
+    const materials = await prisma.studyMaterial.findMany({
+      where: { schoolId: user.schoolId },
+      include: { class: true, teacher: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(materials);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch study materials' });
+  }
+});
+
+router.post('/study-materials', authenticate, async (req, res) => {
+  const { prisma, user, io } = req;
+  const { title, description, classId, subject, fileUrl, fileType, className } = req.body;
+
+  if (!['principal', 'clerk', 'teacher'].includes(user.role)) {
+    return res.status(403).json({ error: 'Permission denied' });
+  }
+
+  try {
+    let finalClassId = classId;
+    if (className && !finalClassId) {
+      let cls = await prisma.class.findFirst({
+        where: { schoolId: user.schoolId, name: className }
+      });
+      if (!cls) {
+        cls = await prisma.class.create({
+          data: {
+            schoolId: user.schoolId,
+            name: className,
+            classTeacherId: user.id
+          }
+        });
+      }
+      finalClassId = cls.id;
+    }
+
+    const material = await prisma.studyMaterial.create({
+      data: {
+        schoolId: user.schoolId,
+        classId: finalClassId,
+        subject: subject || 'General',
+        title,
+        description,
+        fileUrl,
+        fileType,
+        teacherId: user.id
+      },
+      include: { class: true, teacher: { select: { name: true } } }
+    });
+
+    io.to(`school_${user.schoolId}`).emit('materialAdded', material);
+
+    res.status(201).json(material);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create study material' });
+  }
+});
+
+router.delete('/study-materials/:id', authenticate, async (req, res) => {
+  const { prisma, user, io } = req;
+  if (!['principal', 'clerk', 'teacher'].includes(user.role)) {
+    return res.status(403).json({ error: 'Permission denied' });
+  }
+
+  try {
+    const material = await prisma.studyMaterial.findUnique({ where: { id: req.params.id } });
+    if (!material || (user.role === 'teacher' && material.teacherId !== user.id)) {
+      return res.status(403).json({ error: 'You can only delete your own materials' });
+    }
+    await prisma.studyMaterial.delete({ where: { id: req.params.id } });
+    io.to(`school_${user.schoolId}`).emit('materialDeleted', req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete material' });
+  }
+});
+
 // Serve local uploads statically as a fallback
 router.use('/uploads', express.static('uploads'));
 
