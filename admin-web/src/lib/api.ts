@@ -102,7 +102,7 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}, isForm
       if (typeof window !== 'undefined') {
         window.location.href = '/mfa-setup';
       }
-    } else if (response.status === 401 || response.status === 403) {
+    } else if (response.status === 401) {
       auth.signOut();
       if (typeof window !== 'undefined') {
         window.location.href = '/';
