@@ -1,0 +1,129 @@
+'use client';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+type Language = 'en' | 'kn';
+
+interface LanguageContextType {
+  lang: Language;
+  setLang: (lang: Language) => void;
+  t: (key: string) => string;
+}
+
+const TRANSLATIONS = {
+  en: {
+    // Login
+    appName: 'Vidya Setu',
+    subtitle: 'Central Command Desk. Authorize access to enter the workspace.',
+    guardian: 'Guardian',
+    faculty: 'Faculty',
+    phoneLabel: 'Registered Mobile Number',
+    facultyPhone: 'Faculty Mobile Number',
+    phonePlaceholder: 'e.g. +91 74832 92660',
+    reqKey: 'Request Authorization Key',
+    transmitting: 'Transmitting...',
+    keyLabel: 'Authorization Key (Sent to',
+    keyPlaceholder: '6-digit code',
+    verifying: 'Verifying Key...',
+    confirmKey: 'Confirm & Enter',
+    reenter: '← Re-enter Number',
+    devBypass: 'Developer Quick Access',
+    principal: 'Principal',
+    teacher: 'Teacher',
+    parent: 'Parent',
+    clerk: 'Clerk',
+    idCheck: 'Identity Check',
+    sysAuth: 'SYS_AUTH_v3',
+
+    // Dashboard
+    welcomeBack: 'Welcome back',
+    askVidya: 'Ask Vidya e.g. "Show me Class 8 absentees..."',
+    todayAttendance: "Today's Attendance",
+    feeCollection: 'Fee Collection',
+    pendingActions: 'Pending Actions',
+    actionRequired: 'Action Required',
+    takeFirstPeriod: 'Take First Period Attendance',
+    classWaiting: 'Class 8A is waiting.',
+    periodsCompleted: 'Periods Completed',
+    unlockToView: 'Unlock to view',
+    reviewLeaves: 'Review Leaves',
+    monthlyTarget: 'of monthly target',
+    fromYesterday: 'from yesterday'
+  },
+  kn: {
+    // Login
+    appName: 'ವಿದ್ಯಾಸೇತು',
+    subtitle: 'ಕೇಂದ್ರ ಕಮಾಂಡ್ ಡೆಸ್ಕ್. ಕಾರ್ಯಸ್ಥಳವನ್ನು ಪ್ರವೇಶಿಸಲು ದೃಢೀಕರಿಸಿ.',
+    guardian: 'ಪೋಷಕರು',
+    faculty: 'ಶಿಕ್ಷಕರು',
+    phoneLabel: 'ನೋಂದಾಯಿತ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ',
+    facultyPhone: 'ಶಿಕ್ಷಕರ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ',
+    phonePlaceholder: 'ಉದಾ: +91 74832 92660',
+    reqKey: 'ದೃಢೀಕರಣ ಕೀಲಿಯನ್ನು ವಿನಂತಿಸಿ',
+    transmitting: 'ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ...',
+    keyLabel: 'ದೃಢೀಕರಣ ಕೀಲಿ (ಕಳುಹಿಸಲಾಗಿದೆ',
+    keyPlaceholder: '6-ಅಂಕಿಯ ಕೋಡ್',
+    verifying: 'ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...',
+    confirmKey: 'ದೃಢೀಕರಿಸಿ ಮತ್ತು ಪ್ರವೇಶಿಸಿ',
+    reenter: '← ಸಂಖ್ಯೆಯನ್ನು ಮರು-ನಮೂದಿಸಿ',
+    devBypass: 'ಡೆವಲಪರ್ ತ್ವರಿತ ಪ್ರವೇಶ',
+    principal: 'ಪ್ರಾಂಶುಪಾಲರು',
+    teacher: 'ಶಿಕ್ಷಕರು',
+    parent: 'ಪೋಷಕರು',
+    clerk: 'ಗುಮಾಸ್ತ',
+    idCheck: 'ಗುರುತಿನ ಪರಿಶೀಲನೆ',
+    sysAuth: 'SYS_AUTH_v3',
+
+    // Dashboard
+    welcomeBack: 'ಸ್ವಾಗತ',
+    askVidya: 'ವಿದ್ಯಾಗೆ ಕೇಳಿ ಉದಾ: "8ನೇ ತರಗತಿ ಗೈರುಹಾಜರಾದವರನ್ನು ತೋರಿಸಿ..."',
+    todayAttendance: 'ಇಂದಿನ ಹಾಜರಾತಿ',
+    feeCollection: 'ಶುಲ್ಕ ಸಂಗ್ರಹ',
+    pendingActions: 'ಬಾಕಿ ಉಳಿದಿರುವ ಕಾರ್ಯಗಳು',
+    actionRequired: 'ಕ್ರಮ ಅಗತ್ಯವಿದೆ',
+    takeFirstPeriod: 'ಮೊದಲ ಅವಧಿಯ ಹಾಜರಾತಿ ತೆಗೆದುಕೊಳ್ಳಿ',
+    classWaiting: '8ನೇ ತರಗತಿ ಕಾಯುತ್ತಿದೆ.',
+    periodsCompleted: 'ಪೂರ್ಣಗೊಂಡ ಅವಧಿಗಳು',
+    unlockToView: 'ವೀಕ್ಷಿಸಲು ಅನ್ಲಾಕ್ ಮಾಡಿ',
+    reviewLeaves: 'ರಜೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿ',
+    monthlyTarget: 'ಮಾಸಿಕ ಗುರಿಯ',
+    fromYesterday: 'ನಿನ್ನೆಯಿಂದ'
+  }
+};
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const [lang, setLangState] = useState<Language>('en');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('vidya_lang') as Language;
+    if (saved && (saved === 'en' || saved === 'kn')) {
+      setLangState(saved);
+    }
+  }, []);
+
+  const setLang = (newLang: Language) => {
+    setLangState(newLang);
+    localStorage.setItem('vidya_lang', newLang);
+  };
+
+  const t = (key: string): string => {
+    // @ts-ignore
+    return TRANSLATIONS[lang][key] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ lang, setLang, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+}
