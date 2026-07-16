@@ -30,7 +30,16 @@ export default function RootLayout({
     <html lang="en" className={`${outfit.variable} ${spaceMono.variable}`}>
       <body className="antialiased">
         <LanguageProvider>
-          {children}
+          <script dangerouslySetInnerHTML={{ __html: `
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+              for(let registration of registrations) {
+                registration.unregister();
+              }
+            });
+          }
+        `}} />
+        {children}
         </LanguageProvider>
       </body>
     </html>
