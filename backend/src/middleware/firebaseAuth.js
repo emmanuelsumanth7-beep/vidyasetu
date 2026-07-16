@@ -13,7 +13,9 @@ if (!getApps().length) {
  */
 const verifyFirebaseAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
+  console.log('[Auth] Incoming request to', req.originalUrl, 'Headers:', JSON.stringify(req.headers));
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log('[Auth] Missing or invalid Authorization header:', authHeader);
     return res.status(401).json({ error: 'Missing or invalid Authorization header' });
   }
 
@@ -23,20 +25,47 @@ const verifyFirebaseAuth = async (req, res, next) => {
   // DEV BYPASS LOGIN (For easy UI testing)
   // ==========================================
   if (idToken.startsWith('DEV_BYPASS_')) {
-    const requestedRole = idToken.split('DEV_BYPASS_')[1].toLowerCase(); // e.g., 'principal', 'teacher', 'parent'
+    const requestedRole = idToken.split('DEV_BYPASS_')[1].toUpperCase(); 
     
     // Find the first user in the DB with that role
-    const mockUser = await req.prisma.user.findFirst({
+    let mockUser = await req.prisma.user.findFirst({
       where: { role: requestedRole },
       include: { school: true }
     });
     
-    if (mockUser) {
-      req.user = mockUser;
-      return next();
-    } else {
-      return res.status(401).json({ error: `Dev Bypass Failed: No user found with role ${requestedRole}` });
+    // Auto-seed if the database is empty (so the demo never crashes)
+    if (!mockUser) {
+        // Find or create a mock school
+        const mockSchool = await req.prisma.school.upsert({
+            where: { name: 'Vidya Setu Demo School' },
+            update: {},
+            create: { name: 'Vidya Setu Demo School', address: 'Bangalore', phone: '+919999999999', email: 'demo@vidyasetu.com', establishedYear: 2024, type: 'K12' }
+        });
+
+        // Create the user
+        mockUser = await req.prisma.user.create({
+            data: {
+                id: `dev-${requestedRole.toLowerCase()}-id`,
+                phone: `+910000000${requestedRole.length}`,
+                role: requestedRole,
+                schoolId: mockSchool.id,
+                isActive: true
+            },
+            include: { school: true }
+        });
+        
+        // Also create the profile depending on role
+        if (requestedRole === 'PRINCIPAL' || requestedRole === 'STAFF') {
+            await req.prisma.staffProfile.create({ data: { userId: mockUser.id, employeeId: `EMP-${requestedRole}`, name: `Dev ${requestedRole}`, designation: requestedRole, joinDate: new Date(), baseSalary: 50000 }});
+        } else if (requestedRole === 'TEACHER') {
+            await req.prisma.teacherProfile.create({ data: { userId: mockUser.id, employeeId: 'EMP-TEACHER', name: 'Dev Teacher', joinDate: new Date(), baseSalary: 40000 }});
+        } else if (requestedRole === 'PARENT') {
+            await req.prisma.parentProfile.create({ data: { userId: mockUser.id, name: 'Dev Parent', relation: 'FATHER' }});
+        }
     }
+    
+    req.user = mockUser;
+    return next();
   }
 
   try {
