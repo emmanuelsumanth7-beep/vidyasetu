@@ -9,7 +9,7 @@ import {
   CheckSquare, Award, BookOpen, FileText, 
   BellRing, Lightbulb, Banknote, CheckCircle, 
   MessageCircle, Fingerprint, CalendarClock,
-  Search, ShieldAlert, Sparkles, X, ChevronRight, Activity, TrendingUp, Clock, Lock, BrainCircuit, Upload
+  Search, ShieldAlert, Sparkles, X, ChevronRight, Activity, TrendingUp, Clock, Lock, BrainCircuit, Upload, Globe
 } from 'lucide-react';
 import { 
   FeePaymentIcon, ProfileIcon, RemarksIcon, AbsentInfoIcon, 
@@ -68,7 +68,7 @@ const CATEGORIES = {
 
 export default function DashboardOverview() {
   const router = useRouter();
-  const { lang, t } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [askVidyaQuery, setAskVidyaQuery] = useState('');
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
@@ -168,19 +168,29 @@ export default function DashboardOverview() {
           </p>
         </div>
         
-        {/* Ask Vidya NLP Field */}
-        <form onSubmit={handleAskVidya} className="relative w-full md:w-[400px]">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-interactive-blue">
-            <Sparkles size={18} />
-          </div>
-          <input 
-            type="text" 
-            placeholder={t('askVidya')}
-            value={askVidyaQuery}
-            onChange={(e) => setAskVidyaQuery(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 rounded-full pl-10 pr-4 py-3 text-sm font-medium text-ink-primary placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-interactive-blue/20 focus:border-interactive-blue focus:bg-white transition-all shadow-inner"
-          />
-        </form>
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          {/* Ask Vidya NLP Field */}
+          <form onSubmit={handleAskVidya} className="relative w-full md:w-[350px]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-interactive-blue">
+              <Sparkles size={18} />
+            </div>
+            <input 
+              type="text" 
+              placeholder={t('askVidya')}
+              value={askVidyaQuery}
+              onChange={(e) => setAskVidyaQuery(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-full pl-10 pr-4 py-3 text-sm font-medium text-ink-primary placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-interactive-blue/20 focus:border-interactive-blue focus:bg-white transition-all shadow-inner"
+            />
+          </form>
+          
+          <button 
+            onClick={() => setLang(lang === 'en' ? 'kn' : 'en')}
+            className="hidden md:flex items-center gap-2 px-4 py-3 bg-white hover:bg-gray-50 border border-gray-200 text-ink-primary rounded-full transition-all font-bold tracking-widest text-xs uppercase"
+          >
+            <Globe size={16} />
+            {lang === 'en' ? 'ಕನ್ನಡ' : 'ENGLISH'}
+          </button>
+        </div>
       </div>
 
       {/* 2. Priority Insight Row (Hero Tiles) */}
@@ -291,7 +301,7 @@ export default function DashboardOverview() {
                           leading-snug prevents overlapping descenders/ascenders.
                         */}
                         <span className="text-sm font-semibold font-display text-ink-primary leading-snug min-h-[3rem] flex items-center">
-                          {module.title}
+                          {t('mod_' + module.id)}
                         </span>
                         
                         {/* Salary slip specific enhancement */}
