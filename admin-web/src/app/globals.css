@@ -111,3 +111,25 @@
     border-left: 3px solid var(--color-interactive-blue);
   }
 }
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    background-image: none !important;
+  }
+  .no-print, nav, header, aside, button {
+    display: none !important;
+  }
+  .print-area {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+  }
+  * {
+    overflow: visible !important;
+  }
+}

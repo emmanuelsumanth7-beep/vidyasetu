@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '@/lib/api';
-import { Search, Plus, X, Users, CreditCard, AlertCircle, CheckCircle2, Edit2 } from 'lucide-react';
+import { Search, Plus, X, Users, CreditCard, AlertCircle, CheckCircle2, Edit2, Printer } from 'lucide-react';
+import PrintableLetterhead from '@/components/PrintableLetterhead';
 
 interface Student {
   id: string;
@@ -294,16 +295,25 @@ export default function StudentsDirectory() {
                     <p className="text-ink-secondary font-data text-sm mb-6">Roll: {selectedStudent.rollNumber}</p>
                   </div>
                   {['principal', 'clerk', 'teacher'].includes(userRole) && (
-                    <button 
-                      onClick={() => openEditModal(selectedStudent)}
-                      className="text-interactive-blue hover:bg-blue-50 p-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-semibold"
-                    >
-                      <Edit2 size={16} /> Edit
-                    </button>
+                    <div className="flex items-center gap-1 no-print">
+                      <button 
+                        onClick={() => window.print()}
+                        className="text-gray-500 hover:bg-gray-100 p-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-semibold"
+                      >
+                        <Printer size={16} /> Print
+                      </button>
+                      <button 
+                        onClick={() => openEditModal(selectedStudent)}
+                        className="text-interactive-blue hover:bg-blue-50 p-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-semibold"
+                      >
+                        <Edit2 size={16} /> Edit
+                      </button>
+                    </div>
                   )}
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-4 print-area">
+                  <PrintableLetterhead />
                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
                     <span className="text-ink-secondary text-sm">Class & Section</span>
                     <span className="font-semibold text-ink-primary">

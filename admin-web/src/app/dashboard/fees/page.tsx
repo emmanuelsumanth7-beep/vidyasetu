@@ -3,8 +3,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '@/lib/api';
 import { useSocket } from '@/components/SocketProvider';
-import { Search, Plus, X, AlertCircle, CheckCircle, Receipt, Bell, Trash2 } from 'lucide-react';
+import { Search, Plus, X, AlertCircle, CheckCircle, Receipt, Bell, Trash2, Printer } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import PrintableLetterhead from '@/components/PrintableLetterhead';
 
 interface Student {
   id: string;
@@ -172,13 +173,25 @@ export default function FeesDashboard() {
             {user?.role === 'parent' ? 'View and securely pay your school fees online.' : 'Process payments and view transaction history.'}
           </p>
         </div>
-        <button 
-          onClick={() => setShowModal(true)}
-          className="bg-indigo-600 text-white px-6 py-3 flex items-center gap-2 rounded-2xl font-bold uppercase tracking-widest shadow-xl hover:shadow-2xl hover:bg-indigo-700 hover:-translate-y-1 transition-all"
-        >
-          <Plus strokeWidth={3} size={20} /> {user?.role === 'parent' ? 'Pay Fees' : 'Record Payment'}
-        </button>
+        <div className="flex items-center gap-3 no-print">
+          <button 
+            onClick={() => window.print()}
+            className="bg-white text-gray-700 px-6 py-3 flex items-center gap-2 rounded-2xl font-bold uppercase tracking-widest shadow-xl border border-gray-100 hover:shadow-2xl hover:bg-gray-50 hover:-translate-y-1 transition-all"
+          >
+            <Printer strokeWidth={3} size={20} /> Print
+          </button>
+          <button 
+            onClick={() => setShowModal(true)}
+            className="bg-indigo-600 text-white px-6 py-3 flex items-center gap-2 rounded-2xl font-bold uppercase tracking-widest shadow-xl hover:shadow-2xl hover:bg-indigo-700 hover:-translate-y-1 transition-all"
+          >
+            <Plus strokeWidth={3} size={20} /> {user?.role === 'parent' ? 'Pay Fees' : 'Record Payment'}
+          </button>
+        </div>
       </header>
+
+      <div className="print-area print:mb-8">
+        <PrintableLetterhead />
+      </div>
 
       {loading ? (
         <div className="h-64 bg-white/20 backdrop-blur-md rounded-[32px] shadow-sm border border-white/40 animate-pulse" />
