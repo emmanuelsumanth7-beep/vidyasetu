@@ -20,6 +20,7 @@ const auditLogger = (actionName, targetTable = null) => {
             action: `${actionPrefix}_${actionName} [IP: ${req.ip}]`,
             targetTable: targetTable,
             targetId: req.params.id || req.body.id || null, // Best effort to capture ID
+            details: req.body ? JSON.stringify(req.body) : null
           }
         });
       } catch (err) {

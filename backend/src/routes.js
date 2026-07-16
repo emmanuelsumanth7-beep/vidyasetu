@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { router: mfaRouter } = require('./routes/mfa');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
@@ -7,18 +8,15 @@ const prisma = new PrismaClient();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey';
 
-// Middleware to verify JWT token
-const authenticate = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: 'Missing authorization header' });
-  
-  const token = authHeader.split(' ')[1];
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Invalid token' });
-    req.user = user;
-    next();
-  });
-};
+const { verifyFirebaseAuth } = require('./middleware/firebaseAuth');
+const { auditLogger } = require('./middleware/audit');
+const { sendParentNotification } = require('./utils/notifier');
+
+// Middleware to verify Firebase token
+const authenticate = verifyFirebaseAuth;
+
+// Inject MFA Routes
+router.use('/auth/mfa', authenticate, mfaRouter);
 
 const authorize = (roles = []) => {
   return (req, res, next) => {
@@ -192,135 +190,53 @@ router.get('/classes', authenticate, authorize(['principal', 'admin', 'clerk', '
 });
 
 // ==========================================
-// AUTHENTICATION ROUTES
+// AUTHENTICATION ROUTES (Firebase)
 // ==========================================
 
-// Staff Login (Password based)
-router.post('/auth/login', async (req, res) => {
-  const { phoneNumber, password } = req.body;
-  const { prisma } = req;
-  
+router.post('/auth/sync', authenticate, async (req, res) => {
+  // By the time it reaches here, the middleware has verified the Firebase Token
+  // and attached req.user if they exist in the DB.
+  const { prisma, firebaseUser } = req;
+  const phoneNumber = firebaseUser ? firebaseUser.phone_number : (req.user ? req.user.phoneNumber : null);
+
   try {
-    const user = await prisma.user.findFirst({
-      where: { phoneNumber }
-    });
-    
-    if (!user || !user.passwordHash) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    let user = req.user;
+
+    // If user doesn't exist, we can automatically create a generic parent account for them,
+    // or they have to be pre-registered by the school. 
+    // For this prototype, we'll auto-register them as a parent if they don't exist.
+    if (!user) {
+      const schoolId = 'fcbde93f-767f-40da-af8f-306caf98676a';
+      
+      // Ensure school exists
+      let school = await prisma.school.findUnique({ where: { id: schoolId } });
+      if (!school) {
+        school = await prisma.school.create({
+          data: { id: schoolId, name: 'Vidya Setu International', address: 'Bangalore' }
+        });
+      }
+
+      user = await prisma.user.create({
+        data: {
+          name: 'New User (Firebase)',
+          role: 'parent',
+          phoneNumber: phoneNumber,
+          schoolId: school.id
+        }
+      });
     }
-    
-    const isValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    const token = jwt.sign({ id: user.id, role: user.role, schoolId: user.schoolId }, JWT_SECRET, { expiresIn: '24h' });
     
     // Log the action
     await prisma.auditLog.create({
       data: {
         userId: user.id,
-        action: 'staff_login'
+        action: 'firebase_login_sync'
       }
     });
 
-    res.json({ token, user: { id: user.id, role: user.role, name: user.name, schoolId: user.schoolId } });
+    res.json({ user: { id: user.id, role: user.role, name: user.name, schoolId: user.schoolId } });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Parent Login (Mock Implementation as requested)
-router.post('/auth/send-otp', async (req, res) => {
-  const { phoneNumber } = req.body;
-  console.log(`[Mock] Sending OTP to ${phoneNumber}`);
-  res.json({ message: 'OTP sent' });
-});
-
-router.post('/auth/verify-otp', async (req, res) => {
-  let { phoneNumber, otp } = req.body;
-  const { prisma } = req;
-  
-  if (!phoneNumber.startsWith('+')) phoneNumber = `+91${phoneNumber}`;
-  const cleanPhone = phoneNumber.replace(/\s+/g, '');
-
-  const validLogins = {
-    '+917483292660': { otp: '090009', role: 'principal', name: 'Principal Sharma' },
-    '+919141161008': { otp: '890765', role: 'parent', name: 'Rajesh (Parent)' },
-    '+917483575296': { otp: '787509', role: 'student', name: 'Ravi (Student)' },
-    '+919945841675': { otp: '000001', role: 'teacher', name: 'Ms. Anita (Teacher)' }
-  };
-
-  const account = validLogins[cleanPhone];
-  if (!account || otp !== account.otp) {
-    return res.status(401).json({ error: 'Invalid Phone Number or OTP' });
-  }
-
-  try {
-    const schoolId = 'fcbde93f-767f-40da-af8f-306caf98676a';
-    
-    // Ensure school exists
-    let school = await prisma.school.findUnique({ where: { id: schoolId } });
-    if (!school) {
-      school = await prisma.school.create({
-        data: { id: schoolId, name: 'Vidya Setu International', address: 'Bangalore' }
-      });
-    }
-
-    let user = await prisma.user.findFirst({
-      where: { phoneNumber: cleanPhone }
-    });
-    
-    if (!user) {
-      user = await prisma.user.create({
-         data: {
-           name: account.name,
-           role: account.role,
-           phoneNumber: cleanPhone,
-           schoolId: school.id
-         }
-       });
-
-       // Create required relational data to prevent dashboard crashes
-       // 1. Create a default class and teacher if needed
-       let defaultClass = await prisma.class.findFirst({ where: { schoolId: school.id } });
-       if (!defaultClass && account.role !== 'teacher') {
-         // Need a generic teacher for the class
-         const genericTeacher = await prisma.user.create({
-           data: { name: 'Generic Teacher', role: 'teacher', phoneNumber: '+910000000000', schoolId: school.id }
-         });
-         defaultClass = await prisma.class.create({
-           data: { name: '10th Grade A', schoolId: school.id, classTeacherId: genericTeacher.id }
-         });
-       } else if (account.role === 'teacher') {
-         defaultClass = await prisma.class.create({
-           data: { name: '10th Grade B', schoolId: school.id, classTeacherId: user.id }
-         });
-       }
-
-       // 2. Setup relations based on role
-       if (account.role === 'parent') {
-         const studentUser = await prisma.user.create({
-           data: { name: 'Child of Rajesh', role: 'student', phoneNumber: '+911111111111', schoolId: school.id }
-         });
-         const student = await prisma.student.create({
-           data: { name: 'Child of Rajesh', rollNumber: '10A-42', schoolId: school.id, classId: defaultClass.id, userId: studentUser.id }
-         });
-         await prisma.parentStudentLink.create({
-           data: { parentUserId: user.id, studentId: student.id, relationship: 'father' }
-         });
-       } else if (account.role === 'student') {
-         await prisma.student.create({
-           data: { name: account.name, rollNumber: '10A-45', schoolId: school.id, classId: defaultClass.id, userId: user.id }
-         });
-       }
-    }
-    
-    const token = jwt.sign({ id: user.id, role: user.role, schoolId: user.schoolId }, JWT_SECRET, { expiresIn: '24h' });
-    res.json({ token, user: { id: user.id, role: user.role, name: user.name, schoolId: user.schoolId } });
-  } catch (error) {
-    console.error('Login Error:', error);
+    console.error('Firebase Sync Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -722,6 +638,14 @@ router.post('/fees/pay', authenticate, async (req, res) => {
     return res.status(403).json({ error: 'Permission denied' });
   }
 
+  // Strict Validation
+  if (!studentId || studentId.trim() === '') {
+    return res.status(400).json({ error: 'Student must be selected.' });
+  }
+  if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+    return res.status(400).json({ error: 'Invalid fee amount.' });
+  }
+
   try {
     if (user.role === 'parent') {
       const link = await prisma.parentStudentLink.findFirst({
@@ -746,10 +670,50 @@ router.post('/fees/pay', authenticate, async (req, res) => {
     // Broadcast fee collected
     io.to(`school_${user.schoolId}`).emit('feeCollected', receipt);
 
+    // Send SMS Notification to Parent
+    await sendParentNotification({
+      type: 'sms',
+      phone: null, // Would fetch actual parent phone in prod
+      studentName: receipt.student.name,
+      message: `Dear Parent, fee payment of ₹${receipt.amount.toLocaleString()} for ${receipt.feeHead} has been successfully recorded. Receipt: ${receipt.receiptNumber}`
+    });
+
     res.status(201).json(receipt);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to process fee payment' });
+  }
+});
+
+// Principal Only: Delete/Reverse a Fee
+router.delete('/fees/:id', authenticate, auditLogger, async (req, res) => {
+  const { prisma, user, io } = req;
+  const { id } = req.params;
+
+  if (user.role !== 'principal') {
+    return res.status(403).json({ error: 'Only the Principal can delete or reverse a fee receipt.' });
+  }
+
+  try {
+    const deleted = await prisma.feeReceipt.delete({
+      where: { id }
+    });
+    
+    // Broadcast fee deleted
+    io.to(`school_${user.schoolId}`).emit('feeDeleted', { id: deleted.id });
+
+    // Send SMS Notification about reversal
+    await sendParentNotification({
+      type: 'whatsapp',
+      phone: null,
+      studentName: 'N/A', // Could fetch from deleted.studentId
+      message: `Dear Parent, the fee receipt ${deleted.receiptNumber} has been reversed by the Principal.`
+    });
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete fee receipt' });
   }
 });
 
@@ -794,6 +758,16 @@ router.post('/notices', authenticate, async (req, res) => {
 
     // Broadcast new notice
     io.to(`school_${user.schoolId}`).emit('noticePublished', notice);
+
+    // Send SMS/WhatsApp Notification to Audience
+    if (audience === 'parent' || audience === 'all') {
+      await sendParentNotification({
+        type: 'whatsapp',
+        phone: null,
+        studentName: 'All Wards',
+        message: `School Notice: ${notice.title} - Log into Vidya Setu app to read more.`
+      });
+    }
 
     res.status(201).json(notice);
   } catch (error) {
@@ -1222,4 +1196,225 @@ router.post('/homework', authenticate, async (req, res) => {
   }
 });
 
+// ==========================================
+// PAYROLL / SALARY ROUTES
+// ==========================================
+router.get('/salary', authenticate, async (req, res) => {
+  const { prisma, user } = req;
+  try {
+    let whereClause = { schoolId: user.schoolId };
+    // Principal can see everyone's slips; staff can only see their own.
+    if (user.role !== 'principal') {
+      whereClause.staffId = user.id;
+    }
+    const slips = await prisma.salarySlip.findMany({
+      where: whereClause,
+      include: { staff: { select: { name: true, role: true } }, generatedBy: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(slips);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch salary slips' });
+  }
+});
+
+router.post('/salary/generate', authenticate, authorize(['principal']), auditLogger('GENERATE_SALARY', 'SalarySlip'), async (req, res) => {
+  const { prisma, user } = req;
+  const { staffId, monthYear, basicPay, allowances, deductions } = req.body;
+  try {
+    const basic = parseFloat(basicPay);
+    const allow = parseFloat(allowances) || 0;
+    const deduct = parseFloat(deductions) || 0;
+    const netPay = basic + allow - deduct;
+
+    const slip = await prisma.salarySlip.create({
+      data: {
+        schoolId: user.schoolId,
+        staffId,
+        generatedById: user.id,
+        monthYear,
+        basicPay: basic,
+        allowances: allow,
+        deductions: deduct,
+        netPay
+      },
+      include: { staff: { select: { name: true, role: true } }, generatedBy: { select: { name: true } } }
+    });
+    res.status(201).json(slip);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to generate salary slip' });
+  }
+});
+
+// ==========================================
+// EXPENSE & ACCOUNTS ROUTES
+// ==========================================
+router.get('/expenses', authenticate, authorize(['principal', 'accountant']), async (req, res) => {
+  const { prisma, user } = req;
+  try {
+    const expenses = await prisma.expense.findMany({
+      where: { schoolId: user.schoolId },
+      include: { recordedBy: { select: { name: true } } },
+      orderBy: { date: 'desc' }
+    });
+    res.json(expenses);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch expenses' });
+  }
+});
+
+router.post('/expenses', authenticate, authorize(['principal', 'accountant']), auditLogger('RECORD_EXPENSE', 'Expense'), async (req, res) => {
+  const { prisma, user } = req;
+  const { title, amount, category } = req.body;
+  try {
+    const expense = await prisma.expense.create({
+      data: {
+        schoolId: user.schoolId,
+        title,
+        amount: parseFloat(amount),
+        category,
+        recordedById: user.id
+      },
+      include: { recordedBy: { select: { name: true } } }
+    });
+    res.status(201).json(expense);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to record expense' });
+  }
+});
+
+// ==========================================
+// LEAVE MANAGEMENT ROUTES
+// ==========================================
+router.get('/leaves', authenticate, async (req, res) => {
+  const { prisma, user } = req;
+  try {
+    let whereClause = { schoolId: user.schoolId };
+    if (user.role !== 'principal') {
+      whereClause.staffId = user.id;
+    }
+    const leaves = await prisma.staffLeave.findMany({
+      where: whereClause,
+      include: { staff: { select: { name: true, role: true } }, reviewedBy: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(leaves);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch leaves' });
+  }
+});
+
+router.post('/leaves', authenticate, async (req, res) => {
+  const { prisma, user } = req;
+  const { reason, startDate, endDate } = req.body;
+  try {
+    const leave = await prisma.staffLeave.create({
+      data: {
+        schoolId: user.schoolId,
+        staffId: user.id,
+        reason,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate)
+      }
+    });
+    res.status(201).json(leave);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to request leave' });
+  }
+});
+
+router.put('/leaves/:id', authenticate, authorize(['principal']), auditLogger('REVIEW_LEAVE', 'StaffLeave'), async (req, res) => {
+  const { prisma, user } = req;
+  const { status } = req.body;
+  try {
+    const leave = await prisma.staffLeave.update({
+      where: { id: req.params.id },
+      data: { status, reviewedById: user.id },
+      include: { staff: { select: { name: true, role: true } }, reviewedBy: { select: { name: true } } }
+    });
+    res.json(leave);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update leave status' });
+  }
+});
+
+// ==========================================
+// AI COPILOT ROUTE (GEMINI/VERTEX AI)
+// ==========================================
+router.post('/ai/ask-vidya', authenticate, authorize(['principal', 'teacher']), async (req, res) => {
+  const { query } = req.body;
+  if (!query) {
+    return res.status(400).json({ error: 'Query is required' });
+  }
+
+  try {
+    const projectId = process.env.GEMINI_PROJECT_ID;
+    const token = process.env.GEMINI_API_KEY;
+
+    // Use fetch to call Google AI Studio API directly
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${token}`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: `You are Vidya, an AI assistant for the Vidya Setu school management system. Answer the following query concisely based on general school operations knowledge: ${query}` }]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 256
+        }
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Gemini API Error:", data);
+      return res.status(500).json({ error: 'Failed to communicate with AI service.', details: data });
+    }
+
+    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I couldn't generate a response.";
+    res.json({ answer: aiResponse });
+
+  } catch (error) {
+    console.error("AI Copilot Error:", error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;
+
+// Allow creating a class from the students page
+router.post('/classes', authenticate, authorize(['principal', 'admin', 'clerk', 'teacher']), async (req, res) => {
+  try {
+    const { name } = req.body;
+    let teacher = await prisma.user.findFirst({ where: { schoolId: req.user.schoolId, role: 'teacher' } });
+    if (!teacher) {
+      teacher = await prisma.user.findFirst({ where: { schoolId: req.user.schoolId, role: 'principal' } });
+    }
+    const created = await prisma.class.create({
+      data: {
+        schoolId: req.user.schoolId,
+        name,
+        classTeacherId: teacher.id
+      }
+    });
+    res.json(created);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});

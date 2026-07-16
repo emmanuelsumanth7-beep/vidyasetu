@@ -1,0 +1,103 @@
+import json
+import re
+
+svg_code = """<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGrad" cx="35%" cy="25%" r="85%">
+      <stop offset="0%" stop-color="#8B5FE0"/>
+      <stop offset="55%" stop-color="#5A31A6"/>
+      <stop offset="100%" stop-color="#331A5C"/>
+    </radialGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5C9BFF"/>
+      <stop offset="100%" stop-color="#2354C7"/>
+    </linearGradient>
+    <linearGradient id="yellowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE066"/>
+      <stop offset="100%" stop-color="#FFB700"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A7A"/>
+      <stop offset="100%" stop-color="#E0202F"/>
+    </linearGradient>
+    <linearGradient id="pagesGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFDF7"/>
+      <stop offset="100%" stop-color="#EFE3C6"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEDBB"/>
+      <stop offset="100%" stop-color="#D4A94A"/>
+    </linearGradient>
+    <clipPath id="bgClip">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+    <clipPath id="book1Clip">
+      <rect x="38" y="133" width="124" height="24" rx="6"/>
+    </clipPath>
+    <clipPath id="book2Clip">
+      <rect x="48" y="111" width="104" height="22" rx="5"/>
+    </clipPath>
+    <clipPath id="book3Clip">
+      <rect x="57" y="90" width="86" height="20" rx="5"/>
+    </clipPath>
+  </defs>
+
+  <!-- Deep purple circular background -->
+  <circle cx="100" cy="100" r="100" fill="url(#bgGrad)"/>
+  <g clip-path="url(#bgClip)">
+    <ellipse cx="65" cy="50" rx="75" ry="42" fill="#FFFFFF" opacity="0.09"/>
+  </g>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2"/>
+
+  <!-- Grounding shadow -->
+  <ellipse cx="100" cy="163" rx="66" ry="9" fill="#000000" opacity="0.20"/>
+
+  <!-- Book 1 : blue (bottom) -->
+  <g transform="rotate(-4 100 145)">
+    <rect x="38" y="133" width="124" height="24" rx="6" fill="url(#blueGrad)"/>
+    <g clip-path="url(#book1Clip)">
+      <rect x="148" y="133" width="14" height="24" fill="url(#pagesGrad)"/>
+    </g>
+    <rect x="46" y="136" width="100" height="3" rx="1.5" fill="#FFFFFF" opacity="0.25"/>
+  </g>
+
+  <!-- Book 2 : yellow (middle) -->
+  <g transform="rotate(4 100 122)">
+    <rect x="48" y="111" width="104" height="22" rx="5" fill="url(#yellowGrad)"/>
+    <g clip-path="url(#book2Clip)">
+      <rect x="48" y="111" width="14" height="22" fill="url(#pagesGrad)"/>
+    </g>
+    <rect x="58" y="114" width="78" height="3" rx="1.5" fill="#FFFFFF" opacity="0.28"/>
+  </g>
+
+  <!-- Book 3 : red (top) -->
+  <g transform="rotate(-6 100 100)">
+    <rect x="57" y="90" width="86" height="20" rx="5" fill="url(#redGrad)"/>
+    <g clip-path="url(#book3Clip)">
+      <rect x="129" y="90" width="14" height="20" fill="url(#pagesGrad)"/>
+    </g>
+    <rect x="65" y="93" width="62" height="3" rx="1.5" fill="#FFFFFF" opacity="0.28"/>
+  </g>
+
+  <!-- Shadow where glasses rest on the top book -->
+  <ellipse cx="100" cy="93" rx="32" ry="4" fill="#000000" opacity="0.18"/>
+
+  <!-- Reading glasses -->
+  <line x1="60" y1="80" x2="44" y2="87" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="140" y1="80" x2="156" y2="87" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M95,83 Q100,78 105,83" fill="none" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="78" cy="83" rx="19" ry="13.5" fill="#DCEFFF" opacity="0.45"/>
+  <ellipse cx="78" cy="83" rx="19" ry="13.5" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+  <ellipse cx="122" cy="83" rx="19" ry="13.5" fill="#DCEFFF" opacity="0.45"/>
+  <ellipse cx="122" cy="83" rx="19" ry="13.5" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+  <ellipse cx="71" cy="78" rx="6" ry="3.5" fill="#FFFFFF" opacity="0.55"/>
+  <ellipse cx="115" cy="78" rx="6" ry="3.5" fill="#FFFFFF" opacity="0.55"/>
+</svg>"""
+
+with open('unique_svgs_fixed.json') as f:
+    svgs = json.load(f)
+
+svgs[4] = svg_code
+
+with open('unique_svgs_fixed.json', 'w') as f:
+    json.dump(svgs, f, indent=2)

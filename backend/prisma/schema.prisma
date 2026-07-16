@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -27,6 +27,9 @@ model School {
   buses             Bus[]
   documentApprovals DocumentApproval[]
   Message           Message[]
+  salarySlips       SalarySlip[]
+  expenses          Expense[]
+  staffLeaves       StaffLeave[]
 }
 
 model User {
@@ -37,9 +40,12 @@ model User {
   name         String
   phoneNumber  String
   email        String?
-  passwordHash String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  passwordHash     String?
+  isActive         Boolean   @default(true)
+  totpSecret       String?
+  mfaEnabled       Boolean   @default(false)
+  lastAccessReview DateTime?
+  createdAt        DateTime  @default(now())
 
   classesInCharge           Class[]
   subjectAssignments        TeacherSubjectAssignment[]
@@ -60,6 +66,11 @@ model User {
   students                  Student[]                  @relation("StudentLogin")
   submittedDocuments        DocumentApproval[]         @relation("SubmittedDocuments")
   signedDocuments           DocumentApproval[]         @relation("SignedDocuments")
+  salarySlipsReceived       SalarySlip[]               @relation("SalaryReceived")
+  salarySlipsGenerated      SalarySlip[]               @relation("SalaryGenerated")
+  staffLeavesRequested      StaffLeave[]               @relation("StaffLeavesRequested")
+  staffLeavesReviewed       StaffLeave[]               @relation("StaffLeavesReviewed")
+  expensesRecorded          Expense[]                  @relation("ExpensesRecorded")
 }
 
 model Class {
@@ -98,8 +109,10 @@ model Student {
   name        String
   rollNumber  String
   dob         DateTime?
-  photoUrl    String?
-  rfidCardUid String?   @unique
+  photoUrl        String?
+  rfidCardUid     String?   @unique
+  parentalConsent Boolean   @default(false)
+  retentionExpiry DateTime?
 
   bloodGroup        String?
   aadhaar           String?
@@ -295,6 +308,7 @@ model AuditLog {
   action      String
   targetTable String?
   targetId    String?
+  details     String?
   createdAt   DateTime @default(now())
 }
 
@@ -324,4 +338,49 @@ model Message {
   content    String
   readAt     DateTime?
   createdAt  DateTime  @default(now())
+}
+
+model SalarySlip {
+  id            String   @id @default(uuid())
+  schoolId      String
+  school        School   @relation(fields: [schoolId], references: [id])
+  staffId       String
+  staff         User     @relation("SalaryReceived", fields: [staffId], references: [id])
+  generatedById String
+  generatedBy   User     @relation("SalaryGenerated", fields: [generatedById], references: [id])
+  monthYear     String
+  basicPay      Float
+  allowances    Float
+  deductions    Float
+  netPay        Float
+  status        String   @default("paid")
+  createdAt     DateTime @default(now())
+}
+
+model Expense {
+  id           String   @id @default(uuid())
+  schoolId     String
+  school       School   @relation(fields: [schoolId], references: [id])
+  title        String
+  amount       Float
+  category     String
+  date         DateTime @default(now())
+  recordedById String
+  recordedBy   User     @relation("ExpensesRecorded", fields: [recordedById], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model StaffLeave {
+  id           String   @id @default(uuid())
+  schoolId     String
+  school       School   @relation(fields: [schoolId], references: [id])
+  staffId      String
+  staff        User     @relation("StaffLeavesRequested", fields: [staffId], references: [id])
+  reason       String
+  startDate    DateTime
+  endDate      DateTime
+  status       String   @default("pending") // pending, approved, rejected
+  reviewedById String?
+  reviewedBy   User?    @relation("StaffLeavesReviewed", fields: [reviewedById], references: [id])
+  createdAt    DateTime @default(now())
 }

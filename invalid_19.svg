@@ -1,0 +1,91 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#FFF3DC"/>
+      <stop offset="55%" stop-color="#FCE3AE"/>
+      <stop offset="100%" stop-color="#F5C86B"/>
+    </radialGradient>
+
+    <!-- Document gradient -->
+    <linearGradient id="paperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F3F1EA"/>
+    </linearGradient>
+
+    <!-- Stamp gradient -->
+    <radialGradient id="stampGrad" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#4ADE80"/>
+      <stop offset="55%" stop-color="#22B573"/>
+      <stop offset="100%" stop-color="#0E8F57"/>
+    </radialGradient>
+
+    <!-- Gold ring gradient for accents -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE9A8"/>
+      <stop offset="50%" stop-color="#E8B84B"/>
+      <stop offset="100%" stop-color="#C6902A"/>
+    </linearGradient>
+
+    <!-- Soft drop shadow for document -->
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#8A5A1E" flood-opacity="0.28"/>
+    </filter>
+
+    <!-- Glow for stamp -->
+    <filter id="stampGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="stampShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#0E5C38" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <circle cx="100" cy="100" r="98" fill="url(#bgGrad)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#E8B84B" stroke-width="1.5
+
+>
+
+  <!-- Text lines -->
+  <rect x="66" y="66" width="48" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="74" width="44" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="82" width="48" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="90" width="38" height="3" rx="1.5" fill="#D9D2C0"/>
+
+  <rect x="66" y="104" width="48" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="112" width="44" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="120" width="30" height="3" rx="1.5" fill="#D9D2C0"/>
+
+  <!-- Small gold signature line -->
+  <rect x="66" y="130" width="26" height="2.5" rx="1.25" fill="#C6902A" opacity="0.5"/>
+
+  <!-- Glow behind stamp -->
+  <circle cx="126" cy="108" r="34" fill="#22B573" opacity="0.18" filter="url(#stampGlow)"/>
+
+  <!-- Approved stamp -->
+  <g filter="url(#stampShadow)" transform="rotate(-14 126 108)">
+    <circle cx="126" cy="108" r="27" fill="url(#stampGrad)"/>
+    <circle cx="126" cy="108" r="27" fill="none" stroke="#F4FFF7" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="126" cy="108" r="22.5" fill="none" stroke="#F4FFF7" stroke-width="1.2" stroke-dasharray="3 2.5" opacity="0.85"/>
+
+    <!-- Checkmark -->
+    <path d="M 115 108 L 122 115 L 137 99" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+    <!-- Curved text arcs (decorative, suggests stamp text rings) -->
+    <path id="topArc" d="M 106 100 A 22 22 0 0 1 146 100" fill="none" stroke="#F4FFF7" stroke-width="1" opacity="0.5"/>
+  </g>
+
+  <!-- Small gold badge accent bottom-left of document -->
+  <circle cx="68" cy="128" r="0" fill="none"/>
+
+  <!-- Fine gold corner accents on background -->
+  <path d="M 24 24 L 24 34 M 24 24 L 34 24" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
+  <path d="M 176 176 L 176 166 M 176 176 L 166 176" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
+</svg>

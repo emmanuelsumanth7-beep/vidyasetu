@@ -1,0 +1,2065 @@
+=== SVG 0 ===
+<USER_REQUEST>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <defs>
+        <!-- Soft Light-Blue Circular Background Gradient -->
+        <linearGradient id="iconBG" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#95D9F1;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#65A6D1;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    
+    <!-- Background Circle with Entrance Animation -->
+    <circle cx="256" cy="256" r="256" fill="url(#iconBG)">
+        <animate attributeName="r" from="0" to="256" dur="0.6s" fill="freeze" calcMode="spline" keySplines="0.4, 0, 0.2, 1" />
+        <animate attributeName="opacity" from="0" to="1" dur="0.4s" fill="freeze" />
+    </circle>
+    
+    <!-- Money Stacker Animation (Slide In and Drop) -->
+    <g>
+        <animateTransform attributeName="transform" type="translate" from="110, -300" to="110, 160" dur="0.8s" begin="0.4s" fill="freeze" calcMode="spline" keySplines="0.215, 0.61, 0.355, 1" />
+        <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.4s" fill="freeze" />
+
+        <!-- Bills are static within this animated group -->
+        <g>
+            <path d="M10,80 L200,80 A10,10 0 0 1 210,90 L210,210 A10,10 0 0 1 200,220 L10,220 A10,10 0 0 1 0,210 L0,90 A10,10 0 0 1 10,80 Z" fill="#2ECC71" transform="skewX(-15)"/>
+            <path d="M10,60 L200,60 A10,10 0 0 1 210,70 L210,190 A10,10 0 0 1 200,200 L10,200 A10,10 0 0 1 0,190 L0,70 A10,10 0 0 1 10,60 Z" fill="#36E37D" transform="skewX(-10)"/>
+            <path d="M10,40 L200,40 A10,10 0 0 1 210,50 L210,170 A10,10 0 0 1 200,180 L10,180 A10,10 0 0 1 0,170 L0,50 A10,10 0 0 1 10,40 Z" fill="#3DFF8C"/>
+            <path d="M60,80 L160,80" stroke="#FFF" stroke-width="6" stroke-linecap="round"/>
+            <path d="M60,110 L160,110" stroke="#FFF" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="110" cy="140" r="15" fill="#FFF"/>
+        </g>
+    </g>
+    
+    <!-- Document Animation (Slide In from the Right) -->
+    <g>
+        <animateTransform attributeName="transform" type="translate" from="700, 100" to="300, 100" dur="0.8s" begin="0.6s" fill="freeze" calcMode="spline" keySplines="0.215, 0.61, 0.355, 1" />
+        <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.6s" fill="freeze" />
+
+        <!-- Form elements are static within this animated group -->
+        <g>
+            <rect x="0" y="0" width="160" height="220" rx="10" fill="#FFFFFF"/>
+            <line x1="30" y1="40" x2="130" y2="40" stroke="#DDE7EC" stroke-width="8" stroke-linecap="round"/>
+            <line x1="30" y1="70" x2="130" y2="70" stroke="#DDE7EC" stroke-width="8" stroke-linecap="round"/>
+            <line x1="30" y1="100" x2="130" y2="100" stroke="#DDE7EC" stroke-width="8" stroke-linecap="round"/>
+            <line x1="30" y1="140" x2="80" y2="140" stroke="#B0BEC5" stroke-width="6" stroke-linecap="round"/>
+            <line x1="30" y1="170" x2="100" y2="170" stroke="#B0BEC5" stroke-width="6" stroke-linecap="round"/>
+        </g>
+    </g>
+
+    <!-- Large Orange Checkmark Animation (Draw and Pulsate) -->
+    <path d="M350,260 L370,280 L430,220" stroke="#FF5722" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"
+          stroke-dasharray="160" stroke-dashoffset="160">
+        <animate attributeName="stroke-dashoffset" from="160" to="0" dur="0.6s" begin="1.4s" fill="freeze" calcMode="spline" keySplines="0.4, 0, 0.2, 1" />
+        
+        <!-- Subtle pulsation animation -->
+        <animateTransform attributeName="transform" type="scale" from="1" to="1.05" dur="1s" begin="2s" repeatCount="indefinite" additive="sum" />
+        <animateTransform attributeName="transform" type="scale" from="1.05" to="1" dur="1s" begin="3s" repeatCount="indefinite" additive="sum" />
+    </path>
+    
+</svg>
+
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T21:46:35+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 1 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EAF6FF"/>
+      <stop offset="100%" stop-color="#CDE9FF"/>
+    </linearGradient>
+    <linearGradient id="shirtGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#57A2FF"/>
+      <stop offset="100%" stop-color="#2E74E6"/>
+    </linearGradient>
+    <linearGradient id="headGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB681"/>
+      <stop offset="100%" stop-color="#FF8A42"/>
+    </linearGradient>
+    <clipPath id="circleClip">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+
+  <!-- Soft light-blue circular background -->
+  <circle cx="100" cy="100" r="100" fill="url(#bgGrad)"/>
+
+  <!-- Subtle premium rim -->
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="2"/>
+
+  <g clip-path="url(#circleClip)">
+    <!-- Soft ground shadow beneath the avatar -->
+    <ellipse cx="100" cy="176" rx="62" ry="14" fill="#1E4FA8" opacity="0.10"/>
+
+    <!-- Shirt / shoulders -->
+    <path d="M100,112
+             C68,112 42,133 35,172
+             C33,182 33,192 33,200
+             L167,200
+             C167,192 167,182 165,172
+             C158,133 132,112 100,112 Z"
+          fill="url(#shirtGrad)"/>
+
+    <!-- Collar detail -->
+    <path d="M83,114 Q100,132 117,114 L117,124 Q100,140 83,124 Z"
+          fill="#FFFFFF" opacity="0.18"/>
+
+    <!-- Shirt shading for depth -->
+    <path d="M100,112 C132,112 158,133 165,172 C166,178 167,184 167,190
+             L150,190 C148,158 128,128 100,120 Z"
+          fill="#1E5FCC" opacity="0.25"/>
+  </g>
+
+  <!-- Head -->
+  <circle cx="100" cy="80" r="38" fill="url(#headGrad)"/>
+
+  <!-- Head shading for depth -->
+  <path d="M100,42 C120,42 136,58 138,78 C128,64 116,56 100,56 C90,56 81,60 74,66
+           C81,50 90,42 100,42 Z" fill="#E8722A" opacity="0.20"/>
+
+  <!-- Head highlight for premium finish -->
+  <ellipse cx="86" cy="65" rx="11" ry="7" fill="#FFFFFF" opacity="0.30"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:14:09+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 2 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="backGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7C600"/>
+      <stop offset="100%" stop-color="#E6B400"/>
+    </linearGradient>
+    <linearGradient id="frontGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE066"/>
+      <stop offset="100%" stop-color="#FFC300"/>
+    </linearGradient>
+    <linearGradient id="foldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E6A800"/>
+      <stop offset="100%" stop-color="#CC8F00"/>
+    </linearGradient>
+    <radialGradient id="pinGrad" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#FF7A7A"/>
+      <stop offset="55%" stop-color="#F13C4E"/>
+      <stop offset="100%" stop-color="#D6202F"/>
+    </radialGradient>
+    <linearGradient id="pinNeedle" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E8E8E8"/>
+      <stop offset="100%" stop-color="#B0B0B0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Grounding shadow -->
+  <ellipse cx="102" cy="178" rx="66" ry="9" fill="#000000" opacity="0.08"/>
+
+  <!-- Back sticky note -->
+  <g transform="rotate(-9 85 100)">
+    <rect x="35" y="50" width="100" height="100" rx="12" fill="url(#backGrad)"/>
+  </g>
+
+  <!-- Front sticky note -->
+  <g transform="rotate(7 115 115)">
+    <rect x="65" y="65" width="100" height="100" rx="12" fill="url(#frontGrad)"/>
+    <!-- folded corner -->
+    <path d="M165,165 L165,141 L141,165 Z" fill="url(#foldGrad)"/>
+    <!-- soft top sheen -->
+    <rect x="67" y="67" width="96" height="20" rx="10" fill="#FFFFFF" opacity="0.16"/>
+  </g>
+
+  <!-- Pin needle glint (peeking under the pin) -->
+  <path d="M101,88 L115,88 L108,100 Z" fill="url(#pinNeedle)"/>
+
+  <!-- Shadow cast by pin head onto paper -->
+  <ellipse cx="108" cy="90" rx="11" ry="4" fill="#000000" opacity="0.15"/>
+
+  <!-- Push-pin head -->
+  <circle cx="108" cy="76" r="17" fill="url(#pinGrad)"/>
+  <ellipse cx="102" cy="70" rx="6" ry="4" fill="#FFFFFF" opacity="0.45"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:17:35+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 3 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F3F5FA"/>
+      <stop offset="100%" stop-color="#DEE4F0"/>
+    </linearGradient>
+    <linearGradient id="chairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#66AEDB"/>
+      <stop offset="100%" stop-color="#2E7FB0"/>
+    </linearGradient>
+    <linearGradient id="chairLegGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2A6D96"/>
+      <stop offset="100%" stop-color="#1F5578"/>
+    </linearGradient>
+    <linearGradient id="deskTopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EDAD6E"/>
+      <stop offset="100%" stop-color="#C9793A"/>
+    </linearGradient>
+    <linearGradient id="deskLegGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#B36A2E"/>
+      <stop offset="100%" stop-color="#8F5322"/>
+    </linearGradient>
+    <linearGradient id="xGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A7A"/>
+      <stop offset="100%" stop-color="#E0202F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Soft circular background -->
+  <circle cx="100" cy="100" r="100" fill="url(#bgGrad)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="2"/>
+
+  <!-- Grounding shadow -->
+  <ellipse cx="106" cy="181" rx="66" ry="8" fill="#000000" opacity="0.07"/>
+
+  <!-- Chair (peeking behind the desk) -->
+  <rect x="42" y="66" width="24" height="38" rx="6" fill="url(#chairGrad)"/>
+  <rect x="38" y="102" width="34" height="10" rx="4" fill="url(#chairGrad)"/>
+  <rect x="42" y="112" width="4" height="28" rx="2" fill="url(#chairLegGrad)"/>
+  <rect x="68" y="112" width="4" height="28" rx="2" fill="url(#chairLegGrad)"/>
+
+  <!-- Desk -->
+  <rect x="112" y="116" width="34" height="16" rx="3" fill="url(#deskLegGrad)"/>
+  <rect x="124" y="122" width="10" height="3" rx="1.5" fill="#6B4321"/>
+  <rect x="70" y="130" width="9" height="42" rx="3" fill="url(#deskLegGrad)"/>
+  <rect x="147" y="130" width="9" height="42" rx="3" fill="url(#deskLegGrad)"/>
+  <rect x="62" y="116" width="102" height="14" rx="5" fill="url(#deskTopGrad)"/>
+  <rect x="62" y="116" width="102" height="4" rx="2" fill="#FFFFFF" opacity="0.28"/>
+
+  <!-- Shadow cast by the hovering X onto the desk -->
+  <ellipse cx="118" cy="119" rx="17" ry="4" fill="#000000" opacity="0.14"/>
+
+  <!-- Hovering red X mark -->
+  <g>
+    <rect x="96" y="52.5" width="44" height="11" rx="5.5" fill="url(#xGrad)" transform="rotate(45 118 58)"/>
+    <rect x="96" y="52.5" width="44" height="11" rx="5.5" fill="url(#xGrad)" transform="rotate(-45 118 58)"/>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:20:14+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 4 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGrad" cx="35%" cy="25%" r="85%">
+      <stop offset="0%" stop-color="#8B5FE0"/>
+      <stop offset="55%" stop-color="#5A31A6"/>
+      <stop offset="100%" stop-color="#331A5C"/>
+    </radialGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5C9BFF"/>
+      <stop offset="100%" stop-color="#2354C7"/>
+    </linearGradient>
+    <linearGradient id="yellowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE066"/>
+      <stop offset="100%" stop-color="#FFB700"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A7A"/>
+      <stop offset="100%" stop-color="#E0202F"/>
+    </linearGradient>
+    <linearGradient id="pagesGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFDF7"/>
+      <stop offset="100%" stop-color="#EFE3C6"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEDBB"/>
+      <stop offset="100%" stop-color="#D4A94A"/>
+    </linearGradient>
+    <clipPath id="bgClip">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+    <clipPath id="book1Clip">
+      <rect x="38" y="133" width="124" height="24" rx="6"/>
+    </clipPath>
+    <clipPath id="book2Clip">
+      <rect x="48" y="111" width="104" height="22" rx="5"/>
+    </clipPath>
+    <clipPath id="book3Clip">
+      <rect x="57" y="90" width="86" height="20" rx="5"/>
+    </clipPath>
+  </defs>
+
+  <!-- Deep purple circular background -->
+  <circle cx="100" cy="100" r="100" fill="url(#bgGrad)"/>
+  <g clip-path="url(#bgClip)">
+    <ellipse cx="65" cy="50" rx="75" ry="42" fill="#FFFFFF" opacity="0.09"/>
+  </g>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2"/>
+
+  <!-- Grounding shadow -->
+  <e
+<truncated 239 bytes>
+h="url(#book1Clip)">
+      <rect x="148" y="133" width="14" height="24" fill="url(#pagesGrad)"/>
+    </g>
+    <rect x="46" y="136" width="100" height="3" rx="1.5" fill="#FFFFFF" opacity="0.25"/>
+  </g>
+
+  <!-- Book 2 : yellow (middle) -->
+  <g transform="rotate(4 100 122)">
+    <rect x="48" y="111" width="104" height="22" rx="5" fill="url(#yellowGrad)"/>
+    <g clip-path="url(#book2Clip)">
+      <rect x="48" y="111" width="14" height="22" fill="url(#pagesGrad)"/>
+    </g>
+    <rect x="58" y="114" width="78" height="3" rx="1.5" fill="#FFFFFF" opacity="0.28"/>
+  </g>
+
+  <!-- Book 3 : red (top) -->
+  <g transform="rotate(-6 100 100)">
+    <rect x="57" y="90" width="86" height="20" rx="5" fill="url(#redGrad)"/>
+    <g clip-path="url(#book3Clip)">
+      <rect x="129" y="90" width="14" height="20" fill="url(#pagesGrad)"/>
+    </g>
+    <rect x="65" y="93" width="62" height="3" rx="1.5" fill="#FFFFFF" opacity="0.28"/>
+  </g>
+
+  <!-- Shadow where glasses rest on the top book -->
+  <ellipse cx="100" cy="93" rx="32" ry="4" fill="#000000" opacity="0.18"/>
+
+  <!-- Reading glasses -->
+  <line x1="60" y1="80" x2="44" y2="87" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="140" y1="80" x2="156" y2="87" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M95,83 Q100,78 105,83" fill="none" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="78" cy="83" rx="19" ry="13.5" fill="#DCEFFF" opacity="0.45"/>
+  <ellipse cx="78" cy="83" rx="19" ry="13.5" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+  <ellipse cx="122" cy="83" rx="19" ry="13.5" fill="#DCEFFF" opacity="0.45"/>
+  <ellipse cx="122" cy="83" rx="19" ry="13.5" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+  <ellipse cx="71" cy="78" rx="6" ry="3.5" fill="#FFFFFF" opacity="0.55"/>
+  <ellipse cx="115" cy="78" rx="6" ry="3.5" fill="#FFFFFF" opacity="0.55"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:23:40+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 5 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DFF8EE"/>
+      <stop offset="100%" stop-color="#B9E9D6"/>
+    </linearGradient>
+    <linearGradient id="bandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2FBBA3"/>
+      <stop offset="100%" stop-color="#1C8A7C"/>
+    </linearGradient>
+    <linearGradient id="avatarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A7BCD0"/>
+      <stop offset="100%" stop-color="#7C97B3"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A7A"/>
+      <stop offset="100%" stop-color="#E0202F"/>
+    </linearGradient>
+    <clipPath id="cardClip">
+      <rect x="55" y="45" width="90" height="120" rx="14"/>
+    </clipPath>
+  </defs>
+
+  <!-- Soft green/teal circular background -->
+  <circle cx="100" cy="100" r="100" fill="url(#bgGrad)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="2"/>
+
+  <!-- Grounding shadow -->
+  <ellipse cx="100" cy="180" rx="58" ry="8" fill="#000000" opacity="0.07"/>
+
+  <!-- ID badge card -->
+  <rect x="55" y="45" width="90" height="120" rx="14" fill="#FFFFFF"/>
+  <g clip-path="url(#cardClip)">
+    <rect x="55" y="45" width="90" height="36" fill="url(#bandGrad)"/>
+    <circle cx="100" cy="55" r="5" fill="#FFFFFF" opacity="0.85"/>
+  </g>
+  <rect x="55" y="45" width="90" height="120" rx="14" fill="none" stroke="#E3E9EE" stroke-width="1.5"/>
+
+  <!-- Photo silhouette -->
+  <circle cx="100" cy="101" r="13" fill="url(#avatarGrad)"/>
+  <path d="M100,113 C86,113 76,121 73,135 L127,135 C124,121 114,113 100,113 Z" fill="url(#avatarGrad)"/>
+
+  <!-- Name / info lines -->
+  <rect x="68" y="143" width="64" height="6" rx="3" fill="#C9D2DB"/>
+  <rect x="75" y="153" width="50" height="5" rx="2.5" fill="#DDE4EA"/>
+
+  <!-- Lateness clock badge -->
+  <circle cx="142" cy="150" r="27" fill="url(#redGrad)"/>
+  <circle cx="142" cy="150" r="21" fill="#FFFFFF"/>
+
+  <!-- Clock ticks -->
+  <rect x="140.5" y="130" width="3" height="6" rx="1.5" fill="#BFC6CC"/>
+  <rect x="157" y="148.5" width="6" height="3" rx="1.5" fill="#BFC6CC"/>
+  <rect x="140.5" y="164" width="3" height="6" rx="1.5" fill="#BFC6CC"/>
+  <rect x="121" y="148.5" width="6" height="3" rx="1.5" fill="#BFC6CC"/>
+
+  <!-- Clock hands showing a late time -->
+  <line x1="142" y1="150" x2="130" y2="138" stroke="#4A4A4A" stroke-width="4" stroke-linecap="round"/>
+  <line x1="142" y1="150" x2="160" y2="158" stroke="#E0202F" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="142" cy="150" r="3" fill="#2A2A2A"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:24:03+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 6 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="phoneBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2B2D6B"/>
+      <stop offset="100%" stop-color="#1A1B3F"/>
+    </linearGradient>
+    <linearGradient id="screenBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5B5FEF"/>
+      <stop offset="100%" stop-color="#4145C7"/>
+    </linearGradient>
+    <linearGradient id="bellGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE066"/>
+      <stop offset="100%" stop-color="#FFC107"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B6B"/>
+      <stop offset="100%" stop-color="#EE3B3B"/>
+    </linearGradient>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Phone body -->
+  <rect x="90" y="35" width="220" height="330" rx="36" fill="url(#phoneBody)" filter="url(#softShadow)"/>
+
+  <!-- Speaker -->
+  <rect x="175" y="58" width="50" height="6" rx="3" fill="#4B4E9E"/>
+
+  <!-- Screen -->
+  <rect x="112" y="80" width="176" height="255" rx="18" fill="url(#screenBg)"/>
+
+  <!-- Motion / ringing lines - left -->
+  <path d="M148 150 C130 165, 122 190, 128 215" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.55"/>
+  <path d="M162 160 C150 172, 145 190, 149 208" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <!-- Motion / ringing lines - right -->
+  <path d="M252 150 C270 165, 278 190, 272 215" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.55"/>
+  <path d="M238 160 C250 172, 255 190, 251 208" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <!-- Bell top knob -->
+  <circle cx="200" cy="140" r="8" fill="url(#bellGrad)"/>
+
+  <!-- Bell body -->
+  <path d="M200 148
+           C172 148, 158 168, 158 196
+           L158 226
+           C158 240, 150 250, 140 256
+           L260 256
+           C250 250, 242 240, 242 226
+           L242 196
+           C242 168, 228 148, 200 148 Z"
+        fill="url(#bellGrad)"/>
+
+  <!-- Bell base strap -->
+  <rect x="150" y="256" width="100" height="12" rx="6" fill="#F5A623"/>
+
+  <!-- Bell clapper -->
+  <path d="M186 274 C186 286, 192 296, 200 296 C208 296, 214 286, 214 274 Z" fill="#F5A623"/>
+
+  <!-- Notification badge -->
+  <circle cx="288" cy="70" r="26" fill="url(#badgeGrad)" stroke="#1A1B3F" stroke-width="5"/>
+  <text x="288" y="79" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">!</text>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:25:22+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 7 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B5E"/>
+      <stop offset="100%" stop-color="#E8362A"/>
+    </linearGradient>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F5F9"/>
+    </linearGradient>
+    <linearGradient id="checkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B5E"/>
+      <stop offset="100%" stop-color="#D8281D"/>
+    </linearGradient>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <!-- Calendar body -->
+  <rect x="70" y="90" width="260" height="240" rx="22" fill="url(#bodyGrad)" filter="url(#softShadow)"/>
+
+  <!-- Header -->
+  <path d="M70 112 C70 99.7, 79.7 90, 92 90 L308 90 C320.3 90, 330 99.7, 330 112 L330 150 L70 150 Z" fill="url(#headerGrad)"/>
+
+  <!-- Binder rings -->
+  <rect x="118" y="62" width="18" height="56" rx="9" fill="#B4372B"/>
+  <rect x="264" y="62" width="18" height="56" rx="9" fill="#B4372B"/>
+  <rect x="118" y="62" width="18" height="30" rx="9" fill="#D8483A"/>
+  <rect x="264" y="62" width="18" height="30" rx="9" fill="#D8483A"/>
+
+  <!-- Grid lines: vertical -->
+  <line x1="130" y1="150" x2="130" y2="330" stroke="#E3E5EE" stroke-width="4"/>
+  <line x1="200" y1="150" x2="200" y2="330" stroke="#E3E5EE" stroke-width="4"/>
+  <line x1="270" y1="150" x2="270" y2="330" stroke="#E3E5EE" stroke-width="4"/>
+
+  <!-- Grid lines: horizontal -->
+  <line x1="70" y1="196" x2="330" y2="196" stroke="#E3E5EE" stroke-width="4"/>
+  <line x1="70" y1="242" x2="330" y2="242" stroke="#E3E5EE" stroke-width="4"/>
+  <line x1="70" y1="288" x2="330" y2="288" stroke="#E3E5EE" stroke-width="4"/>
+
+  <!-- Small date dots (non-highlighted days) -->
+  <circle cx="100" cy="173" r="5" fill="#D6D9E4"/>
+  <circle cx="165" cy="173" r="5" fill="#D6D9E4"/>
+  <circle cx="235" cy="173" r="5" fill="#D6D9E4"/>
+  <circle cx="300" cy="173" r="5" fill="#D6D9E4"/>
+
+  <circle cx="100" cy="219" r="5" fill="#D6D9E4"/>
+  <circle cx="165" cy="219" r="5" fill="#D6D9E4"/>
+  <circle cx="300" cy="219" r="5" fill="#D6D9E4"/>
+
+  <circle cx="100" cy="265" r="5" fill="#D6D9E4"/>
+  <circle cx="165" cy="265" r="5" fill="#D6D9E4"/>
+  <circle cx="300" cy="265" r="5" fill="#D6D9E4"/>
+
+  <circle cx="100" cy="309" r="5" fill="#D6D9E4"/>
+  <circle cx="300" cy="309" r="5" fill="#D6D9E4"/>
+
+  <!-- Highlighted date cell -->
+  <rect x="207" y="205" width="56" height="46" rx="10" fill="#FFECEA"/>
+
+  <!-- Checkmark on highlighted date -->
+  <path d="M221 228 L233 240 L251 216" stroke="url(#checkGrad)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:26:12+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 8 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E7F3FF"/>
+      <stop offset="100%" stop-color="#D2E8FF"/>
+    </linearGradient>
+    <linearGradient id="docGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F3F6FB"/>
+    </linearGradient>
+    <linearGradient id="billBack" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38B27A"/>
+      <stop offset="100%" stop-color="#2A9D63"/>
+    </linearGradient>
+    <linearGradient id="billMid" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#43C989"/>
+      <stop offset="100%" stop-color="#31B071"/>
+    </linearGradient>
+    <linearGradient id="billFront" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#5EE0A0"/>
+      <stop offset="100%" stop-color="#3ECB86"/>
+    </linearGradient>
+    <linearGradient id="checkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5EE0A0"/>
+      <stop offset="100%" stop-color="#2A9D63"/>
+    </linearGradient>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#1A3A5C" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Circular background -->
+  <circle cx="200" cy="200" r="190" fill="url(#bgGrad)"/>
+
+  <!-- Document / form -->
+  <g filter="url(#softShadow)">
+    <rect x="150" y="70" width="150" height="200" rx="14" fill="url(#docGrad)"/>
+    <!-- folded corner -->
+    <path d="M262 70 L300 108 L272 108 C265.4 108, 262 104.6, 262 98 Z" fill="#DCE4EF"/>
+  </g>
+
+  <!-- Document text lines -->
+  <rect x="172" y="118" width="88" height="8" rx="4" fill="#B8C4D6"/>
+  <rect x="172" y="140" width="66" height="8" rx="4" fill="#B8C4D6"/>
+  <rect x="172" y="162" width="88" height="8" rx="4" fill="#B8C4D6"/>
+  <rect x="172" y="184" width="50" height="8" rx="4" fill="#B8C4D6"/>
+
+  <!-- Checkmark badge on document -->
+  <circle cx="238" cy="232" r="26" fill="url(#checkGrad)"/>
+  <path d="M226 232 L235 241 L251 221" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Stack of bills -->
+  <g>
+    <rect x="98" y="252" width="140" height="60" rx="10" fill="url(#billBack)"/>
+    <rect x="92" y="238" width="140" height="60" rx="10" fill="url(#billMid)"/>
+    <rect x="86" y="224" width="140" height="60" rx="10" fill="url(#billFront)"/>
+
+    <!-- Front bill detail -->
+    <circle cx="156" cy="254" r="18" fill="#FFFFFF" opacity="0.35"/>
+    <text x="156" y="261" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1E7A50" text-anchor="middle">$</text>
+    <line x1="188" y1="238" x2="216" y2="238" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+    <line x1="188" y1="250" x2="210" y2="250" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:26:33+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 9 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7C7FF2"/>
+      <stop offset="100%" stop-color="#5A5DE0"/>
+    </linearGradient>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F5FB"/>
+    </linearGradient>
+    <linearGradient id="clockGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFC93C"/>
+      <stop offset="100%" stop-color="#FF9F1C"/>
+    </linearGradient>
+    <linearGradient id="clockFace" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FFF6E5"/>
+    </linearGradient>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="7" stdDeviation="9" flood-color="#000000" flood-opacity="0.16"/>
+    </filter>
+    <filter id="clockShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#B45F00" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Calendar body -->
+  <g filter="url(#softShadow)">
+    <rect x="55" y="90" width="230" height="215" rx="20" fill="url(#bodyGrad)"/>
+    <path d="M55 112 C55 99.85, 64.85 90, 77 90 L263 90 C275.15 90, 285 99.85, 285 112 L285 148 L55 148 Z" fill="url(#headerGrad)"/>
+  </g>
+
+  <!-- Binder rings -->
+  <rect x="100" y="64" width="16" height="52" rx="8" fill="#43459E"/>
+  <rect x="224" y="64" width="16" height="52" rx="8" fill="#43459E"/>
+  <rect x="100" y="64" width="16" height="26" rx="8" fill="#5A5DE0"/>
+  <rect x="224" y="64" width="16" height="26" rx="8" fill="#5A5DE0"/>
+
+  <!-- Grid lines -->
+  <line x1="55" y1="192" x2="285" y2="192" stroke="#E7E9F3" stroke-width="4"/>
+  <line x1="55" y1="234" x2="285" y2="234" stroke="#E7E9F3" stroke-width="4"/>
+  <line x1="55" y1="276" x2="285" y2="276" stroke="#E7E9F3" stroke-width="4"/>
+  <line x1="120" y1="148" x2="120" y2="305" stroke="#E7E9F3" stroke-width="4"/>
+  <line x1="185" y1="148" x2="185" y2="305" stroke="#E7E9F3" stroke-width="4"/>
+
+  <!-- Date dots -->
+  <circle cx="85" cy="170" r="5" fill="#D6D9EC"/>
+  <circle cx="150" cy="170" r="5" fill="#D6D9EC"/>
+  <circle cx="85" cy="213" r="5" fill="#D6D9EC"/>
+  <circle cx="150" cy="213" r="5" fill="#D6D9EC"/>
+  <circle cx="85" cy="255" r="5" fill="#D6D9EC"/>
+  <circle cx="150" cy="255" r="5" fill="#D6D9EC"/>
+  <circle cx="85" cy="291" r="5" fill="#D6D9EC"/>
+  <circle cx="150" cy="291" r="5" fill="#D6D9EC"/>
+
+  <!-- Bold clock overlapping bottom-right -->
+  <g filter="url(#clockShadow)">
+    <circle cx="270" cy="270" r="82" fill="url(#clockGrad)"/>
+    <circle cx="270" cy="270" r="62" fill="url(#clockFace)"/>
+  </g>
+
+  <!-- Clock ticks -->
+  <line x1="270" y1="218" x2="270" y2="228" stroke="#FF9F1C" stroke-width="5" stroke-linecap="round"/>
+  <line x1="270" y1="312" x2="270" y2="322" stroke="#FF9F1C" stroke-width="5" stroke-linecap="round"/>
+  <line x1="218" y1="270" x2="228" y2="270" stroke="#FF9F1C" stroke-width="5" stroke-linecap="round"/>
+  <line x1="312" y1="270" x2="322" y2="270" stroke="#FF9F1C" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Clock hands -->
+  <line x1="270" y1="270" x2="270" y2="234" stroke="#3A3D7A" stroke-width="8" stroke-linecap="round"/>
+  <line x1="270" y1="270" x2="298" y2="284" stroke="#3A3D7A" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="270" cy="270" r="8" fill="#FF9F1C"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:27:38+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 10 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B78CFF"/>
+      <stop offset="55%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#5B21B6"/>
+    </linearGradient>
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF4C2"/>
+      <stop offset="100%" stop-color="#FFD84D"/>
+    </linearGradient>
+    <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EAF2FF"/>
+      <stop offset="100%" stop-color="#C7DBFF"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#3B1E80" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Ambient glow behind moon -->
+  <circle cx="190" cy="170" r="140" fill="url(#moonGlow)"/>
+
+  <!-- Crescent moon -->
+  <g filter="url(#softShadow)">
+    <path d="M235 90
+             C170 90, 118 142, 118 207
+             C118 272, 170 324, 235 324
+             C260 324, 283 316, 302 302
+             C263 296, 232 260, 232 216
+             C232 172, 263 136, 302 130
+             C283 106, 260 90, 235 90 Z"
+          fill="url(#moonGrad)"/>
+  </g>
+
+  <!-- Craters for texture -->
+  <circle cx="180" cy="160" r="9" fill="#7434E6" opacity="0.35"/>
+  <circle cx="165" cy="230" r="6" fill="#7434E6" opacity="0.3"/>
+  <circle cx="205" cy="270" r="5" fill="#7434E6" opacity="0.3"/>
+
+  <!-- Star -->
+  <g filter="url(#softShadow)">
+    <path d="M300 70
+             L309 92
+             L333 96
+             L315 113
+             L320 137
+             L300 125
+             L280 137
+             L285 113
+             L267 96
+             L291 92 Z"
+          fill="url(#starGrad)"/>
+  </g>
+
+  <!-- Small sparkle star -->
+  <path d="M328 150 L332 160 L342 164 L332 168 L328 178 L324 168 L314 164 L324 160 Z" fill="url(#starGrad)"/>
+
+  <!-- Cloud -->
+  <g filter="url(#softShadow)">
+    <path d="M90 300
+             C90 284, 103 271, 119 271
+             C123 271, 127 272, 131 274
+             C137 258, 152 247, 170 247
+             C193 247, 212 265, 213 288
+             C213 288, 214 288, 215 288
+             C230 288, 242 300, 242 315
+             C242 330, 230 342, 215 342
+             L112 342
+             C97 342, 85 330, 85 315
+             C85 308, 87 303, 90 300 Z"
+          fill="url(#cloudGrad)"/>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:29:45+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 11 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bellStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4C5AF0"/>
+      <stop offset="100%" stop-color="#2E2FB8"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B5E"/>
+      <stop offset="100%" stop-color="#E01F2E"/>
+    </linearGradient>
+    <radialGradient id="bellGlow" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#4C5AF0" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#4C5AF0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#1B1D6B" flood-opacity="0.25"/>
+    </filter>
+    <filter name="badgeShadow" id="badgeShadow" x="-80%" y="-80%" width="260%" height="260%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#8A0E17" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Ambient glow -->
+  <circle cx="200" cy="195" r="150" fill="url(#bellGlow)"/>
+
+  <!-- Bell outline -->
+  <g filter="url(#softShadow)">
+    <path d="M200 70
+             C216 70, 229 83, 229 99
+             C229 101.3, 228.8 103.5, 228.3 105.6
+             C260 118, 282 148, 282 184
+             L282 240
+             C282 254, 290 266, 302 274
+             L98 274
+             C110 266, 118 254, 118 240
+             L118 184
+             C118 148, 140 118, 171.7 105.6
+             C171.2 103.5, 171 101.3, 171 99
+             C171 83, 184 70, 200 70 Z"
+          fill="none"
+          stroke="url(#bellStroke)"
+          stroke-width="16"
+          stroke-linejoin="round"
+          stroke-linecap="round"/>
+
+    <!-- Clapper -->
+    <path d="M172 290 C172 306, 184 318, 200 318 C216 318, 228 306, 228 290 Z"
+          fill="none"
+          stroke="url(#bellStroke)"
+          stroke-width="16"
+          stroke-linejoin="round"
+          stroke-linecap="round"/>
+  </g>
+
+  <!-- Red notification badge -->
+  <g filter="url(#badgeShadow)">
+    <circle cx="286" cy="94" r="42" fill="url(#badgeGrad)" stroke="#FFFFFF" stroke-width="8"/>
+  </g>
+  <text x="286" y="106" font-family="Arial, sans-serif" font-size="40" font-weight="800" fill="#FFFFFF" text-anchor="middle">0</text>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:33:32+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 12 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EDE6FF"/>
+      <stop offset="100%" stop-color="#DCCCFF"/>
+    </linearGradient>
+
+    <!-- Back avatar (teal blazer) -->
+    <linearGradient id="skinBack" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F6C9A0"/>
+      <stop offset="100%" stop-color="#EDB284"/>
+    </linearGradient>
+    <linearGradient id="blazerBack" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4FBFB0"/>
+      <stop offset="100%" stop-color="#33A192"/>
+    </linearGradient>
+
+    <!-- Front-left avatar (violet blazer, teacher w/ book) -->
+    <linearGradient id="skinLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E8B48C"/>
+      <stop offset="100%" stop-color="#D89A6C"/>
+    </linearGradient>
+    <linearGradient id="blazerLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8B7CF6"/>
+      <stop offset="100%" stop-color="#6C5CE0"/>
+    </linearGradient>
+    <linearGradient id="bookGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFC93C"/>
+      <stop offset="100%" stop-color="#FF9F1C"/>
+    </linearGradient>
+
+    <!-- Front-right avatar (coral blazer, glasses) -->
+    <linearGradient id="skinRight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFDCC2"/>
+      <stop offset="100%" stop-color="#F5C29E"/>
+    </linearGradient>
+    <linearGradient id="blazerRight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF8C7A"/>
+      <stop offset="100%" stop-color="#F26D5B"/>
+    </linearGradient>
+    <linearGradient id="hairRight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5A4632"/>
+      <stop offset="100%" stop-color="#3E301F"/>
+    </linearGradient>
+
+    <filter name="softShadow" id="softShadow" x="-60%" y="-60%" width="220%" heig
+<truncated 305 bytes>
+ow)">
+    <path d="M200 205 C165 205, 137 233, 137 268 L137 285 C137 291, 142 296, 148 296 L252 296 C258 296, 263 291, 263 285 L263 268 C263 233, 235 205, 200 205 Z" fill="url(#blazerBack)"/>
+    <circle cx="200" cy="158" r="42" fill="url(#skinBack)"/>
+    <path d="M160 148 C160 122, 178 106, 200 106 C222 106, 240 122, 240 148 C240 138, 230 130, 200 130 C170 130, 160 138, 160 148 Z" fill="#2E2A26"/>
+  </g>
+
+  <!-- Front-left avatar (violet blazer, holding book) -->
+  <g filter="url(#softShadow)">
+    <path d="M130 240 C100 240, 76 264, 76 295 L76 320 C76 326, 81 330, 87 330 L173 330 C179 330, 184 326, 184 320 L184 295 C184 264, 160 240, 130 240 Z" fill="url(#blazerLeft)"/>
+    <circle cx="130" cy="200" r="36" fill="url(#skinLeft)"/>
+    <path d="M98 194 C98 172, 112 158, 130 158 C148 158, 162 172, 162 194 C162 186, 152 178, 130 178 C108 178, 98 186, 98 194 Z" fill="#4A3626"/>
+
+    <!-- Book -->
+    <rect x="97" y="292" width="66" height="42" rx="5" fill="url(#bookGrad)" transform="rotate(-4 130 313)"/>
+    <line x1="130" y1="292" x2="130" y2="334" stroke="#FFFFFF" stroke-width="3" opacity="0.6" transform="rotate(-4 130 313)"/>
+  </g>
+
+  <!-- Front-right avatar (coral blazer, glasses) -->
+  <g filter="url(#softShadow)">
+    <path d="M270 240 C300 240, 324 264, 324 295 L324 320 C324 326, 319 330, 313 330 L227 330 C221 330, 216 326, 216 320 L216 295 C216 264, 240 240, 270 240 Z" fill="url(#blazerRight)"/>
+    <circle cx="270" cy="200" r="36" fill="url(#skinRight)"/>
+    <path d="M234 192 C234 170, 250 154, 270 154 C290 154, 306 170, 306 192 C306 184, 296 172, 270 172 C244 172, 234 184, 234 192 Z" fill="url(#hairRight)"/>
+
+    <!-- Glasses -->
+    <circle cx="257" cy="202" r="11" fill="none" stroke="#3E301F" stroke-width="4"/>
+    <circle cx="283" cy="202" r="11" fill="none" stroke="#3E301F" stroke-width="4"/>
+    <line x1="268" y1="202" x2="272" y2="202" stroke="#3E301F" stroke-width="4"/>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:39:01+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 13 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#332C81"/>
+      <stop offset="100%" stop-color="#1C1652"/>
+    </linearGradient>
+
+    <linearGradient id="billBack" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38B27A"/>
+      <stop offset="100%" stop-color="#2A9D63"/>
+    </linearGradient>
+    <linearGradient id="billFront" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#5EE0A0"/>
+      <stop offset="100%" stop-color="#3ECB86"/>
+    </linearGradient>
+
+    <linearGradient id="coinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE58A"/>
+      <stop offset="100%" stop-color="#FFB930"/>
+    </linearGradient>
+    <linearGradient id="coinEdge" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E8971A"/>
+      <stop offset="100%" stop-color="#C9770A"/>
+    </linearGradient>
+
+    <linearGradient id="calcBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4C5AF0"/>
+      <stop offset="100%" stop-color="#2E2FB8"/>
+    </linearGradient>
+    <linearGradient id="calcScreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#B7F5D8"/>
+      <stop offset="100%" stop-color="#7EE6B5"/>
+    </linearGradient>
+
+    <filter name="softShadow" id="softShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <!-- Circular background -->
+  <circle cx="200" cy="200" r="190" fill="url(#bgGrad)"/>
+
+  <!-- Bills stack (back left) -->
+  <g filter="url(#softShadow)">
+    <rect x="62" y="222" width="118" height="52" rx="9" fill="url(#billBack)"/>
+    <rect x="56" y="208" width="118" height="52" rx="9" fill="url(#billFront)"/>
+    <circle cx="100" cy="234" r="14" fill="#FFFFFF" opacity="0.3"/>
+    <text x="100" y="
+<truncated 209 bytes>
+>
+    <line x1="128" y1="230" x2="146" y2="230" stroke="#FFFFFF" stroke-width="3" opacity="0.4"/>
+  </g>
+
+  <!-- Coin stack (front left, overlapping bills) -->
+  <g filter="url(#softShadow)">
+    <ellipse cx="110" cy="308" rx="40" ry="13" fill="url(#coinEdge)"/>
+    <ellipse cx="110" cy="298" rx="40" ry="13" fill="url(#coinGrad)"/>
+    <ellipse cx="110" cy="286" rx="40" ry="13" fill="url(#coinEdge)"/>
+    <ellipse cx="110" cy="276" rx="40" ry="13" fill="url(#coinGrad)"/>
+    <text x="110" y="281" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#B4720B" text-anchor="middle">$</text>
+  </g>
+
+  <!-- Calculator (right side, hero element) -->
+  <g filter="url(#softShadow)">
+    <rect x="212" y="118" width="130" height="176" rx="18" fill="url(#calcBody)"/>
+    <rect x="228" y="136" width="98" height="48" rx="9" fill="url(#calcScreen)"/>
+    <text x="317" y="168" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#1C6B47" text-anchor="end">482.50</text>
+
+    <!-- Calculator buttons grid -->
+    <rect x="228" y="198" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="256" y="198" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="284" y="198" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="312" y="198" width="14" height="20" rx="5" fill="#FFB930"/>
+
+    <rect x="228" y="226" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="256" y="226" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="284" y="226" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="312" y="226" width="14" height="20" rx="5" fill="#FFB930"/>
+
+    <rect x="228" y="254" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="256" y="254" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="284" y="254" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="312" y="254" width="14" height="20" rx="5" fill="#3ECB86"/>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:43:17+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 14 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1FAE72"/>
+      <stop offset="100%" stop-color="#0D7D50"/>
+    </linearGradient>
+
+    <linearGradient id="ledgerLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F4F7FB"/>
+      <stop offset="100%" stop-color="#E3E9F2"/>
+    </linearGradient>
+    <linearGradient id="ledgerRight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F1F4FA"/>
+    </linearGradient>
+    <linearGradient id="ledgerSpine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2E2FB8"/>
+      <stop offset="100%" stop-color="#1D1E7E"/>
+    </linearGradient>
+
+    <linearGradient id="barGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5EE0A0"/>
+      <stop offset="100%" stop-color="#2A9D63"/>
+    </linearGradient>
+
+    <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#B7F5D8"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="7" stdDeviation="8" flood-color="#00301C" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Circular background -->
+  <circle cx="200" cy="200" r="190" fill="url(#bgGrad)"/>
+
+  <!-- Open ledger -->
+  <g filter="url(#softShadow)">
+    <path d="M200 150 L96 168 C90 169, 86 174, 86 180 L86 296 C86 303, 92 308, 99 307 L200 288 Z" fill="url(#ledgerLeft)"/>
+    <path d="M200 150 L304 168 C310 169, 314 174, 314 180 L314 296 C314 303, 308 308, 301 307 L200 288 Z" fill="url(#ledgerRight)"/>
+    <rect x="196" y="148" width="8" height="142" fill="url(#ledgerSpine)"/>
+  </g>
+
+  <!-- Ledger lines - left page -->
+  <line x1="104" y1="196" x2="176" y2="188" stroke="#C7D1E0" stroke-width="4" stroke-linecap="round"/>
+  <line x1="104" y1="220" x2="176" y2="213" stroke="#C7D1E0" stroke-width="4" stroke-linecap="round"/>
+  <line x1="104" y1="244" x2="176" y2="238" stroke="#C7D1E0" stroke-width="4" stroke-linecap="round"/>
+  <line x1="104" y1="268" x2="176" y2="263" stroke="#C7D1E0" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Ledger lines - right page -->
+  <line x1="224" y1="188" x2="296" y2="196" stroke="#C7D1E0" stroke-width="4" stroke-linecap="round"/>
+  <line x1="224" y1="213" x2="296" y2="220" stroke="#C7D1E0" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Mini bar chart on right page (grounded, subtle) -->
+  <rect x="228" y="248" width="14" height="20" rx="2" fill="url(#barGrad)"/>
+  <rect x="248" y="238" width="14" height="30" rx="2" fill="url(#barGrad)"/>
+  <rect x="268" y="226" width="14" height="42" rx="2" fill="url(#barGrad)"/>
+
+  <!-- Upward trending graph emerging from ledger spine -->
+  <g filter="url(#softShadow)">
+    <path d="M130 200 L170 160 L205 188 L260 118"
+          fill="none" stroke="url(#arrowGrad)" stroke-width="12"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Arrowhead -->
+    <path d="M232 118 L262 112 L268 142 Z" fill="url(#arrowGrad)"/>
+  </g>
+
+  <!-- Trend dots -->
+  <circle cx="130" cy="200" r="8" fill="#FFFFFF"/>
+  <circle cx="170" cy="160" r="8" fill="#FFFFFF"/>
+  <circle cx="205" cy="188" r="8" fill="#FFFFFF"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:48:02+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 15 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B1467"/>
+      <stop offset="55%" stop-color="#230C4A"/>
+      <stop offset="100%" stop-color="#120629"/>
+    </linearGradient>
+
+    <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E040FB" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#9B30FF" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#9B30FF" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="brainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F792FF"/>
+      <stop offset="50%" stop-color="#C64BFF"/>
+      <stop offset="100%" stop-color="#7A2FE0"/>
+    </linearGradient>
+
+    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E9C6FF"/>
+    </linearGradient>
+
+    <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF7C2"/>
+      <stop offset="100%" stop-color="#FFD24C"/>
+    </linearGradient>
+
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="softShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Circular background -->
+  <circle cx="200" cy="200" r="190" fill="url(#bgGrad)"/>
+
+  <!-- Ambient core glow -->
+  <circle cx="200" cy="200" r="150" fill="url(#coreGlow)"/>
+
+  <!-- Outer orbit ring -->
+  <circle cx="200" cy="200" r="120" fill="none" stroke="#B85CFF" stroke-width="2.5" opacity="0.4" stroke-dasharray="4 10"/>
+
+  <!-- Circuit brain co
+<truncated 598 bytes>
+nes inside brain -->
+  <g stroke="#3B1467" stroke-width="4" stroke-linecap="round" opacity="0.55" fill="none">
+    <path d="M170 160 L170 190 L196 190"/>
+    <path d="M200 150 L200 175"/>
+    <path d="M228 165 L228 195 L206 210"/>
+    <path d="M160 220 L188 220 L188 244"/>
+    <path d="M212 230 L238 230 L238 208"/>
+    <path d="M200 210 L200 236"/>
+  </g>
+
+  <!-- Circuit nodes -->
+  <circle cx="170" cy="160" r="6" fill="url(#nodeGrad)"/>
+  <circle cx="196" cy="190" r="6" fill="url(#nodeGrad)"/>
+  <circle cx="228" cy="165" r="6" fill="url(#nodeGrad)"/>
+  <circle cx="206" cy="210" r="6" fill="url(#nodeGrad)"/>
+  <circle cx="160" cy="220" r="6" fill="url(#nodeGrad)"/>
+  <circle cx="188" cy="244" r="6" fill="url(#nodeGrad)"/>
+  <circle cx="238" cy="230" r="6" fill="url(#nodeGrad)"/>
+  <circle cx="238" cy="208" r="6" fill="url(#nodeGrad)"/>
+  <circle cx="200" cy="150" r="6" fill="url(#nodeGrad)"/>
+  <circle cx="200" cy="236" r="6" fill="url(#nodeGrad)"/>
+
+  <!-- Floating external nodes with connecting lines -->
+  <line x1="200" y1="200" x2="120" y2="140" stroke="#E9C6FF" stroke-width="2" opacity="0.5"/>
+  <line x1="200" y1="200" x2="288" y2="150" stroke="#E9C6FF" stroke-width="2" opacity="0.5"/>
+  <line x1="200" y1="200" x2="284" y2="270" stroke="#E9C6FF" stroke-width="2" opacity="0.5"/>
+  <circle cx="120" cy="140" r="7" fill="url(#nodeGrad)" filter="url(#glow)"/>
+  <circle cx="288" cy="150" r="7" fill="url(#nodeGrad)" filter="url(#glow)"/>
+  <circle cx="284" cy="270" r="7" fill="url(#nodeGrad)" filter="url(#glow)"/>
+
+  <!-- Sparkles -->
+  <g filter="url(#glow)">
+    <path d="M112 260 L117 272 L129 277 L117 282 L112 294 L107 282 L95 277 L107 272 Z" fill="url(#sparkGrad)"/>
+    <path d="M296 205 L300 214 L309 218 L300 222 L296 231 L292 222 L283 218 L292 214 Z" fill="url(#sparkGrad)"/>
+    <path d="M250 90 L253 97 L260 100 L253 103 L250 110 L247 103 L240 100 L247 97 Z" fill="url(#sparkGrad)"/>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:49:34+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 16 ===
+<USER_REQUEST>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E4F1FF"/>
+      <stop offset="100%" stop-color="#CDE6FF"/>
+    </linearGradient>
+
+    <linearGradient id="panelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3D63E8"/>
+      <stop offset="100%" stop-color="#2544B8"/>
+    </linearGradient>
+
+    <linearGradient id="scanScreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#123B8F"/>
+      <stop offset="100%" stop-color="#0B285F"/>
+    </linearGradient>
+
+    <linearGradient id="printGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8FCBFF"/>
+      <stop offset="100%" stop-color="#4FA3FF"/>
+    </linearGradient>
+
+    <linearGradient id="laserGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#5EE0A0" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#5EE0A0" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#5EE0A0" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="checkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5EE0A0"/>
+      <stop offset="100%" stop-color="#2A9D63"/>
+    </linearGradient>
+
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="softShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#0B2A5C" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Circular background -->
+  <circle cx="200" cy="200" r="190" fill="url(#bgGrad)"/>
+
+  <!-- Scanner panel -->
+  <g filter="url(#softShadow)">
+    <rect x="100" y="88" width="200" height="224" rx="28" fill="url(#panelGrad)"/>
+    <rect x="122" y="112" width="156" height="176" rx="16" fill="url(#scanScreen)"/>
+  </g>
+
+  <!-- Corner scan brackets -->
+  <path d="M132 122 L132 112 L142 112" stroke="#8FCBFF" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M268 122 L268 112 L258 112" stroke="#8FCBFF" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M132 278 L132 288 L142 288" stroke="#8FCBFF" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M268 278 L268 288 L258 288" stroke="#8FCBFF" stroke-width="5" stroke-linecap="round" fill="none"/>
+
+  <!-- Fingerprint (concentric loops) -->
+  <g fill="none" stroke="url(#printGrad)" stroke-width="6" stroke-linecap="round" filter="url(#glow)">
+    <path d="M200 150 C170 150, 152 172, 152 200 C152 226, 168 246, 190 252"/>
+    <path d="M200 162 C178 162, 165 178, 165 200 C165 220, 178 236, 197 240"/>
+    <path d="M200 174 C186 174, 177 184, 177 200 C177 214, 187 226, 202 229"/>
+    <path d="M200 138 C154 138, 128 168, 128 200 C128 228, 143 252, 168 264"/>
+    <path d="M215 150 C238 158, 252 178, 250 202 C248 224, 233 240, 213 245"/>
+    <path d="M222 138 C255 148, 274 176, 271 208 C268 236, 248 258, 220 264"/>
+  </g>
+
+  <!-- Scanning laser line -->
+  <rect x="122" y="196" width="156" height="8" fill="url(#laserGrad)" filter="url(#glow)"/>
+
+  <!-- Green checkmark badge -->
+  <g filter="url(#softShadow)">
+    <circle cx="278" cy="278" r="38" fill="url(#checkGrad)" stroke="#EAF3FF" stroke-width="7"/>
+  </g>
+  <path d="M262 278 L273 289 L296 264" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:50:03+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 17 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="98" fill="#FDF6E3"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#F0DFAE" stroke-width="2"/>
+
+  <!-- Diploma scroll -->
+  <g>
+    <!-- Main scroll body -->
+    <rect x="62" y="70" width="76" height="60" rx="4" fill="#FFFDF5"/>
+    <rect x="62" y="70" width="76" height="60" rx="4" fill="none" stroke="#E8DCC0" stroke-width="1.5"/>
+
+    <!-- Left rolled end -->
+    <ellipse cx="62" cy="100" rx="10" ry="32" fill="#F5EFDD"/>
+    <ellipse cx="62" cy="100" rx="10" ry="32" fill="none" stroke="#D8C89A" stroke-width="1.5"/>
+    <path d="M 55 82 Q 62 100 55 118" stroke="#D8C89A" stroke-width="1.2" fill="none"/>
+
+    <!-- Right rolled end -->
+    <ellipse cx="138" cy="100" rx="10" ry="32" fill="#F5EFDD"/>
+    <ellipse cx="138" cy="100" rx="10" ry="32" fill="none" stroke="#D8C89A" stroke-width="1.5"/>
+    <path d="M 145 82 Q 138 100 145 118" stroke="#D8C89A" stroke-width="1.2" fill="none"/>
+
+    <!-- Decorative text lines on scroll -->
+    <rect x="76" y="84" width="48" height="3" rx="1.5" fill="#C9A63C" opacity="0.6"/>
+    <rect x="80" y="93" width="40" height="2.5" rx="1.25" fill="#D8C89A"/>
+    <rect x="80" y="101" width="40" height="2.5" rx="1.25" fill="#D8C89A"/>
+    <rect x="80" y="109" width="30" height="2.5" rx="1.25" fill="#D8C89A"/>
+  </g>
+
+  <!-- Red ribbon -->
+  <g>
+    <path d="M 88 118 L 88 156 L 100 147 L 112 156 L 112 118 Z" fill="#D7263D"/>
+    <path d="M 88 118 L 88 156 L 100 147 L 100 118 Z" fill="#C21A30"/>
+    <rect x="86" y="112" width="28" height="10" rx="3" fill="#E63946"/>
+  </g>
+
+  <!-- Golden seal/badge -->
+  <g>
+    <circle cx="100" cy="122" r="17" fill="#F2C14E"/>
+    <circle cx="100" cy="122" r="17" fill="none" stroke="#D9A62B" stroke-width="2"/>
+    <circle cx="100" cy="122" r="12" fill="none" stroke="#FFE9A8" stroke-width="1.5" stroke-dasharray="2 2"/>
+    <!-- Star in center -->
+    <path d="M 100 114 L 102.2 119.8 L 108.5 119.9 L 103.4 123.6 L 105.3 129.6 L 100 126 L 94.7 129.6 L 96.6 123.6 L 91.5 119.9 L 97.8 119.8 Z" fill="#FFF6DA"/>
+  </g>
+
+  <!-- Small sparkle accents -->
+  <circle cx="145" cy="65" r="3" fill="#F2C14E" opacity="0.8"/>
+  <circle cx="55" cy="60" r="2" fill="#D7263D" opacity="0.7"/>
+  <circle cx="150" cy="135" r="2.5" fill="#C9A63C" opacity="0.6"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:51:27+05:30.
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from Claude Sonnet 4.6 (Thinking) to Gemini 3.5 Flash (Medium). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>
+=== SVG 18 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="98" fill="#E0F5F3"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#BFE8E3" stroke-width="2"/>
+
+  <!-- Sky accents -->
+  <circle cx="150" cy="55" r="10" fill="#FFFFFF" opacity="0.6"/>
+  <circle cx="162" cy="60" r="7" fill="#FFFFFF" opacity="0.6"/>
+  <circle cx="141" cy="62" r="6" fill="#FFFFFF" opacity="0.6"/>
+
+  <!-- Road -->
+  <rect x="0" y="140" width="200" height="40" fill="#3D4B56"/>
+  <rect x="0" y="140" width="200" height="6" fill="#2E3940"/>
+  <!-- Dashed road line -->
+  <rect x="10" y="158" width="18" height="5" rx="2" fill="#F2C14E"/>
+  <rect x="46" y="158" width="18" height="5" rx="2" fill="#F2C14E"/>
+  <rect x="82" y="158" width="18" height="5" rx="2" fill="#F2C14E"/>
+  <rect x="118" y="158" width="18" height="5" rx="2" fill="#F2C14E"/>
+  <rect x="154" y="158" width="18" height="5" rx="2" fill="#F2C14E"/>
+  <rect x="190" y="158" width="14" height="5" rx="2" fill="#F2C14E"/>
+
+  <!-- Motion lines -->
+  <rect x="18" y="98" width="20" height="4" rx="2" fill="#8FD3CB"/>
+  <rect x="12" y="112" width="14" height="4" rx="2" fill="#8FD3CB"/>
+
+  <!-- Bus body -->
+  <g>
+    <!-- Main body -->
+    <path d="M 48 92 
+             L 158 92 
+             Q 168 92 168 102 
+             L 168 132 
+             Q 168 138 162 138 
+             L 44 138 
+             Q 38 138 38 132 
+             L 38 102 
+             Q 38 92 48 92 Z" fill="#FFC93C"/>
+    <path d="M 48 92 
+             L 158 92 
+             Q 168 92 168 102 
+             L 168 132 
+             Q 168 138 162 138 
+             L 44 138 
+             Q 38 138 38 132 
+             L 38 102 
+             Q 38 92 48 92 Z" fill="none" stroke="#E0A825" stroke-width="1.5"/>
+
+    <!-- Roof accent -->
+    <rect x="42" y="92" width="122" height="8" fill="#FFD65C"/>
+
+    <!-- Front nose (rounded front of bus) -->
+    <path d="M 158 96 Q 168 96 168 106 L 168 132 Q 168 138 162 138 L 158 138 Z" fill="#F5B82E"/>
+
+    <!-- Bottom black stripe -->
+    <rect x="38" y="130" width="130" height="8" fill="#2E3940"/>
+
+    <!-- Windows -->
+    <rect x="48" y="100" width="20" height="18" rx="3" fill="#BEE9F0"/>
+    <rect x="72" y="100" width="20" height="18" rx="3" fill="#BEE9F0"/>
+    <rect x="96" y="100" width="20" height="18" rx="3" fill="#BEE9F0"/>
+    <rect x="120" y="100" width="20" height="18" rx="3" fill="#BEE9F0"/>
+    <!-- Front windshield -->
+    <rect x="146" y="100" width="16" height="18" rx="3" fill="#DFF3F7"/>
+
+    <!-- Door -->
+    <rect x="150" y="120" width="12" height="16" rx="2" fill="#E0A825"/>
+    <line x1="156" y1="120" x2="156" y2="136" stroke="#B9861B" stroke-width="1"/>
+
+    <!-- Headlight -->
+    <circle cx="165" cy="126" r="4" fill="#FFF6DA"/>
+    <circle cx="165" cy="126" r="4" fill="none" stroke="#E0A825" stroke-width="1"/>
+
+    <!-- Red stop sign accent -->
+    <circle cx="55" cy="108" r="0" fill="none"/>
+    <rect x="40" y="108" width="6" height="6" fill="#D7263D" opacity="0.9"/>
+  </g>
+
+  <!-- Wheels -->
+  <g>
+    <circle cx="62" cy="142" r="14" fill="#2E3940"/>
+    <circle cx="62" cy="142" r="6" fill="#8A99A3"/>
+    <circle cx="148" cy="142" r="14" fill="#2E3940"/>
+    <circle cx="148" cy="142" r="6" fill="#8A99A3"/>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:51:58+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 19 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#FFF3DC"/>
+      <stop offset="55%" stop-color="#FCE3AE"/>
+      <stop offset="100%" stop-color="#F5C86B"/>
+    </radialGradient>
+
+    <!-- Document gradient -->
+    <linearGradient id="paperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F3F1EA"/>
+    </linearGradient>
+
+    <!-- Stamp gradient -->
+    <radialGradient id="stampGrad" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#4ADE80"/>
+      <stop offset="55%" stop-color="#22B573"/>
+      <stop offset="100%" stop-color="#0E8F57"/>
+    </radialGradient>
+
+    <!-- Gold ring gradient for accents -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE9A8"/>
+      <stop offset="50%" stop-color="#E8B84B"/>
+      <stop offset="100%" stop-color="#C6902A"/>
+    </linearGradient>
+
+    <!-- Soft drop shadow for document -->
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#8A5A1E" flood-opacity="0.28"/>
+    </filter>
+
+    <!-- Glow for stamp -->
+    <filter id="stampGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="stampShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#0E5C38" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <circle cx="100" cy="100" r="98" fill="url(#bgGrad)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#E8B84B" stroke-width="1.5
+<truncated 873 bytes>
+>
+
+  <!-- Text lines -->
+  <rect x="66" y="66" width="48" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="74" width="44" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="82" width="48" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="90" width="38" height="3" rx="1.5" fill="#D9D2C0"/>
+
+  <rect x="66" y="104" width="48" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="112" width="44" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="120" width="30" height="3" rx="1.5" fill="#D9D2C0"/>
+
+  <!-- Small gold signature line -->
+  <rect x="66" y="130" width="26" height="2.5" rx="1.25" fill="#C6902A" opacity="0.5"/>
+
+  <!-- Glow behind stamp -->
+  <circle cx="126" cy="108" r="34" fill="#22B573" opacity="0.18" filter="url(#stampGlow)"/>
+
+  <!-- Approved stamp -->
+  <g filter="url(#stampShadow)" transform="rotate(-14 126 108)">
+    <circle cx="126" cy="108" r="27" fill="url(#stampGrad)"/>
+    <circle cx="126" cy="108" r="27" fill="none" stroke="#F4FFF7" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="126" cy="108" r="22.5" fill="none" stroke="#F4FFF7" stroke-width="1.2" stroke-dasharray="3 2.5" opacity="0.85"/>
+
+    <!-- Checkmark -->
+    <path d="M 115 108 L 122 115 L 137 99" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+    <!-- Curved text arcs (decorative, suggests stamp text rings) -->
+    <path id="topArc" d="M 106 100 A 22 22 0 0 1 146 100" fill="none" stroke="#F4FFF7" stroke-width="1" opacity="0.5"/>
+  </g>
+
+  <!-- Small gold badge accent bottom-left of document -->
+  <circle cx="68" cy="128" r="0" fill="none"/>
+
+  <!-- Fine gold corner accents on background -->
+  <path d="M 24 24 L 24 34 M 24 24 L 34 24" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
+  <path d="M 176 176 L 176 166 M 176 176 L 166 176" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:53:05+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 20 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="98" fill="#FF8A3D"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#F26E1D" stroke-width="2"/>
+
+  <!-- Sun -->
+  <circle cx="152" cy="46" r="12" fill="#FFD166"/>
+  <g stroke="#FFD166" stroke-width="3" stroke-linecap="round">
+    <line x1="152" y1="24" x2="152" y2="18"/>
+    <line x1="152" y1="68" x2="152" y2="74"/>
+    <line x1="130" y1="46" x2="124" y2="46"/>
+    <line x1="174" y1="46" x2="180" y2="46"/>
+    <line x1="136" y1="30" x2="132" y2="26"/>
+    <line x1="168" y1="62" x2="172" y2="66"/>
+    <line x1="168" y1="30" x2="172" y2="26"/>
+    <line x1="136" y1="62" x2="132" y2="66"/>
+  </g>
+
+  <!-- Desk calendar stand/base -->
+  <rect x="52" y="152" width="96" height="10" rx="4" fill="#B8541E"/>
+
+  <!-- Calendar body -->
+  <g>
+    <rect x="46" y="58" width="108" height="96" rx="8" fill="#FFFDF7"/>
+    <rect x="46" y="58" width="108" height="96" rx="8" fill="none" stroke="#E8DCC0" stroke-width="1.5"/>
+
+    <!-- Top header band -->
+    <path d="M 46 66 Q 46 58 54 58 L 146 58 Q 154 58 154 66 L 154 80 L 46 80 Z" fill="#D7263D"/>
+
+    <!-- Calendar rings -->
+    <rect x="66" y="48" width="8" height="20" rx="4" fill="#8A99A3"/>
+    <rect x="126" y="48" width="8" height="20" rx="4" fill="#8A99A3"/>
+
+    <!-- Month text bar -->
+    <rect x="80" y="66" width="40" height="6" rx="3" fill="#FFFFFF" opacity="0.85"/>
+  </g>
+
+  <!-- Beach scene inside calendar -->
+  <g>
+    <!-- Sand -->
+    <path d="M 46 140 Q 100 128 154 140 L 154 154 Q 154 154 154 154 L 46 154 Z" fill="#F5D998"/>
+    <!-- Sea -->
+    <rect x="46" y="122" width="108" height="18" fill="#7FD8D6"/>
+    <path d="M 46 128 Q 60 124 74 128 Q 88 132 100 128 Q 114 124 128 128 Q 142 132 154 128" stroke="#5EC0BE" stroke-width="1.5" fill="none" opacity="0.7"/>
+
+    <!-- Palm tree -->
+    <g>
+      <path d="M 68 140 Q 65 118 70 104" stroke="#8A5A2B" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M 70 104 Q 52 96 44 104" fill="#2FA35A"/>
+      <path d="M 70 104 Q 60 90 48 90" fill="#38B568"/>
+      <path d="M 70 104 Q 78 88 92 92" fill="#2FA35A"/>
+      <path d="M 70 104 Q 86 100 96 108" fill="#38B568"/>
+      <path d="M 70 104 Q 66 90 74 78" fill="#2FA35A"/>
+    </g>
+
+    <!-- Beach umbrella -->
+    <g>
+      <line x1="122" y1="152" x2="122" y2="112" stroke="#8A5A2B" stroke-width="3" stroke-linecap="round"/>
+      <path d="M 96 112 Q 122 90 148 112 Q 148 116 144 115 Q 133 108 122 111 Q 111 108 100 115 Q 96 116 96 112 Z" fill="#D7263D"/>
+      <path d="M 96 112 Q 109 108 122 111 L 122 112 Q 109 110 96 112 Z" fill="#B31E31"/>
+      <path d="M 122 111 Q 133 108 144 115 L 144 116 Q 133 110 122 112 Z" fill="#B31E31"/>
+      <path d="M 122 90 L 122 112" stroke="#B31E31" stroke-width="1.5"/>
+    </g>
+
+    <!-- Beach chair -->
+    <g>
+      <path d="M 84 148 L 90 130 L 100 133 L 96 150 Z" fill="#4AA6E8"/>
+      <path d="M 84 148 L 78 150 L 96 156 L 100 150 Z" fill="#3B8FCB"/>
+      <line x1="84" y1="148" x2="80" y2="156" stroke="#8A5A2B" stroke-width="2"/>
+      <line x1="96" y1="150" x2="94" y2="157" stroke="#8A5A2B" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- Small airplane accent -->
+  <g transform="translate(150,150) rotate(-25)">
+    <path d="M 0 0 L 14 4 L 20 3 L 14 6 L 12 12 L 9 11 L 8 6 L 0 4 L -3 6 L -4 3 L -3 1 Z" fill="#FFFDF7" opacity="0.95"/>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:53:46+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 21 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#FF6FB5"/>
+      <stop offset="100%" stop-color="#E8399A"/>
+    </radialGradient>
+
+    <!-- Pie chart 3D side gradient -->
+    <linearGradient id="pieSide" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#B02E7A"/>
+      <stop offset="100%" stop-color="#8A2261"/>
+    </linearGradient>
+
+    <!-- Bar gradients -->
+    <linearGradient id="barGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFD166"/>
+      <stop offset="100%" stop-color="#F2A93C"/>
+    </linearGradient>
+    <linearGradient id="barGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4ADE80"/>
+      <stop offset="100%" stop-color="#22B573"/>
+    </linearGradient>
+    <linearGradient id="barGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5EC8F2"/>
+      <stop offset="100%" stop-color="#2E9FD6"/>
+    </linearGradient>
+
+    <filter name="softShadow" id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#6E1A4C" flood-opacity="0.35"/>
+    </filter>
+
+    <filter id="glassShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="1" dy="3" stdDeviation="3" flood-color="#4A0F33" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <circle cx="100" cy="100" r="98" fill="url(#bgGrad)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#FF9FCC" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Sparkle accents -->
+  <circle cx="42" cy="42" r="2.2" fill="#FFE9F5" opacity="0.85"/>
+  <circle cx="160" cy="150" r="1.6" fill="#FFE9F5" opacity="0.7"/>
+
+  <!-- Bar chart -->
+  <g filter="url(#softShadow)">
+    <!-- Base line -->
+    <rect x="44" y="138" width="66" height="5" rx="2" fill="#8A2261"/>
+
+    <!-- Bars -->
+    <rect x="48" y="112" width="14" height="26" rx="2.5" fill="url(#barGrad1)"/>
+    <rect x="66" y="98" width="14" height="40" rx="2.5" fill="url(#barGrad2)"/>
+    <rect x="84" y="86" width="14" height="52" rx="2.5" fill="url(#barGrad3)"/>
+  </g>
+
+  <!-- 3D Pie chart -->
+  <g filter="url(#softShadow)">
+    <!-- Side/depth of pie (3D base) -->
+    <path d="M 118 128
+             A 30 30 0 0 0 152 116
+             L 152 124
+             A 30 30 0 0 1 118 136
+             Z" fill="url(#pieSide)"/>
+    <path d="M 152 116
+             A 30 30 0 0 0 140 92
+             L 140 100
+             A 30 30 0 0 1 152 124
+             Z" fill="#7A1D57"/>
+
+    <!-- Top of pie -->
+    <g transform="translate(0,-8)">
+      <path d="M 135 106 L 135 76 A 30 30 0 0 1 158.97 89.5 Z" fill="#FFD166"/>
+      <path d="M 135 106 L 158.97 89.5 A 30 30 0 0 1 162 106 Z" fill="#4ADE80"/>
+      <path d="M 135 106 L 162 106 A 30 30 0 0 1 149 130.5 Z" fill="#5EC8F2"/>
+      <path d="M 135 106 L 149 130.5 A 30 30 0 0 1 105 106 Z" fill="#FF9FCC"/>
+      <path d="M 135 106 L 105 106 A 30 30 0 0 1 135 76 Z" fill="#F2A93C"/>
+    </g>
+  </g>
+
+  <!-- Magnifying glass -->
+  <g filter="url(#glassShadow)">
+    <circle cx="122" cy="66" r="20" fill="#DFF3F7" opacity="0.35"/>
+    <circle cx="122" cy="66" r="20" fill="none" stroke="#FFFFFF" stroke-width="5"/>
+    <circle cx="122" cy="66" r="20" fill="none" stroke="#8A2261" stroke-width="1.5" opacity="0.4"/>
+    <line x1="136" y1="80" x2="152" y2="96" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/>
+    <line x1="136" y1="80" x2="152" y2="96" stroke="#8A2261" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+    <!-- Glass shine -->
+    <path d="M 112 58 A 14 14 0 0 1 124 50" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8"/>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:54:35+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 22 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGrad2" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#484D57"/>
+      <stop offset="100%" stop-color="#24272D"/>
+    </radialGradient>
+
+    <!-- Metallic gradients -->
+    <linearGradient id="gearPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B79CF0"/>
+      <stop offset="45%" stop-color="#7C5CC4"/>
+      <stop offset="100%" stop-color="#4E3888"/>
+    </linearGradient>
+
+    <linearGradient id="gearSilver2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EDEFF2"/>
+      <stop offset="45%" stop-color="#B4BBC3"/>
+      <stop offset="100%" stop-color="#7E8891"/>
+    </linearGradient>
+
+    <linearGradient id="gearAmber" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFCF7A"/>
+      <stop offset="45%" stop-color="#F0A93E"/>
+      <stop offset="100%" stop-color="#B87418"/>
+    </linearGradient>
+
+    <filter id="softShadow2" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+
+    <filter id="glow2" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <circle cx="100" cy="100" r="98" fill="url(#bgGrad2)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#54585F" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Small amber gear (top left, behind) -->
+  <g filter="url(#softShadow2)" transform="translate(62,58)">
+    <path d="M 0,-20 L 3.5,-20 L 5,-14.5 L 11,-12.2 L 15.5,-16 L 18.2,-13.2 L 14.5,-8.7 L 16.8,-2.7 L 22.5,-1.2 L 22.5,2.2 L 16.8,3.7 L 14.5,9.7 L 18.2,14.2 L 15.5,17 L 11,13.2 L 5,15.5 L 3.5,21 L 0,21 L -1.5,15.5 L -7.5,13.2 L -12,17 L -14.7,14.2 L -11,9.7 L -13.3,3.7 L -19,2.2 L -19,-1.2 L -13.3,-2.7 L -11,-8.7 L -14.7,-13.2 L -12,-16 L -7.5,-12.2 L -1.5,-14.5 Z" fill="url(#gearAmber)"/>
+    <circle cx="0" cy="0" r="9" fill="#B87418"/>
+    <circle cx="0" cy="0" r="6.2" fill="#24272D"/>
+  </g>
+
+  <!-- Medium silver gear (bottom right) -->
+  <g filter="url(#softShadow2)" transform="translate(138,132)">
+    <path d="M 0,-27 L 4.5,-27 L 6.3,-20.2 L 14.4,-17 L 20.7,-22 L 24.3,-18.4 L 19.3,-12.1 L 22.5,-4 L 30.2,-2.2 L 30.2,3.2 L 22.5,5 L 19.3,13.1 L 24.3,19.4 L 20.7,23 L 14.4,18 L 6.3,21.2 L 4.5,28 L 0,28 L -1.8,21.2 L -9.9,18 L -16.2,23 L -19.8,19.4 L -14.8,13.1 L -18,5 L -25.7,3.2 L -25.7,-2.2 L -18,-4 L -14.8,-12.1 L -19.8,-18.4 L -16.2,-22 L -9.9,-17 L -1.8,-20.2 Z" fill="url(#gearSilver2)"/>
+    <circle cx="0" cy="0" r="12.2" fill="#7E8891"/>
+    <circle cx="0" cy="0" r="8.5" fill="#24272D"/>
+  </g>
+
+  <!-- Large purple gear (center, main/front) -->
+  <g filter="url(#softShadow2)" transform="translate(98,98)">
+    <path d="M 0,-38 L 6,-38 L 8.5,-28.5 L 20,-24 L 29,-31 L 34,-26 L 27,-17 L 31.5,-5.5 L 42,-3 L 42,4.5 L 31.5,7 L 27,18.5 L 34,27.5 L 29,32.5 L 20,25.5 L 8.5,30 L 6,39.5 L 0,39.5 L -2.5,30 L -14,25.5 L -23,32.5 L -28,27.5 L -21,18.5 L -25.5,7 L -36,4.5 L -36,-3 L -25.5,-5.5 L -21,-17 L -28,-26 L -23,-31 L -14,-24 L -2.5,-28.5 Z" fill="url(#gearPurple)"/>
+    <circle cx="0" cy="0" r="17" fill="#4E3888"/>
+    <circle cx="0" cy="0" r="12" fill="#24272D"/>
+  </g>
+
+  <!-- Glow accents on gear tips -->
+  <g filter="url(#glow2)">
+    <circle cx="62" cy="38" r="2.2" fill="#FFD98F" opacity="0.9"/>
+    <circle cx="164" cy="112" r="2" fill="#E4E8EC" opacity="0.85"/>
+    <circle cx="98" cy="60" r="2.4" fill="#C4ACF5" opacity="0.9"/>
+  </g>
+
+  <!-- Subtle highlight sweep -->
+  <path d="M 36 44 A 90 90 0 0 1 128 26" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.12"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:55:46+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 23 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#FBE4E2"/>
+      <stop offset="55%" stop-color="#F5C9C6"/>
+      <stop offset="100%" stop-color="#E8A9A5"/>
+    </radialGradient>
+
+    <!-- Door frame gradient -->
+    <linearGradient id="frameGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5C4A42"/>
+      <stop offset="100%" stop-color="#3E312B"/>
+    </linearGradient>
+
+    <!-- Door panel gradient -->
+    <linearGradient id="doorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8A6A56"/>
+      <stop offset="100%" stop-color="#6B4F3F"/>
+    </linearGradient>
+
+    <!-- Arrow gradient -->
+    <linearGradient id="arrowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF6A4D"/>
+      <stop offset="100%" stop-color="#E8351E"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#5C231C" flood-opacity="0.3"/>
+    </filter>
+
+    <filter id="arrowGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <circle cx="100" cy="100" r="98" fill="url(#bgGrad)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#E8A9A5" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Door frame (fixed, left side) -->
+  <g filter="url(#softShadow)">
+    <rect x="54" y="46" width="14" height="108" rx="2" fill="url(#frameGrad)"/>
+  </g>
+
+  <!-- Open door panel (angled, swinging open) -->
+  <g filter="url(#softShadow)">
+    <path d="M 68 48 L 104 58 L 104 144 L 68 152 Z" fill="url(#doorGrad)"/>
+    <path d="M 68 48 L 104 58 L 104 66 L 68 58 Z" fill="#9B7A64" opacity="0.5"/>
+    <!-- Door knob -->
+    <circle cx="96" cy="102" r="4" fill="#FFD166"/>
+    <circle cx="96" cy="102" r="4" fill="none" stroke="#B8862E" stroke-width="1"/>
+  </g>
+
+  <!-- Doorway dark interior sliver -->
+  <path d="M 68 48 L 68 152 L 60 150 L 60 50 Z" fill="#2A1F1A" opacity="0.5"/>
+
+  <!-- Arrow pointing outward (exit arrow) -->
+  <g filter="url(#arrowGlow)">
+    <line x1="86" y1="100" x2="146" y2="100" stroke="url(#arrowGrad)" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 130 82 L 152 100 L 130 118" fill="none" stroke="url(#arrowGrad)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Small sparkle accents -->
+  <circle cx="150" cy="56" r="2.2" fill="#FF6A4D" opacity="0.6"/>
+  <circle cx="46" cy="150" r="1.8" fill="#E8A9A5" opacity="0.7"/>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T22:56:26+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 24 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#FFDCB0"/>
+      <stop offset="55%" stop-color="#FFB870"/>
+      <stop offset="100%" stop-color="#F29940"/>
+    </radialGradient>
+
+    <linearGradient id="boardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#B5824F"/>
+      <stop offset="100%" stop-color="#8F6236"/>
+    </linearGradient>
+
+    <linearGradient id="paperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F1E8"/>
+    </linearGradient>
+
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD98F"/>
+      <stop offset="100%" stop-color="#E8901F"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#7A4A16" flood-opacity="0.3"/>
+    </filter>
+
+    <filter id="ringShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#7A4A16" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <circle cx="100" cy="100" r="98" fill="url(#bgGrad)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#F2A24F" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Clipboard -->
+  <g filter="url(#softShadow)">
+    <rect x="46" y="40" width="88" height="120" rx="8" fill="url(#boardGrad)"/>
+    <rect x="54" y="52" width="72" height="100" rx="4" fill="url(#paperGrad)"/>
+  </g>
+
+  <!-- Clip clamp -->
+  <rect x="76" y="32" width="28" height="16" rx="6" fill="#6B4726"/>
+  <rect x="80" y="36" width="20" height="8" rx="3" fill="#8F6236"/>
+
+  <!-- Checklist rows -->
+  <g>
+    <!-- Row 1: check -->
+    <rect x="62" y="64" width="14" height="14" rx="3" fill="#22B573"/>
+    <path d="M 65 71 L 69 75 L 75 66" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="82" y="68" width="36" height="3" rx="1.5" fill="#C8BEA8"/>
+
+    <!-- Row 2: check -->
+    <rect x="62" y="86" width="14" height="14" rx="3" fill="#22B573"/>
+    <path d="M 65 93 L 69 97 L 75 88" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="82" y="90" width="32" height="3" rx="1.5" fill="#C8BEA8"/>
+
+    <!-- Row 3: red cross -->
+    <rect x="62" y="108" width="14" height="14" rx="3" fill="#E8351E"/>
+    <path d="M 65 111 L 73 119 M 73 111 L 65 119" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <rect x="82" y="112" width="34" height="3" rx="1.5" fill="#C8BEA8"/>
+
+    <!-- Row 4: check -->
+    <rect x="62" y="130" width="14" height="14" rx="3" fill="#22B573"/>
+    <path d="M 65 137 L 69 141 L 75 132" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="82" y="134" width="28" height="3" rx="1.5" fill="#C8BEA8"/>
+  </g>
+
+  <!-- Progress ring overlapping bottom-right corner -->
+  <g filter="url(#ringShadow)">
+    <circle cx="140" cy="146" r="26" fill="#FFFDF7"/>
+    <circle cx="140" cy="146" r="26" fill="none" stroke="#F0E5D0" stroke-width="5"/>
+    <circle cx="140" cy="146" r="26" fill="none" stroke="url(#ringGrad)" stroke-width="5"
+            stroke-linecap="round" stroke-dasharray="127.2" stroke-dashoffset="27"
+            transform="rotate(-90 140 146)"/>
+    <text x="140" y="151" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#8F5A1E">79%</text>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T23:00:53+05:30.
+</ADDITIONAL_METADATA>
+=== SVG 25 ===
+<USER_REQUEST>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#2B2F6B"/>
+      <stop offset="100%" stop-color="#161A40"/>
+    </radialGradient>
+
+    <linearGradient id="bulbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFEB99"/>
+      <stop offset="55%" stop-color="#FFD166"/>
+      <stop offset="100%" stop-color="#F2A93C"/>
+    </linearGradient>
+
+    <linearGradient id="baseGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#B4B9C2"/>
+      <stop offset="100%" stop-color="#7D8391"/>
+    </linearGradient>
+
+    <linearGradient id="bubbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5B6FE0"/>
+      <stop offset="100%" stop-color="#3A4CBF"/>
+    </linearGradient>
+
+    <filter id="bulbGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#05061A" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <circle cx="100" cy="100" r="98" fill="url(#bgGrad)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#4148A0" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Halo glow behind bulb -->
+  <circle cx="100" cy="80" r="38" fill="#FFD166" opacity="0.18" filter="url(#bulbGlow)"/>
+
+  <!-- Sparkle rays -->
+  <g filter="url(#bulbGlow)">
+    <line x1="100" y1="24" x2="100" y2="12" stroke="#FFE9A8" stroke-width="3" stroke-linecap="round"/>
+    <line x1="64" y1="38" x2="55" y2="30" stroke="#FFE9A8" stroke-width="3" stroke-linecap="round"/>
+    <line x1="136" y1="38" x2="145" y2="30" stroke="#FFE9A8" stroke-width="3" stro
+<truncated 184 bytes>
+ stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Sparkle stars -->
+  <g fill="#FFE9A8" filter="url(#bulbGlow)">
+    <path d="M 148 46 L 150 52 L 156 54 L 150 56 L 148 62 L 146 56 L 140 54 L 146 52 Z" opacity="0.9"/>
+    <path d="M 46 100 L 47.5 104 L 51.5 105.5 L 47.5 107 L 46 111 L 44.5 107 L 40.5 105.5 L 44.5 104 Z" opacity="0.8"/>
+  </g>
+
+  <!-- Lightbulb -->
+  <g filter="url(#softShadow)">
+    <!-- Glass bulb -->
+    <path d="M 100 42 
+             C 118 42 130 54 130 72 
+             C 130 86 122 92 116 100 
+             C 113 104 112 108 112 112 
+             L 88 112 
+             C 88 108 87 104 84 100 
+             C 78 92 70 86 70 72 
+             C 70 54 82 42 100 42 Z" fill="url(#bulbGrad)"/>
+    <!-- Glass shine -->
+    <path d="M 84 58 Q 88 48 98 46" stroke="#FFFDF0" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+    <!-- Filament -->
+    <path d="M 92 68 L 96 82 L 100 70 L 104 82 L 108 68" stroke="#E8901F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/>
+
+    <!-- Screw base -->
+    <rect x="88" y="112" width="24" height="6" fill="url(#baseGrad)"/>
+    <rect x="88" y="120" width="24" height="6" fill="url(#baseGrad)"/>
+    <rect x="90" y="128" width="20" height="8" rx="3" fill="#5F6470"/>
+  </g>
+
+  <!-- Speech bubble below -->
+  <g filter="url(#softShadow)">
+    <path d="M 58 150 
+             Q 58 140 68 140 
+             L 132 140 
+             Q 142 140 142 150 
+             L 142 166 
+             Q 142 176 132 176 
+             L 92 176 
+             L 78 188 
+             L 80 176 
+             L 68 176 
+             Q 58 176 58 166 Z" fill="url(#bubbleGrad)"/>
+
+    <!-- Dots inside bubble -->
+    <circle cx="84" cy="158" r="4" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="100" cy="158" r="4" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="116" cy="158" r="4" fill="#FFFFFF" opacity="0.9"/>
+  </g>
+</svg>
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-15T23:01:58+05:30.
+</ADDITIONAL_METADATA>

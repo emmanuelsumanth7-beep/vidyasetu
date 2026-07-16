@@ -8,6 +8,8 @@ const { configureSecurityHeaders, apiRateLimiter } = require('./middleware/secur
 
 const prisma = new PrismaClient();
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy (Cloudflare Tunnel)
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
