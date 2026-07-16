@@ -36,7 +36,7 @@ const DASHBOARD_MODULES: Module[] = [
   // Administration & HR (Violet/Indigo)
   { id: 'students', title: 'Students Info', icon: ProfileIcon, color: '', bgHex: '', category: 'admin', href: '/dashboard/students', allowedRoles: ['principal', 'teacher', 'clerk'] },
   { id: 'staff', title: 'Staff Info', icon: StaffIcon, color: '', bgHex: '', category: 'admin', href: '/dashboard/staff', allowedRoles: ['principal', 'clerk'] },
-  { id: 'salary', title: 'My Salary Slip', icon: FeePaymentIcon, color: '', bgHex: '', category: 'admin', href: '#', allowedRoles: ['principal', 'teacher', 'clerk', 'counselor'] },
+  { id: 'salary', title: 'My Salary Slip', icon: FeePaymentIcon, color: '', bgHex: '', category: 'admin', href: '/dashboard/payroll', allowedRoles: ['principal', 'teacher', 'clerk', 'counselor'] },
   { id: 'ai_insights', title: 'AI Command Center', icon: SystemIcon, color: '', bgHex: '', category: 'admin', href: '/dashboard/ai-insights', allowedRoles: ['principal'] },
   { id: 'staff_attendance', title: 'Staff Attendance', icon: BiometricsIcon, color: '', bgHex: '', category: 'admin', href: '#', allowedRoles: ['principal', 'clerk'] },
 
