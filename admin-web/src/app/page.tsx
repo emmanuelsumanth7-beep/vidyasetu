@@ -71,8 +71,15 @@ export default function ArchitecturalLogin() {
     
     try {
       if (!window.recaptchaVerifier) throw new Error("Recaptcha not initialized");
+      
+      // Clean the phone number (remove spaces, dashes, etc.)
+      const cleaned = phoneNumber.replace(/[^0-9+]/g, '');
       // Format phone number to E.164 if missing +91
-      const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`;
+      const formattedPhone = cleaned.startsWith('+') ? cleaned : `+91${cleaned}`;
+      
+      if (formattedPhone.length < 12) {
+        throw new Error("Please enter a valid 10-digit mobile number.");
+      }
       
       const confResult = await signInWithPhoneNumber(auth, formattedPhone, window.recaptchaVerifier);
       setConfirmationResult(confResult);
