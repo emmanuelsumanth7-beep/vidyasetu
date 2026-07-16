@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Shield, LogOut, User, Phone, Mail, Award } from 'lucide-react';
+import { Shield, LogOut, User, Phone, Mail, Award, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FloatingNavProps {
@@ -26,11 +26,11 @@ export function FloatingNav({ navItems, user, onSignOut }: FloatingNavProps) {
   }, []);
 
   return (
-    <nav className="hidden md:flex flex-col items-center py-6 px-4 fixed left-6 top-1/2 -translate-y-1/2 bg-white shadow-2xl z-50 rounded-[32px] border border-gray-100 max-h-[85vh]">
+    <nav className="hidden md:flex flex-col items-center py-6 px-4 fixed left-6 top-1/2 -translate-y-1/2 bg-gradient-to-b from-indigo-50/90 via-white to-purple-50/90 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] z-50 rounded-[32px] border border-white/50 max-h-[85vh]">
       
       {/* Brand Icon */}
-      <div className="w-12 h-12 mb-8 rounded-full bg-ink-primary flex items-center justify-center text-sheet shadow-sm shrink-0">
-        <Shield size={22} />
+      <div className="w-12 h-12 mb-8 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 shrink-0 transform hover:scale-110 transition-transform">
+        <BookOpen size={22} />
       </div>
 
       {/* Nav Links */}

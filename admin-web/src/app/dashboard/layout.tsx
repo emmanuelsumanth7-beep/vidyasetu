@@ -116,8 +116,13 @@ export default function DashboardLayout({
         <div className="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-[120px]">
           
           {/* Topbar for Mobile */}
-          <header className="md:hidden flex items-center justify-between px-4 h-16 bg-white shrink-0 shadow-sm relative z-10">
-            <span className="font-bold text-xl tracking-tight text-ink-primary font-display">Vidya Setu</span>
+          <header className="md:hidden flex items-center justify-between px-4 h-16 bg-gradient-to-r from-indigo-50 via-white to-purple-50 shrink-0 shadow-sm border-b border-indigo-100 relative z-10">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+                <BookOpen size={16} />
+              </div>
+              <span className="font-bold text-xl tracking-tight text-indigo-950 font-display">Vidya Setu</span>
+            </div>
             <div className="flex items-center gap-3">
               <span className="text-xs font-semibold text-interactive-blue uppercase tracking-wider">{user.role}</span>
               <div className="w-9 h-9 rounded-full bg-hover-subtle flex items-center justify-center text-ink-primary font-bold">
