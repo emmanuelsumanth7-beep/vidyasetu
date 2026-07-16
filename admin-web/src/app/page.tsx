@@ -346,6 +346,7 @@ export default function ArchitecturalLogin() {
               )}
             </motion.div>
           </AnimatePresence>
+          <div id="recaptcha-container"></div>
           
         </motion.div>
       </div>
