@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
-import { Award, FileText } from 'lucide-react';
+import { Award, FileText, Printer } from 'lucide-react';
+import PrintableLetterhead from '@/components/PrintableLetterhead';
 
 export default function GradesDashboard() {
   const [marks, setMarks] = useState<any[]>([]);
@@ -46,8 +47,19 @@ export default function GradesDashboard() {
             {user?.role === 'parent' ? 'Academic performance and test scores.' : 'Manage student academic records.'}
           </p>
         </div>
+        <div className="no-print">
+          <button 
+            onClick={() => window.print()}
+            className="bg-white text-gray-700 px-6 py-3 flex items-center gap-2 rounded-2xl font-bold uppercase tracking-widest shadow-xl border border-gray-100 hover:shadow-2xl hover:bg-gray-50 hover:-translate-y-1 transition-all"
+          >
+            <Printer strokeWidth={3} size={20} /> Print
+          </button>
+        </div>
       </header>
 
+      <div className="print-area print:mb-8">
+        <PrintableLetterhead />
+      </div>
       <div className="bg-white/40 backdrop-blur-2xl rounded-[32px] border border-white/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] overflow-hidden">
         <div className="p-6 border-b border-white/50 flex justify-between items-center bg-white/30">
           <h3 className="text-xl font-bold text-gray-900 font-display flex items-center gap-2">
