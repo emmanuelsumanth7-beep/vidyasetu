@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '@/lib/api';
-import { Search, Plus, X, Users, CreditCard, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Search, Plus, X, Users, CreditCard, AlertCircle, CheckCircle2, Edit2 } from 'lucide-react';
 
 interface Student {
   id: string;
@@ -47,10 +47,16 @@ export default function StudentsDirectory() {
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [userRole, setUserRole] = useState<string>('');
 
   useEffect(() => {
     fetchStudents();
     fetchClasses();
+    if (typeof window !== 'undefined') {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user.role) setUserRole(user.role);
+    }
   }, []);
 
   const fetchStudents = async () => {
@@ -88,7 +94,30 @@ export default function StudentsDirectory() {
     return cls?.name || classId || 'Unassigned';
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const openEditModal = (student: Student) => {
+    setFormData({
+      name: student.name,
+      rollNumber: student.rollNumber,
+      className: getClassName(student.classId),
+      section: student.section || '',
+      gender: student.gender || '',
+      dob: student.dob ? student.dob.split('T')[0] : '',
+      bloodGroup: student.bloodGroup || '',
+      emergencyContact: student.emergencyContact || '',
+      rfidCardUid: student.rfidCardUid || '',
+      parentalConsent: student.parentalConsent || false,
+    });
+    setIsEditing(true);
+    setShowModal(true);
+  };
+
+  const openCreateModal = () => {
+    setFormData(INITIAL_FORM);
+    setIsEditing(false);
+    setShowModal(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
 
@@ -114,16 +143,24 @@ export default function StudentsDirectory() {
         setClasses([...classes, targetClass!]);
       }
 
-      await api.post('/students', {
-        ...formData,
-        classId: targetClass!.id,
-      });
+      if (isEditing && selectedStudent) {
+        const updated = await api.put(`/students/${selectedStudent.id}`, {
+          ...formData,
+          classId: targetClass!.id,
+        });
+        setSelectedStudent(updated);
+      } else {
+        await api.post('/students', {
+          ...formData,
+          classId: targetClass!.id,
+        });
+      }
 
       setShowModal(false);
       setFormData(INITIAL_FORM);
       fetchStudents();
     } catch (err: any) {
-      setFormError(err.message || 'Failed to register student');
+      setFormError(err.message || 'Failed to save student details');
     } finally {
       setSubmitting(false);
     }
@@ -156,13 +193,15 @@ export default function StudentsDirectory() {
           <h1 className="text-2xl md:text-3xl font-bold text-ink-primary font-display tracking-tight">Student Roster</h1>
           <p className="text-ink-secondary mt-1">Manage enrollments, IDs, and student profiles.</p>
         </div>
-        <button 
-          onClick={() => setShowModal(true)}
-          className="bg-interactive-blue hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-sm"
-        >
-          <Plus size={18} />
-          <span>Register Student</span>
-        </button>
+        {['principal', 'clerk', 'teacher'].includes(userRole) && (
+          <button 
+            onClick={openCreateModal}
+            className="bg-interactive-blue hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-sm"
+          >
+            <Plus size={18} />
+            <span>Register Student</span>
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -249,8 +288,20 @@ export default function StudentsDirectory() {
                   {selectedStudent.name.charAt(0)}
                 </div>
                 
-                <h3 className="text-2xl font-bold text-ink-primary mb-1">{selectedStudent.name}</h3>
-                <p className="text-ink-secondary font-data text-sm mb-6">Roll: {selectedStudent.rollNumber}</p>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold text-ink-primary mb-1">{selectedStudent.name}</h3>
+                    <p className="text-ink-secondary font-data text-sm mb-6">Roll: {selectedStudent.rollNumber}</p>
+                  </div>
+                  {['principal', 'clerk', 'teacher'].includes(userRole) && (
+                    <button 
+                      onClick={() => openEditModal(selectedStudent)}
+                      className="text-interactive-blue hover:bg-blue-50 p-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-semibold"
+                    >
+                      <Edit2 size={16} /> Edit
+                    </button>
+                  )}
+                </div>
                 
                 <div className="space-y-4">
                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -328,14 +379,16 @@ export default function StudentsDirectory() {
         <div className="fixed inset-0 bg-ink-primary/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50 shrink-0">
-              <h3 className="font-bold text-lg text-ink-primary">Register New Student</h3>
+              <h3 className="font-bold text-lg text-ink-primary">
+                {isEditing ? 'Edit Student Profile' : 'Register New Student'}
+              </h3>
               <button onClick={() => setShowModal(false)} className="p-2 -mr-2 text-gray-400 hover:text-gray-700 bg-white rounded-full border border-gray-200 transition-colors">
                 <X size={18} />
               </button>
             </div>
 
             <div className="overflow-y-auto p-5">
-              <form id="student-form" onSubmit={handleCreate} className="space-y-4">
+              <form id="student-form" onSubmit={handleSubmit} className="space-y-4">
                 {formError && (
                   <div className="bg-red-50 text-red-700 p-3 rounded-lg flex gap-2 items-start text-sm">
                     <AlertCircle size={16} className="mt-0.5 shrink-0" />
@@ -493,7 +546,7 @@ export default function StudentsDirectory() {
                 className="bg-interactive-blue hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-sm"
                 disabled={submitting}
               >
-                {submitting ? 'Saving…' : 'Register Student'}
+                {submitting ? 'Saving…' : (isEditing ? 'Save Changes' : 'Register Student')}
               </button>
             </div>
           </div>
