@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "dev": "cd admin-web && npm run dev",
+    "build": "cd admin-web && npm install && npm run build && cd .. && rm -rf dist && cp -r admin-web/out dist",
+    "preview": "cd admin-web && npm run start"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.1",
