@@ -48,7 +48,26 @@ const TRANSLATIONS = {
     unlockToView: 'Unlock to view',
     reviewLeaves: 'Review Leaves',
     monthlyTarget: 'of monthly target',
-    fromYesterday: 'from yesterday'
+    fromYesterday: 'from yesterday',
+    
+    // Modules
+    mod_students: 'Students Info',
+    mod_staff: 'Staff Info',
+    mod_salary: 'My Salary Slip',
+    mod_ai_insights: 'AI Command Center',
+    mod_staff_attendance: 'Staff Attendance',
+    mod_attendance: 'Take Attendance',
+    mod_absent: 'Absent Info',
+    mod_classes: 'Classes & Timetable',
+    mod_work_done: 'Work Done',
+    mod_homework: 'Homework Upload',
+    mod_study_material: 'Study Material Upload',
+    mod_exam_marks: 'Exam Marks',
+    mod_diary: 'Daily Diary',
+    mod_documents: 'Document Approvals',
+    mod_chat: 'Chat / Connect',
+    mod_notifications: 'Send Notification',
+    mod_suggestions: 'Suggestions'
   },
   kn: {
     // Login
@@ -87,7 +106,26 @@ const TRANSLATIONS = {
     unlockToView: 'ವೀಕ್ಷಿಸಲು ಅನ್ಲಾಕ್ ಮಾಡಿ',
     reviewLeaves: 'ರಜೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿ',
     monthlyTarget: 'ಮಾಸಿಕ ಗುರಿಯ',
-    fromYesterday: 'ನಿನ್ನೆಯಿಂದ'
+    fromYesterday: 'ನಿನ್ನೆಯಿಂದ',
+
+    // Modules
+    mod_students: 'ವಿದ್ಯಾರ್ಥಿಗಳ ಮಾಹಿತಿ',
+    mod_staff: 'ಸಿಬ್ಬಂದಿ ಮಾಹಿತಿ',
+    mod_salary: 'ನನ್ನ ವೇತನ ಚೀಟಿ',
+    mod_ai_insights: 'ಎಐ ಕಮಾಂಡ್ ಸೆಂಟರ್',
+    mod_staff_attendance: 'ಸಿಬ್ಬಂದಿ ಹಾಜರಾತಿ',
+    mod_attendance: 'ಹಾಜರಾತಿ ತೆಗೆದುಕೊಳ್ಳಿ',
+    mod_absent: 'ಗೈರುಹಾಜರಿ ಮಾಹಿತಿ',
+    mod_classes: 'ತರಗತಿಗಳು ಮತ್ತು ವೇಳಾಪಟ್ಟಿ',
+    mod_work_done: 'ಪೂರ್ಣಗೊಂಡ ಕೆಲಸ',
+    mod_homework: 'ಮನೆಕೆಲಸ ಅಪ್‌ಲೋಡ್',
+    mod_study_material: 'ಅಧ್ಯಯನ ಸಾಮಗ್ರಿ ಅಪ್‌ಲೋಡ್',
+    mod_exam_marks: 'ಪರೀಕ್ಷೆಯ ಅಂಕಗಳು',
+    mod_diary: 'ದೈನಂದಿನ ಡೈರಿ',
+    mod_documents: 'ದಾಖಲೆಗಳ ಅನುಮೋದನೆ',
+    mod_chat: 'ಚಾಟ್ / ಸಂಪರ್ಕ',
+    mod_notifications: 'ಸೂಚನೆ ಕಳುಹಿಸಿ',
+    mod_suggestions: 'ಸಲಹೆಗಳು'
   }
 };
 
