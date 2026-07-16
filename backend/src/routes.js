@@ -518,6 +518,85 @@ router.post('/students', authenticate, async (req, res) => {
   }
 });
 
+router.put('/students/:id', authenticate, async (req, res) => {
+  const { prisma, user, io } = req;
+  
+  if (!['principal', 'clerk', 'teacher'].includes(user.role)) {
+    return res.status(403).json({ error: 'Permission denied' });
+  }
+
+  const { id } = req.params;
+  const {
+    name, rollNumber, classId, rfidCardUid,
+    dob, bloodGroup, aadhaar, gender,
+    emergencyContact, medicalConditions, allergies,
+    transportRoute, house, section, className, parentalConsent
+  } = req.body;
+
+  try {
+    // Verify student belongs to the same school
+    const existingStudent = await prisma.student.findFirst({
+      where: { id, schoolId: user.schoolId }
+    });
+    
+    if (!existingStudent) {
+      return res.status(404).json({ error: 'Student not found in your school.' });
+    }
+
+    let finalClassId = classId || existingStudent.classId;
+
+    if (className && className !== existingStudent.className) {
+      let cls = await prisma.class.findFirst({
+        where: { schoolId: user.schoolId, name: className }
+      });
+      if (!cls) {
+        let teacher = await prisma.user.findFirst({ where: { schoolId: user.schoolId, role: 'teacher' } });
+        if (!teacher) {
+          teacher = await prisma.user.findFirst({ where: { schoolId: user.schoolId, role: 'principal' } });
+        }
+        cls = await prisma.class.create({
+          data: {
+            schoolId: user.schoolId,
+            name: className,
+            classTeacherId: teacher.id
+          }
+        });
+      }
+      finalClassId = cls.id;
+    }
+
+    const updatedStudent = await prisma.student.update({
+      where: { id },
+      data: {
+        name: name || existingStudent.name,
+        rollNumber: rollNumber || existingStudent.rollNumber,
+        classId: finalClassId,
+        rfidCardUid: rfidCardUid !== undefined ? (rfidCardUid || null) : existingStudent.rfidCardUid,
+        dob: dob ? new Date(dob) : existingStudent.dob,
+        bloodGroup: bloodGroup !== undefined ? bloodGroup : existingStudent.bloodGroup,
+        aadhaar: aadhaar !== undefined ? aadhaar : existingStudent.aadhaar,
+        gender: gender !== undefined ? gender : existingStudent.gender,
+        emergencyContact: emergencyContact !== undefined ? emergencyContact : existingStudent.emergencyContact,
+        medicalConditions: medicalConditions !== undefined ? medicalConditions : existingStudent.medicalConditions,
+        allergies: allergies !== undefined ? allergies : existingStudent.allergies,
+        transportRoute: transportRoute !== undefined ? transportRoute : existingStudent.transportRoute,
+        house: house !== undefined ? house : existingStudent.house,
+        section: section !== undefined ? section : existingStudent.section,
+        parentalConsent: parentalConsent !== undefined ? parentalConsent : existingStudent.parentalConsent
+      },
+      include: { class: true }
+    });
+
+    // Broadcast update
+    io.to(`school_${user.schoolId}`).emit('studentUpdated', updatedStudent);
+    
+    res.json(updatedStudent);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update student profile.' });
+  }
+});
+
 // ==========================================
 // ATTENDANCE & RFID ROUTES
 // ==========================================
