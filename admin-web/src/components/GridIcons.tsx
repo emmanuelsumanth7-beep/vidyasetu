@@ -1638,10 +1638,89 @@ export const StaffIcon = () => (
 );
 
 export const CalculatorIcon = () => (
-  <div className="w-full h-full text-blue-500">
-    <Calculator size={32} strokeWidth={1.5} />
-  </div>
-);
+<svg className="w-full h-full" width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#332C81"/>
+      <stop offset="100%" stopColor="#1C1652"/>
+    </linearGradient>
+
+    <linearGradient id="billBack" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="#38B27A"/>
+      <stop offset="100%" stopColor="#2A9D63"/>
+    </linearGradient>
+    <linearGradient id="billFront" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="#5EE0A0"/>
+      <stop offset="100%" stopColor="#3ECB86"/>
+    </linearGradient>
+
+    <linearGradient id="coinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#FFE58A"/>
+      <stop offset="100%" stopColor="#FFB930"/>
+    </linearGradient>
+    <linearGradient id="coinEdge" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#E8971A"/>
+      <stop offset="100%" stopColor="#C9770A"/>
+    </linearGradient>
+
+    <linearGradient id="calcBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#4C5AF0"/>
+      <stop offset="100%" stopColor="#2E2FB8"/>
+    </linearGradient>
+    <linearGradient id="calcScreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#B7F5D8"/>
+      <stop offset="100%" stopColor="#7EE6B5"/>
+    </linearGradient>
+
+    <filter name="softShadow" id="softShadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" floodColor="#000000" floodOpacity="0.28"/>
+    </filter>
+  </defs>
+
+  
+  <circle cx="200" cy="200" r="190" fill="url(#bgGrad)"/>
+
+  
+  <g filter="url(#softShadow)">
+    <rect x="62" y="222" width="118" height="52" rx="9" fill="url(#billBack)"/>
+    <rect x="56" y="208" width="118" height="52" rx="9" fill="url(#billFront)"/>
+    <circle cx="100" cy="234" r="14" fill="#FFFFFF" opacity="0.3"/>
+    <text x="100" y="245">
+    <line x1="128" y1="230" x2="146" y2="230" stroke="#FFFFFF" strokeWidth="3" opacity="0.4"/>
+  </g>
+
+  
+  <g filter="url(#softShadow)">
+    <ellipse cx="110" cy="308" rx="40" ry="13" fill="url(#coinEdge)"/>
+    <ellipse cx="110" cy="298" rx="40" ry="13" fill="url(#coinGrad)"/>
+    <ellipse cx="110" cy="286" rx="40" ry="13" fill="url(#coinEdge)"/>
+    <ellipse cx="110" cy="276" rx="40" ry="13" fill="url(#coinGrad)"/>
+    <text x="110" y="281" fontFamily="Arial, sans-serif" fontSize="15" fontWeight="700" fill="#B4720B" textAnchor="middle">$</text>
+  </g>
+
+  
+  <g filter="url(#softShadow)">
+    <rect x="212" y="118" width="130" height="176" rx="18" fill="url(#calcBody)"/>
+    <rect x="228" y="136" width="98" height="48" rx="9" fill="url(#calcScreen)"/>
+    <text x="317" y="168" fontFamily="Arial, sans-serif" fontSize="20" fontWeight="700" fill="#1C6B47" textAnchor="end">482.50</text>
+
+    
+    <rect x="228" y="198" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="256" y="198" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="284" y="198" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="312" y="198" width="14" height="20" rx="5" fill="#FFB930"/>
+
+    <rect x="228" y="226" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="256" y="226" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="284" y="226" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="312" y="226" width="14" height="20" rx="5" fill="#FFB930"/>
+
+    <rect x="228" y="254" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="256" y="254" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="284" y="254" width="20" height="20" rx="5" fill="#5D6BFF"/>
+    <rect x="312" y="254" width="14" height="20" rx="5" fill="#3ECB86"/>
+  </g>
+</svg>);
 
 export const SystemIcon = () => (
 <svg className="w-full h-full" width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
@@ -1736,10 +1815,95 @@ export const SystemIcon = () => (
 );
 
 export const DocumentIcon = () => (
-  <div className="w-full h-full text-indigo-500">
-    <FileText size={32} strokeWidth={1.5} />
-  </div>
-);
+<svg className="w-full h-full" width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    
+    <radialGradient id="bgGrad" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stopColor="#FFF3DC"/>
+      <stop offset="55%" stopColor="#FCE3AE"/>
+      <stop offset="100%" stopColor="#F5C86B"/>
+    </radialGradient>
+
+    
+    <linearGradient id="paperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#FFFFFF"/>
+      <stop offset="100%" stopColor="#F3F1EA"/>
+    </linearGradient>
+
+    
+    <radialGradient id="stampGrad" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stopColor="#4ADE80"/>
+      <stop offset="55%" stopColor="#22B573"/>
+      <stop offset="100%" stopColor="#0E8F57"/>
+    </radialGradient>
+
+    
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#FFE9A8"/>
+      <stop offset="50%" stopColor="#E8B84B"/>
+      <stop offset="100%" stopColor="#C6902A"/>
+    </linearGradient>
+
+    
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#8A5A1E" floodOpacity="0.28"/>
+    </filter>
+
+    
+    <filter id="stampGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="stampShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#0E5C38" floodOpacity="0.4"/>
+    </filter>
+  </defs>
+
+  
+  <circle cx="100" cy="100" r="98" fill="url(#bgGrad)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#E8B84B" strokeWidth="1.5">
+
+  
+  <rect x="66" y="66" width="48" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="74" width="44" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="82" width="48" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="90" width="38" height="3" rx="1.5" fill="#D9D2C0"/>
+
+  <rect x="66" y="104" width="48" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="112" width="44" height="3" rx="1.5" fill="#D9D2C0"/>
+  <rect x="66" y="120" width="30" height="3" rx="1.5" fill="#D9D2C0"/>
+
+  
+  <rect x="66" y="130" width="26" height="2.5" rx="1.25" fill="#C6902A" opacity="0.5"/>
+
+  
+  <circle cx="126" cy="108" r="34" fill="#22B573" opacity="0.18" filter="url(#stampGlow)"/>
+
+  
+  <g filter="url(#stampShadow)" transform="rotate(-14 126 108)">
+    <circle cx="126" cy="108" r="27" fill="url(#stampGrad)"/>
+    <circle cx="126" cy="108" r="27" fill="none" stroke="#F4FFF7" strokeWidth="1.5" opacity="0.6"/>
+    <circle cx="126" cy="108" r="22.5" fill="none" stroke="#F4FFF7" strokeWidth="1.2" strokeDasharray="3 2.5" opacity="0.85"/>
+
+    
+    <path d="M 115 108 L 122 115 L 137 99" stroke="#FFFFFF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+
+    
+    <path id="topArc" d="M 106 100 A 22 22 0 0 1 146 100" fill="none" stroke="#F4FFF7" strokeWidth="1" opacity="0.5"/>
+  </g>
+
+  
+  <circle cx="68" cy="128" r="0" fill="none"/>
+
+  
+  <path d="M 24 24 L 24 34 M 24 24 L 34 24" stroke="url(#goldGrad)" strokeWidth="2" strokeLinecap="round" opacity="0.55"/>
+  <path d="M 176 176 L 176 166 M 176 176 L 166 176" stroke="url(#goldGrad)" strokeWidth="2" strokeLinecap="round" opacity="0.55"/>
+</svg>);
 
 export const SunIcon = () => (
 <svg className="w-full h-full" width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
