@@ -23,6 +23,7 @@ import {
   Award,
   BookMarked,
   LogOut,
+  RefreshCw,
   type LucideIcon
 } from 'lucide-react';
 
@@ -45,6 +46,20 @@ export default function DashboardLayout({
       router.push('/');
     }
   }, [router, user]);
+
+  // Auto-sync when internet is restored
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('Internet connected. Auto-syncing data...');
+      window.location.reload();
+    };
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
+
+  const handleRefresh = () => {
+    window.location.reload();
+  };
 
   const handleSignOut = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -167,6 +182,15 @@ export default function DashboardLayout({
             </div>
           </main>
         </div>
+
+        {/* Global Floating Refresh Button */}
+        <button
+          onClick={handleRefresh}
+          className="fixed bottom-24 md:bottom-10 right-4 md:right-10 bg-interactive-blue text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all z-50 group"
+          title="Force Sync / Refresh"
+        >
+          <RefreshCw size={20} className="group-active:animate-spin" />
+        </button>
 
         {/* Mobile bottom nav */}
         <MobileNav navItems={navItems} />
