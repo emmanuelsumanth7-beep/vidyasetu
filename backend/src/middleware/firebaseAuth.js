@@ -26,6 +26,11 @@ const verifyFirebaseAuth = async (req, res, next) => {
   // ==========================================
   if (idToken.startsWith('DEV_BYPASS_')) {
     const requestedRole = idToken.split('DEV_BYPASS_')[1].toUpperCase(); 
+    const validRoles = ['SUPER_ADMIN', 'PRINCIPAL', 'VICE_PRINCIPAL', 'TEACHER', 'CLERK', 'ACCOUNTANT', 'LIBRARIAN', 'NURSE', 'DRIVER', 'WARDEN', 'PARENT', 'STUDENT', 'ALUMNUS'];
+
+    if (!validRoles.includes(requestedRole)) {
+      return res.status(401).json({ error: 'Invalid developer bypass role' });
+    }
     
     // Find the first user in the DB with that role
     let mockUser = await req.prisma.user.findFirst({
@@ -35,18 +40,22 @@ const verifyFirebaseAuth = async (req, res, next) => {
     
     // Auto-seed if the database is empty (so the demo never crashes)
     if (!mockUser) {
-        // Find or create a mock school
-        const mockSchool = await req.prisma.school.upsert({
-            where: { name: 'Vidya Setu Demo School' },
-            update: {},
-            create: { name: 'Vidya Setu Demo School', address: 'Bangalore', phone: '+919999999999', email: 'demo@vidyasetu.com', establishedYear: 2024, type: 'K12' }
+        let mockSchool = await req.prisma.school.findFirst({
+          where: { name: 'Vidya Setu Demo School' }
         });
+
+        if (!mockSchool) {
+          mockSchool = await req.prisma.school.create({
+            data: { name: 'Vidya Setu Demo School', address: 'Bangalore' }
+          });
+        }
 
         // Create the user
         mockUser = await req.prisma.user.create({
             data: {
                 id: `dev-${requestedRole.toLowerCase()}-id`,
-                phone: `+910000000${requestedRole.length}`,
+                name: `Dev ${requestedRole}`,
+                phoneNumber: `+910000000${requestedRole.length}`,
                 role: requestedRole,
                 schoolId: mockSchool.id,
                 isActive: true
@@ -55,12 +64,12 @@ const verifyFirebaseAuth = async (req, res, next) => {
         });
         
         // Also create the profile depending on role
-        if (requestedRole === 'PRINCIPAL' || requestedRole === 'STAFF') {
-            await req.prisma.staffProfile.create({ data: { userId: mockUser.id, employeeId: `EMP-${requestedRole}`, name: `Dev ${requestedRole}`, designation: requestedRole, joinDate: new Date(), baseSalary: 50000 }});
+        if (requestedRole === 'PRINCIPAL' || requestedRole === 'VICE_PRINCIPAL' || requestedRole === 'CLERK' || requestedRole === 'ACCOUNTANT' || requestedRole === 'LIBRARIAN' || requestedRole === 'NURSE' || requestedRole === 'DRIVER' || requestedRole === 'WARDEN') {
+            await req.prisma.staffProfile.create({ data: { userId: mockUser.id, schoolId: mockSchool.id, employeeCode: `EMP-${requestedRole}`, department: requestedRole, dateOfJoining: new Date() }});
         } else if (requestedRole === 'TEACHER') {
-            await req.prisma.teacherProfile.create({ data: { userId: mockUser.id, employeeId: 'EMP-TEACHER', name: 'Dev Teacher', joinDate: new Date(), baseSalary: 40000 }});
+            await req.prisma.teacherProfile.create({ data: { userId: mockUser.id, schoolId: mockSchool.id, employeeCode: 'EMP-TEACHER', dateOfJoining: new Date() }});
         } else if (requestedRole === 'PARENT') {
-            await req.prisma.parentProfile.create({ data: { userId: mockUser.id, name: 'Dev Parent', relation: 'FATHER' }});
+            await req.prisma.parentProfile.create({ data: { userId: mockUser.id, schoolId: mockSchool.id }});
         }
     }
     
@@ -78,7 +87,7 @@ const verifyFirebaseAuth = async (req, res, next) => {
     const phoneNumber = decodedToken.phone_number;
     if (phoneNumber) {
       const user = await req.prisma.user.findFirst({
-        where: { phoneNumber: phoneNumber },
+        where: { phoneNumber },
         include: { school: true }
       });
       if (user) {
@@ -86,7 +95,7 @@ const verifyFirebaseAuth = async (req, res, next) => {
       }
     }
     // Optional: MFA Check for Principal Role
-    if (req.user && req.user.role === 'principal' && req.user.mfaEnabled) {
+    if (req.user && req.user.role === 'PRINCIPAL' && req.user.mfaEnabled) {
       // Allow them to hit the MFA endpoints without MFA token
       if (!req.originalUrl.startsWith('/api/auth/mfa')) {
         const mfaToken = req.headers['x-mfa-token'];

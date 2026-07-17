@@ -1,9 +1,5 @@
 {
   "appId": "com.vidyasetu.app",
-  "appName": "vidyasetu",
-  "webDir": "admin-web/out",
-  "server": {
-    "androidScheme": "http",
-    "cleartext": true
-  }
+  "appName": "Vidya Setu",
+  "webDir": "admin-web/out"
 }

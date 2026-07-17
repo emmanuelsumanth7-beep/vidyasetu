@@ -1,13 +1,9 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.eduportal.app',
-  appName: 'EduPortal',
-  webDir: 'out',
-  server: {
-    url: 'https://bot.smha.co.in',
-    cleartext: true
-  }
+  appId: 'com.vidyasetu.app',
+  appName: 'Vidya Setu',
+  webDir: 'out'
 };
 
 export default config;

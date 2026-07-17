@@ -1,12 +1,30 @@
 apply plugin: 'com.android.application'
 
+// ---------------------------------------------------------------------------
+// Release signing — credentials are loaded from keystore.properties, which
+// is gitignored and never committed.  In CI, set the four environment
+// variables instead and the same block falls through to them automatically.
+//
+// keystore.properties keys   |  CI environment variable equivalent
+// -------------------------- | ------------------------------------
+// storeFile                  |  KEYSTORE_PATH
+// storePassword              |  KEYSTORE_STORE_PASSWORD
+// keyAlias                   |  KEYSTORE_KEY_ALIAS
+// keyPassword                |  KEYSTORE_KEY_PASSWORD
+// ---------------------------------------------------------------------------
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.vidyasetu.app"
-    compileSdk = rootProject.ext.compileSdkVersion
+    compileSdk = rootProject.ext.compileSdkVersion  // 36 — set in variables.gradle
     defaultConfig {
         applicationId "com.vidyasetu.app"
         minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion  // 36 — set in variables.gradle
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -16,9 +34,18 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            storeFile     file(keystoreProperties['storeFile']     ?: System.getenv('KEYSTORE_PATH')            ?: 'vidyasetu-upload.jks')
+            storePassword      keystoreProperties['storePassword'] ?: System.getenv('KEYSTORE_STORE_PASSWORD')  ?: ''
+            keyAlias           keystoreProperties['keyAlias']      ?: System.getenv('KEYSTORE_KEY_ALIAS')       ?: ''
+            keyPassword        keystoreProperties['keyPassword']   ?: System.getenv('KEYSTORE_KEY_PASSWORD')    ?: ''
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            signingConfig   signingConfigs.release
+            minifyEnabled   false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

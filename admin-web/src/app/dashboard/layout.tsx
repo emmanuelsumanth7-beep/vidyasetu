@@ -52,7 +52,7 @@ export default function DashboardLayout({
     router.push('/');
   };
 
-  if (!user) return <div className="h-screen w-full flex items-center justify-center text-ink-secondary bg-canvas font-data">Loading workspace...</div>;
+  if (!user) return <div className="h-screen w-full flex items-center justify-center font-data" style={{color:'#AEAEB2'}}>Loading workspace…</div>;
 
   // Role-based Navigation mapping
   let navItems: NavItem[] = [];
@@ -109,60 +109,66 @@ export default function DashboardLayout({
 
   return (
     <SocketProvider>
-      <div className="flex h-screen bg-canvas overflow-hidden">
-        
-        {/* Desktop Floating Pill Navigation */}
+      {/* Root container — transparent so body blobs show through */}
+      <div className="flex h-screen overflow-hidden" style={{ background: 'transparent' }}>
+
+        {/* Desktop Floating Glass Nav */}
         <FloatingNav navItems={navItems} user={user} onSignOut={handleSignOut} />
-        
-        {/* Main Content Area */}
-        {/* On desktop, we add md:ml-[120px] to clear the fixed floating nav dock */}
-        <div className="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-[120px]">
-          
-          {/* Topbar for Mobile */}
-          <header className="md:hidden flex items-center justify-between px-3 h-16 bg-gradient-to-r from-indigo-50 via-white to-purple-50 shrink-0 shadow-sm border-b border-indigo-100 relative z-10 w-full">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+
+        {/* Main content */}
+        <div className="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-[100px]">
+
+          {/* Mobile glass topbar */}
+          <header
+            className="md:hidden flex items-center justify-between px-4 h-14 shrink-0 relative z-10 w-full"
+            style={{
+              background: 'rgba(242,242,247,0.80)',
+              backdropFilter: 'blur(32px) saturate(1.8)',
+              WebkitBackdropFilter: 'blur(32px) saturate(1.8)',
+              borderBottom: '1px solid rgba(60,60,67,0.10)',
+              boxShadow: '0 1px 0 rgba(255,255,255,0.80) inset',
+            }}
+          >
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-white"
+                style={{ background: 'linear-gradient(135deg,#007AFF,#5856D6)', boxShadow: '0 4px 12px rgba(0,122,255,0.30)' }}
+              >
                 <BookOpen size={14} />
               </div>
-              <span className="font-bold text-lg sm:text-xl tracking-tight text-indigo-950 font-display truncate max-w-[120px] sm:max-w-none">Vidya Setu</span>
+              <span className="font-black text-lg tracking-tight truncate max-w-[130px]" style={{ color: '#1C1C1E' }}>
+                Vidya Setu
+              </span>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-xs font-semibold text-interactive-blue uppercase tracking-wider">{user.role}</span>
-              <div className="w-9 h-9 rounded-full bg-hover-subtle flex items-center justify-center text-ink-primary font-bold">
-                {user.name.charAt(0)}
-              </div>
-              <button onClick={handleSignOut} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors">
-                <LogOut size={18} />
+            <div className="flex items-center gap-2">
+              <span
+                className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"
+                style={{ background: 'rgba(0,122,255,0.10)', color: '#007AFF', border: '1px solid rgba(0,122,255,0.18)' }}
+              >
+                {user.role}
+              </span>
+              <button
+                onClick={handleSignOut}
+                className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
+                style={{ color: '#6C7278', background: 'rgba(60,60,67,0.06)' }}
+              >
+                <LogOut size={15} />
               </button>
             </div>
           </header>
 
-          {/* Scrollable Main Content */}
-          <main className="flex-1 overflow-y-auto px-2 py-4 sm:p-4 md:p-10 pb-24 md:pb-10 relative w-full overflow-x-hidden">
-            
-            {/* Desktop Top Area: Title & Greeting. 
-                Instead of a full-width header bar, it's just content placed directly on the canvas. */}
-            <div className="hidden md:flex items-end justify-between mb-10 pb-4 border-b-2 border-border-draft">
-              <h1 className="text-4xl font-bold text-ink-primary font-display tracking-tight">Workspace</h1>
-              <div className="text-sm font-data text-ink-secondary flex items-center gap-4">
-                <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                <span className="text-interactive-blue font-bold">
-                  ● Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {user.name.split(' ')[0]}
-                </span>
-                <button onClick={handleSignOut} className="flex items-center gap-2 px-4 py-2 ml-4 text-red-600 bg-red-50 hover:bg-red-100 rounded-full font-bold transition-colors shadow-sm">
-                  <LogOut size={16} /> Logout
-                </button>
-              </div>
-            </div>
-
+          {/* Scrollable main */}
+          <main
+            className="flex-1 overflow-y-auto px-3 py-4 sm:px-4 md:px-10 md:py-10 relative w-full overflow-x-hidden"
+            style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+          >
             <div className="w-full">
               {children}
             </div>
           </main>
-          
         </div>
 
-        {/* Mobile Bottom Navigation */}
+        {/* Mobile bottom nav */}
         <MobileNav navItems={navItems} />
 
       </div>

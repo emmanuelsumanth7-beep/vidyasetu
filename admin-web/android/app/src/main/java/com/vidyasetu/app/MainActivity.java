@@ -1,4 +1,4 @@
-package com.eduportal.app;
+package com.vidyasetu.app;
 
 import com.getcapacitor.BridgeActivity;
 

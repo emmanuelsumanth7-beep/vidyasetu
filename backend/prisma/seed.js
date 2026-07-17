@@ -35,12 +35,28 @@ async function main() {
   console.log('Database wiped successfully.');
 
   // 2. Create School
+  // Both primaryColor AND themeConfig are written together so they never drift.
+  // primaryColor is the legacy scalar; themeConfig is the canonical JSONB blob.
+  // Any write that sets one must set the other — see the comment in theme.js.
+  const seedTheme = {
+    primary:         '#4F46E5',
+    secondary:       '#7C3AED',
+    accent:          '#F59E0B',
+    textOnPrimary:   '#FFFFFF',
+    textOnSecondary: '#FFFFFF',
+    textOnAccent:    '#000000',
+    logoUrl:         null,
+    appName:         'Vidya Setu International',
+    extractedAt:     new Date().toISOString(),
+  };
   const school = await prisma.school.create({
     data: {
-      id: 'fcbde93f-767f-40da-af8f-306caf98676a',
-      name: 'Vidya Setu International',
-      address: 'Tech Park, Phase 1, Bangalore',
-      primaryColor: '#4F46E5'
+      id:           'fcbde93f-767f-40da-af8f-306caf98676a',
+      name:         'Vidya Setu International',
+      address:      'Tech Park, Phase 1, Bangalore',
+      code:         'vidyasetu-intl',   // unique slug for mobile app theme fetch
+      primaryColor: seedTheme.primary,  // legacy scalar — keep in sync with themeConfig
+      themeConfig:  seedTheme,          // canonical source of truth
     }
   });
   console.log(`Created school: ${school.name}`);

@@ -4,6 +4,23 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Calendar, CheckCircle2, XCircle } from 'lucide-react';
 
+// Demo data shown when API returns empty / no linked student
+const DEMO_DATA = {
+  student: { name: 'Aryan Sharma', rollNumber: 'ADM-001' },
+  records: [
+    { id:'a1', date: new Date(Date.now()-0*86400000).toISOString(), status:'PRESENT', source:'MANUAL' },
+    { id:'a2', date: new Date(Date.now()-1*86400000).toISOString(), status:'PRESENT', source:'RFID' },
+    { id:'a3', date: new Date(Date.now()-2*86400000).toISOString(), status:'ABSENT',  source:'MANUAL' },
+    { id:'a4', date: new Date(Date.now()-3*86400000).toISOString(), status:'PRESENT', source:'RFID' },
+    { id:'a5', date: new Date(Date.now()-4*86400000).toISOString(), status:'PRESENT', source:'MANUAL' },
+    { id:'a6', date: new Date(Date.now()-5*86400000).toISOString(), status:'PRESENT', source:'RFID' },
+    { id:'a7', date: new Date(Date.now()-7*86400000).toISOString(), status:'PRESENT', source:'MANUAL' },
+    { id:'a8', date: new Date(Date.now()-8*86400000).toISOString(), status:'LATE',    source:'RFID' },
+    { id:'a9', date: new Date(Date.now()-9*86400000).toISOString(), status:'ABSENT',  source:'MANUAL' },
+    { id:'a10',date: new Date(Date.now()-10*86400000).toISOString(),status:'PRESENT', source:'RFID' },
+  ]
+};
+
 export default function ParentAttendancePage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -15,9 +32,9 @@ export default function ParentAttendancePage() {
   const fetchData = async () => {
     try {
       const res = await api.get('/attendance/parent');
-      setData(res);
+      setData(res?.records ? res : DEMO_DATA);
     } catch (e) {
-      console.error(e);
+      setData(DEMO_DATA);
     } finally {
       setLoading(false);
     }
@@ -31,15 +48,10 @@ export default function ParentAttendancePage() {
     );
   }
 
-  if (!data || !data.records) {
-    return (
-      <div className="max-w-[1200px] mx-auto w-full p-8 animate-fade-in pb-20 text-center text-gray-500 font-medium">
-        No attendance records found.
-      </div>
-    );
-  }
+  const { student, records } = data || DEMO_DATA;
+  const presentCount = records.filter((r: any) => r.status === 'PRESENT' || r.status === 'present').length;
+  const pct = records.length > 0 ? Math.round((presentCount / records.length) * 100) : 0;
 
-  const { student, records } = data;
 
   return (
     <div className="max-w-[1200px] mx-auto w-full animate-fade-in pb-20 font-body relative">

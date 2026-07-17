@@ -1986,3 +1986,107 @@ export const SunIcon = () => (
 </svg>
 );
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NEW ICONS added for updated principal dashboard layout
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const ClassCompletedIcon = () => (
+<svg className="w-full h-full" width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="ccBg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stopColor="#E0F7FA"/>
+      <stop offset="100%" stopColor="#B2EBF2"/>
+    </radialGradient>
+    <linearGradient id="ccBoard" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#4CAF50"/>
+      <stop offset="100%" stopColor="#2E7D32"/>
+    </linearGradient>
+    <filter id="ccShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#1B5E20" floodOpacity="0.25"/>
+    </filter>
+  </defs>
+  <circle cx="100" cy="100" r="98" fill="url(#ccBg)"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#80DEEA" strokeWidth="1.5" opacity="0.7"/>
+  {/* easel legs */}
+  <line x1="100" y1="140" x2="75" y2="175" stroke="#795548" strokeWidth="5" strokeLinecap="round"/>
+  <line x1="100" y1="140" x2="125" y2="175" stroke="#795548" strokeWidth="5" strokeLinecap="round"/>
+  <line x1="100" y1="140" x2="100" y2="175" stroke="#795548" strokeWidth="4" strokeLinecap="round"/>
+  {/* board */}
+  <rect x="38" y="35" width="124" height="110" rx="8" fill="url(#ccBoard)" filter="url(#ccShadow)"/>
+  <rect x="44" y="41" width="112" height="98" rx="5" fill="#1B5E20"/>
+  {/* big tick */}
+  <circle cx="100" cy="90" r="36" fill="#A5D6A7" opacity="0.3"/>
+  <path d="M 76 90 L 93 107 L 128 72" stroke="#FFFFFF" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  {/* class complete text stripe */}
+  <rect x="44" y="122" width="112" height="17" rx="3" fill="#2E7D32"/>
+  <rect x="60" y="127" width="80" height="5" rx="2.5" fill="#C8E6C9"/>
+</svg>
+);
+
+export const DocumentInfoIcon = () => (
+<svg className="w-full h-full" width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="diBg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stopColor="#FFF8E1"/>
+      <stop offset="100%" stopColor="#FFECB3"/>
+    </radialGradient>
+    <linearGradient id="diPage" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#FFFFFF"/>
+      <stop offset="100%" stopColor="#F5F5F5"/>
+    </linearGradient>
+    <filter id="diShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" floodColor="#BF8D20" floodOpacity="0.25"/>
+    </filter>
+  </defs>
+  <circle cx="100" cy="100" r="98" fill="url(#diBg)"/>
+  {/* folder base */}
+  <rect x="30" y="75" width="140" height="100" rx="10" fill="#FFA726" filter="url(#diShadow)"/>
+  <path d="M 30 85 Q 30 75 40 75 L 90 75 L 100 62 L 160 62 Q 170 62 170 72 L 170 85 Z" fill="#FFB74D"/>
+  {/* documents */}
+  <rect x="52" y="90" width="96" height="72" rx="6" fill="url(#diPage)"/>
+  <rect x="62" y="102" width="76" height="5" rx="2.5" fill="#BDBDBD"/>
+  <rect x="62" y="113" width="60" height="4" rx="2" fill="#E0E0E0"/>
+  <rect x="62" y="123" width="68" height="4" rx="2" fill="#E0E0E0"/>
+  <rect x="62" y="133" width="50" height="4" rx="2" fill="#E0E0E0"/>
+  {/* badge */}
+  <circle cx="148" cy="68" r="18" fill="#FF6F00"/>
+  <text x="148" y="74" textAnchor="middle" fontFamily="Arial" fontSize="18" fontWeight="900" fill="#FFFFFF">i</text>
+</svg>
+);
+
+export const MoreInfoIcon = () => (
+<svg className="w-full h-full" width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="miBg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stopColor="#E8EAF6"/>
+      <stop offset="100%" stopColor="#C5CAE9"/>
+    </radialGradient>
+    <linearGradient id="miScreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#3F51B5"/>
+      <stop offset="100%" stopColor="#283593"/>
+    </linearGradient>
+    <filter id="miShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" floodColor="#1A237E" floodOpacity="0.3"/>
+    </filter>
+  </defs>
+  <circle cx="100" cy="100" r="98" fill="url(#miBg)"/>
+  {/* monitor */}
+  <rect x="28" y="45" width="144" height="100" rx="10" fill="url(#miScreen)" filter="url(#miShadow)"/>
+  <rect x="36" y="53" width="128" height="84" rx="5" fill="#1A237E"/>
+  {/* screen content bars */}
+  <rect x="48" y="65" width="104" height="8" rx="4" fill="#5C6BC0"/>
+  <rect x="48" y="80" width="80" height="6" rx="3" fill="#7986CB"/>
+  <rect x="48" y="92" width="90" height="6" rx="3" fill="#7986CB"/>
+  <rect x="48" y="104" width="70" height="6" rx="3" fill="#7986CB"/>
+  {/* chart bars */}
+  <rect x="48" y="116" width="20" height="15" rx="2" fill="#FF8A65"/>
+  <rect x="74" y="108" width="20" height="23" rx="2" fill="#FFD54F"/>
+  <rect x="100" y="112" width="20" height="19" rx="2" fill="#81C784"/>
+  <rect x="126" y="105" width="20" height="26" rx="2" fill="#64B5F6"/>
+  {/* stand */}
+  <rect x="88" y="145" width="24" height="18" rx="3" fill="#3F51B5"/>
+  <rect x="70" y="163" width="60" height="8" rx="4" fill="#3F51B5"/>
+</svg>
+);
+

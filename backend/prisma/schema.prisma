@@ -428,11 +428,20 @@ enum MealType {
 
 model School {
   id           String   @id @default(cuid())
+  /// Short, URL-safe identifier used by the mobile app to fetch this school's
+  /// theme without exposing the internal cuid. e.g. "springdale-blr".
+  /// Set once at onboarding; changing it breaks cached app installs.
+  code         String?  @unique
   name         String
   address      String?
   logoUrl      String?
   primaryColor String?
   cbseAffCode  String? // board affiliation number — needed on certificates
+  /// JSONB blob written by the logo-upload pipeline (or the future Lambda).
+  /// Shape: { primary, secondary, accent, textOnPrimary, textOnSecondary,
+  ///          textOnAccent, logoUrl, appName, extractedAt }
+  /// Stored as Json (Prisma maps this to jsonb on Postgres).
+  themeConfig  Json?
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -441,6 +450,7 @@ model School {
   academicYears AcademicYear[]
 
   @@index([isActive])
+  @@index([code])
 }
 
 model AcademicYear {
@@ -470,6 +480,7 @@ model User {
   email       String?
   isActive    Boolean   @default(true)
   mfaEnabled  Boolean   @default(false)
+  totpSecret  String?
   lastLoginAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
