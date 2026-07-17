@@ -111,7 +111,7 @@ router.post('/auth/sync', authenticate, async (req, res) => {
 router.get('/classes', authenticate, async (req, res) => {
   try {
     const classes = await prisma.class.findMany({
-      where: { schoolId: req.user.schoolId },
+      where: { class: { schoolId: req.user.schoolId } },
       include: {
         enrollments: true
       }
@@ -531,7 +531,7 @@ router.post('/messages', authenticate, async (req, res) => {
 router.get('/notices', authenticate, async (req, res) => {
   try {
     const notices = await prisma.notice.findMany({
-      where: { schoolId: req.user.schoolId },
+      where: { class: { schoolId: req.user.schoolId } },
       orderBy: { createdAt: 'desc' },
       take: 50,
       include: { postedBy: { select: { id: true, name: true } } }
@@ -586,7 +586,7 @@ router.post('/notices', authenticate, authorize(['principal', 'vice_principal', 
 router.get('/expenses', authenticate, async (req, res) => {
   try {
     const expenses = await prisma.expense.findMany({
-      where: { schoolId: req.user.schoolId },
+      where: { class: { schoolId: req.user.schoolId } },
       orderBy: { date: 'desc' },
       take: 100,
       include: { recordedBy: { select: { id: true, name: true } } }
@@ -692,7 +692,7 @@ router.post('/marks', authenticate, authorize(['principal', 'teacher', 'clerk'])
     });
     if (!exam) {
       // Create a minimal exam schedule scoped to school
-      const anyClass = await prisma.class.findFirst({ where: { schoolId: req.user.schoolId } });
+      const anyClass = await prisma.class.findFirst({ where: { class: { schoolId: req.user.schoolId } } });
       if (!anyClass) return res.status(400).json({ error: 'No class found. Create a class first.' });
       exam = await prisma.examSchedule.create({
         data: { name: examName || 'Exam', classId: anyClass.id, subjectId: 'general', date: new Date(), duration: 60 }
@@ -727,7 +727,7 @@ router.post('/marks', authenticate, authorize(['principal', 'teacher', 'clerk'])
 router.get('/study-materials', authenticate, async (req, res) => {
   try {
     const mats = await prisma.studyMaterial.findMany({
-      where: { schoolId: req.user.schoolId },
+      where: { class: { schoolId: req.user.schoolId } },
       orderBy: { uploadedAt: 'desc' },
       take: 50
     });
@@ -757,7 +757,7 @@ router.post('/study-materials', authenticate, authorize(['principal', 'teacher']
 router.get('/fees', authenticate, async (req, res) => {
   try {
     const receipts = await prisma.feeReceipt.findMany({
-      where: { schoolId: req.user.schoolId },
+      where: { class: { schoolId: req.user.schoolId } },
       orderBy: { createdAt: 'desc' },
       take: 100,
       include: {
@@ -802,7 +802,7 @@ router.post('/fees/pay', authenticate, async (req, res) => {
     const dbMode = paymentModeMap[(paymentMode || '').toLowerCase()] || 'CASH';
 
     // Generate receipt number
-    const count = await prisma.feeReceipt.count({ where: { schoolId: req.user.schoolId } });
+    const count = await prisma.feeReceipt.count({ where: { class: { schoolId: req.user.schoolId } } });
     const year  = new Date().getFullYear();
     const receiptNumber = `RCP-${year}-${String(count + 1).padStart(3, '0')}`;
 
@@ -915,8 +915,8 @@ router.post('/leaves', authenticate, async (req, res) => {
     res.json({
       ...leave,
       status:    leave.status.toLowerCase(),
-      startDate: leave.startDate.toISOString(),
-      endDate:   leave.endDate.toISOString(),
+      startDate: leave.fromDate.toISOString(),
+      endDate:   leave.toDate.toISOString(),
       staff:     { name: leave.staff.name, role: leave.staff.role?.toLowerCase() || 'staff' },
       reviewedBy: null
     });
@@ -941,8 +941,8 @@ router.put('/leaves/:id', authenticate, authorize(['principal', 'vice_principal'
     res.json({
       ...leave,
       status:    leave.status.toLowerCase(),
-      startDate: leave.startDate.toISOString(),
-      endDate:   leave.endDate.toISOString(),
+      startDate: leave.fromDate.toISOString(),
+      endDate:   leave.toDate.toISOString(),
       staff:     { name: leave.staff.name, role: leave.staff.role?.toLowerCase() || 'staff' },
       reviewedBy: leave.reviewedBy ? { name: leave.reviewedBy.name } : null
     });
@@ -957,11 +957,15 @@ router.post('/attendance/manual', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'records array required' });
     }
     const attendanceDate = date ? new Date(date) : new Date();
+    const { classId } = req.body;
+    if (!classId) return res.status(400).json({ error: 'classId is required' });
+    const currentYear = await prisma.academicYear.findFirst({ where: { schoolId: req.user.schoolId, isCurrent: true } });
+    if (!currentYear) return res.status(400).json({ error: 'No active academic year' });
+
     const created = [];
     for (const r of records) {
       const statusMap = { present: 'PRESENT', absent: 'ABSENT', late: 'LATE', half_day: 'HALF_DAY' };
       const dbStatus = statusMap[(r.status || '').toLowerCase()] || 'PRESENT';
-      // Upsert so re-submitting the same date updates rather than errors
       const record = await prisma.attendance.upsert({
         where: {
           studentProfileId_date: {
@@ -972,6 +976,8 @@ router.post('/attendance/manual', authenticate, async (req, res) => {
         update: { status: dbStatus, source: 'MANUAL', markedByUserId: req.user.id },
         create: {
           studentProfileId: r.studentId,
+          classId: classId,
+          academicYearId: currentYear.id,
           date:             attendanceDate,
           status:           dbStatus,
           source:           'MANUAL',
@@ -988,18 +994,18 @@ router.post('/attendance/manual', authenticate, async (req, res) => {
 router.get('/homework', authenticate, async (req, res) => {
   try {
     const homework = await prisma.homework.findMany({
-      where: { schoolId: req.user.schoolId },
+      where: { class: { schoolId: req.user.schoolId } },
       orderBy: { dueDate: 'desc' },
       take: 50,
       include: {
         class:       { select: { grade: true, section: true } },
-        assignedBy:  { select: { id: true, name: true } }
+        teacher:  { select: { id: true, name: true } }
       }
     });
     const formatted = homework.map(h => ({
       ...h,
-      className:    `${h.class.grade}-${h.class.section}`,
-      teacherName:  h.assignedBy?.name || 'Teacher',
+      className:    `${h.class?.grade}-${h.class?.section}`,
+      teacherName:  h.teacher?.name || 'Teacher',
       dueDate:      h.dueDate?.toISOString() || null,
       createdAt:    h.createdAt?.toISOString() || null
     }));
@@ -1014,7 +1020,7 @@ router.post('/homework', authenticate, authorize(['principal', 'teacher']), asyn
     const hw = await prisma.homework.create({
       data: {
         schoolId:        req.user.schoolId,
-        assignedByUserId: req.user.id,
+        teacherUserId: req.user.id,
         classId,
         title:           title.trim(),
         description:     description || '',
@@ -1023,7 +1029,7 @@ router.post('/homework', authenticate, authorize(['principal', 'teacher']), asyn
       },
       include: {
         class:      { select: { grade: true, section: true } },
-        assignedBy: { select: { id: true, name: true } }
+        teacher: { select: { id: true, name: true } }
       }
     });
     const formatted = {

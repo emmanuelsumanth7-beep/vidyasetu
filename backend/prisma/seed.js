@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting seed process...');
 
-  // 1. Wipe existing data in reverse dependency order to prevent FK constraints
+  // 1. Wipe existing data in reverse dependency order
   console.log('Wiping existing data...');
   await prisma.staffLeave.deleteMany();
   await prisma.expense.deleteMany();
@@ -14,7 +14,10 @@ async function main() {
   await prisma.auditLog.deleteMany();
   await prisma.otpRequest.deleteMany();
   await prisma.busLocation.deleteMany();
+  await prisma.studentTransport.deleteMany();
   await prisma.bus.deleteMany();
+  await prisma.busStop.deleteMany();
+  await prisma.busRoute.deleteMany();
   await prisma.rfidScan.deleteMany();
   await prisma.rfidDevice.deleteMany();
   await prisma.timetable.deleteMany();
@@ -24,20 +27,24 @@ async function main() {
   await prisma.feeReceipt.deleteMany();
   await prisma.feeStructure.deleteMany();
   await prisma.marks.deleteMany();
+  await prisma.homeworkSubmission.deleteMany();
   await prisma.homework.deleteMany();
+  await prisma.studyMaterial.deleteMany();
   await prisma.attendance.deleteMany();
   await prisma.parentStudentLink.deleteMany();
-  await prisma.student.deleteMany();
-  await prisma.teacherSubjectAssignment.deleteMany();
+  await prisma.enrollment.deleteMany();
   await prisma.class.deleteMany();
+  await prisma.subject.deleteMany();
+  await prisma.academicYear.deleteMany();
+  await prisma.studentProfile.deleteMany();
+  await prisma.teacherProfile.deleteMany();
+  await prisma.parentProfile.deleteMany();
+  await prisma.staffProfile.deleteMany();
   await prisma.user.deleteMany();
   await prisma.school.deleteMany();
   console.log('Database wiped successfully.');
 
   // 2. Create School
-  // Both primaryColor AND themeConfig are written together so they never drift.
-  // primaryColor is the legacy scalar; themeConfig is the canonical JSONB blob.
-  // Any write that sets one must set the other — see the comment in theme.js.
   const seedTheme = {
     primary:         '#4F46E5',
     secondary:       '#7C3AED',
@@ -54,185 +61,112 @@ async function main() {
       id:           'fcbde93f-767f-40da-af8f-306caf98676a',
       name:         'Vidya Setu International',
       address:      'Tech Park, Phase 1, Bangalore',
-      code:         'vidyasetu-intl',   // unique slug for mobile app theme fetch
-      primaryColor: seedTheme.primary,  // legacy scalar — keep in sync with themeConfig
-      themeConfig:  seedTheme,          // canonical source of truth
+      code:         'vidyasetu-intl',
+      primaryColor: seedTheme.primary,
+      themeConfig:  seedTheme,
     }
   });
   console.log(`Created school: ${school.name}`);
 
-  // 3. Create Users
-  // Principal
-  const principal = await prisma.user.create({
+  // 3. Create Academic Year
+  const currentYear = await prisma.academicYear.create({
     data: {
       schoolId: school.id,
-      name: 'Dr. S. K. Sharma',
-      role: 'principal',
-      phoneNumber: '+919999999991',
-      email: 'principal@vidyasetu.edu'
+      name: '2026-27',
+      startDate: new Date('2026-04-01'),
+      endDate: new Date('2027-03-31'),
+      isCurrent: true
     }
   });
+
+  // 4. Create Subjects
+  const subjectMath = await prisma.subject.create({
+    data: { schoolId: school.id, name: 'Mathematics', code: 'MATH' }
+  });
+  const subjectSci = await prisma.subject.create({
+    data: { schoolId: school.id, name: 'Science', code: 'SCI' }
+  });
+
+  // 5. Create Users & Profiles
+  // Principal
+  const principal = await prisma.user.create({
+    data: { schoolId: school.id, name: 'Dr. S. K. Sharma', role: 'PRINCIPAL', phoneNumber: '+919999999991', email: 'principal@vidyasetu.edu' }
+  });
+  await prisma.staffProfile.create({ data: { userId: principal.id, schoolId: school.id, employeeCode: 'EMP-P1', dateOfJoining: new Date('2020-01-01') }});
 
   // Clerk
   const clerk = await prisma.user.create({
-    data: {
-      schoolId: school.id,
-      name: 'Ms. Anita Desai',
-      role: 'clerk',
-      phoneNumber: '+919999999992',
-      email: 'office@vidyasetu.edu'
-    }
+    data: { schoolId: school.id, name: 'Ms. Anita Desai', role: 'CLERK', phoneNumber: '+919999999992', email: 'office@vidyasetu.edu' }
   });
+  await prisma.staffProfile.create({ data: { userId: clerk.id, schoolId: school.id, employeeCode: 'EMP-C1', dateOfJoining: new Date('2021-01-01') }});
 
   // Teachers
-  const teacher1 = await prisma.user.create({
-    data: { schoolId: school.id, name: 'Mr. R. Iyer (Maths)', role: 'teacher', phoneNumber: '+919999999993' }
-  });
-  const teacher2 = await prisma.user.create({
-    data: { schoolId: school.id, name: 'Mrs. V. Patel (Science)', role: 'teacher', phoneNumber: '+919999999994' }
-  });
-  const teacher3 = await prisma.user.create({
-    data: { schoolId: school.id, name: 'Mr. A. Singh (English)', role: 'teacher', phoneNumber: '+919999999995' }
-  });
+  const teacher1 = await prisma.user.create({ data: { schoolId: school.id, name: 'Mr. R. Iyer (Maths)', role: 'TEACHER', phoneNumber: '+919999999993' }});
+  await prisma.teacherProfile.create({ data: { userId: teacher1.id, schoolId: school.id, employeeCode: 'EMP-T1', dateOfJoining: new Date('2022-01-01') }});
+  
+  const teacher2 = await prisma.user.create({ data: { schoolId: school.id, name: 'Mrs. V. Patel (Science)', role: 'TEACHER', phoneNumber: '+919999999994' }});
+  await prisma.teacherProfile.create({ data: { userId: teacher2.id, schoolId: school.id, employeeCode: 'EMP-T2', dateOfJoining: new Date('2022-01-01') }});
 
   // Parents
-  const parent1 = await prisma.user.create({
-    data: { schoolId: school.id, name: 'Mr. Rajesh Kumar', role: 'parent', phoneNumber: '+918888888881' }
-  });
-  const parent2 = await prisma.user.create({
-    data: { schoolId: school.id, name: 'Mrs. Sunita Verma', role: 'parent', phoneNumber: '+918888888882' }
-  });
+  const parent1 = await prisma.user.create({ data: { schoolId: school.id, name: 'Mr. Rajesh Kumar', role: 'PARENT', phoneNumber: '+918888888881' }});
+  const parentProfile1 = await prisma.parentProfile.create({ data: { userId: parent1.id, schoolId: school.id }});
 
-  console.log('Created Users.');
+  // Students
+  const studentUser1 = await prisma.user.create({ data: { schoolId: school.id, name: 'Aarav Kumar', role: 'STUDENT', phoneNumber: '+917777777771' }});
+  const studentProfile1 = await prisma.studentProfile.create({ data: { userId: studentUser1.id, schoolId: school.id, admissionNumber: 'ADM-2026-01', admissionDate: new Date('2026-04-01'), dob: new Date('2010-05-15'), gender: 'MALE', bloodGroup: 'O_POS' }});
 
-  // 4. Create Classes
-  const class8A = await prisma.class.create({
-    data: { schoolId: school.id, name: 'Class 8A', classTeacherId: teacher1.id }
-  });
-  const class9A = await prisma.class.create({
-    data: { schoolId: school.id, name: 'Class 9A', classTeacherId: teacher2.id }
-  });
-  const class10A = await prisma.class.create({
-    data: { schoolId: school.id, name: 'Class 10A', classTeacherId: teacher3.id }
-  });
+  const studentUser2 = await prisma.user.create({ data: { schoolId: school.id, name: 'Ananya Verma', role: 'STUDENT', phoneNumber: '+917777777772' }});
+  const studentProfile2 = await prisma.studentProfile.create({ data: { userId: studentUser2.id, schoolId: school.id, admissionNumber: 'ADM-2026-02', admissionDate: new Date('2026-04-01'), dob: new Date('2010-08-20'), gender: 'FEMALE', bloodGroup: 'B_POS' }});
 
-  console.log('Created Classes.');
+  // Parent Links
+  await prisma.parentStudentLink.create({ data: { parentUserId: parent1.id, parentProfileId: parentProfile1.id, studentProfileId: studentProfile1.id, relationship: 'FATHER' }});
+  await prisma.parentStudentLink.create({ data: { parentUserId: parent1.id, parentProfileId: parentProfile1.id, studentProfileId: studentProfile2.id, relationship: 'FATHER' }});
 
-  // 5. Create Students
-  const studentsData = [
-    { name: 'Aarav Kumar', roll: '8A-01', classId: class8A.id, parent: parent1, relation: 'father' },
-    { name: 'Ananya Verma', roll: '8A-02', classId: class8A.id, parent: parent2, relation: 'mother' },
-    { name: 'Vihaan Sharma', roll: '9A-01', classId: class9A.id, parent: parent1, relation: 'father' },
-    { name: 'Diya Patel', roll: '10A-01', classId: class10A.id, parent: parent2, relation: 'mother' },
-  ];
+  console.log('Created Users & Profiles.');
 
-  const createdStudents = [];
-  for (const s of studentsData) {
-    const student = await prisma.student.create({
-      data: {
-        schoolId: school.id,
-        classId: s.classId,
-        name: s.name,
-        rollNumber: s.roll,
-        dob: new Date('2010-05-15'),
-        bloodGroup: 'O+',
-        parentLinks: {
-          create: {
-            parentUserId: s.parent.id,
-            relationship: s.relation
-          }
-        }
-      }
-    });
-    createdStudents.push(student);
-  }
-  console.log(`Created ${createdStudents.length} Students with Parent Links.`);
+  // 6. Create Classes
+  const class8A = await prisma.class.create({ data: { schoolId: school.id, academicYearId: currentYear.id, grade: '8', section: 'A' }});
+  const class9A = await prisma.class.create({ data: { schoolId: school.id, academicYearId: currentYear.id, grade: '9', section: 'A' }});
 
-  // 6. Create Daily Operations (Attendance, Homework, Marks, Fee)
+  // 7. Enrollments
+  await prisma.enrollment.create({ data: { studentProfileId: studentProfile1.id, classId: class8A.id, academicYearId: currentYear.id, rollNumber: 1, status: 'ACTIVE' }});
+  await prisma.enrollment.create({ data: { studentProfileId: studentProfile2.id, classId: class8A.id, academicYearId: currentYear.id, rollNumber: 2, status: 'ACTIVE' }});
+  
+  console.log('Created Classes & Enrollments.');
+
+  // 8. Operations (Attendance, Homework)
   const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  // Attendance
   await prisma.attendance.createMany({
     data: [
-      { studentId: createdStudents[0].id, date: today, status: 'present', markedById: teacher1.id },
-      { studentId: createdStudents[1].id, date: today, status: 'absent', markedById: teacher1.id },
-      { studentId: createdStudents[2].id, date: today, status: 'present', markedById: teacher2.id },
-      { studentId: createdStudents[0].id, date: yesterday, status: 'present', markedById: teacher1.id },
-      { studentId: createdStudents[1].id, date: yesterday, status: 'present', markedById: teacher1.id },
+      { studentProfileId: studentProfile1.id, classId: class8A.id, academicYearId: currentYear.id, date: today, status: 'PRESENT', markedByUserId: teacher1.id },
+      { studentProfileId: studentProfile2.id, classId: class8A.id, academicYearId: currentYear.id, date: today, status: 'ABSENT', markedByUserId: teacher1.id },
     ]
   });
 
-  // Homework
   await prisma.homework.create({
     data: {
       classId: class8A.id,
-      subject: 'Mathematics',
-      teacherId: teacher1.id,
+      subjectId: subjectMath.id,
+      academicYearId: currentYear.id,
+      teacherUserId: teacher1.id,
+      title: 'Algebra Exercises',
       description: 'Complete Algebra Chapter 4 Exercises 1-20.',
+      assignedDate: new Date(),
       dueDate: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000)
     }
   });
 
-  // Marks
-  await prisma.marks.createMany({
-    data: [
-      { studentId: createdStudents[0].id, subject: 'Math', examName: 'Mid-Term', marksObtained: 85, maxMarks: 100, teacherId: teacher1.id, term: 'Term 1' },
-      { studentId: createdStudents[1].id, subject: 'Math', examName: 'Mid-Term', marksObtained: 92, maxMarks: 100, teacherId: teacher1.id, term: 'Term 1' },
-    ]
-  });
-
-  // Notices
   await prisma.notice.create({
     data: {
       schoolId: school.id,
       title: 'Annual Sports Day 2026',
-      body: 'The annual sports day will be held next Friday. All students are requested to be present in their house uniforms.',
-      audience: 'all',
-      postedById: principal.id
+      body: 'The annual sports day will be held next Friday.',
+      audience: 'EVERYONE',
+      postedByUserId: principal.id
     }
   });
 
-  // Fee Structure
-  const fee = await prisma.feeStructure.create({
-    data: {
-      schoolId: school.id,
-      feeHead: 'Tuition Fee - Term 1',
-      amount: 25000,
-      applicableClassId: class8A.id,
-      updatedById: clerk.id
-    }
-  });
-
-  // Fee Receipt
-  await prisma.feeReceipt.create({
-    data: {
-      studentId: createdStudents[0].id,
-      feeHead: 'Tuition Fee - Term 1',
-      amount: 25000,
-      collectedById: clerk.id,
-      paymentMode: 'UPI',
-      receiptNumber: 'RCPT-2026-001'
-    }
-  });
-
-  // Salary Slip
-  await prisma.salarySlip.create({
-    data: {
-      schoolId: school.id,
-      staffId: teacher1.id,
-      generatedById: principal.id,
-      monthYear: 'July 2026',
-      basicPay: 45000,
-      allowances: 10000,
-      deductions: 2000,
-      netPay: 53000,
-      status: 'paid'
-    }
-  });
-
-  console.log('Created Operations Data (Attendance, Homework, Fees, Notices).');
+  console.log('Created Operations Data.');
   console.log('Seed completed successfully!');
 }
 
