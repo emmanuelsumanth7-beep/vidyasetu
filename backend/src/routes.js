@@ -161,6 +161,10 @@ router.get('/classes/:classId/timetable', authenticate, async (req, res) => {
     const { classId } = req.params;
     const timetable = await prisma.timetable.findMany({
       where: { classId },
+      include: {
+        subject: { select: { id: true, name: true } },
+        teacher: { select: { id: true, name: true } }
+      },
       orderBy: [
         { dayOfWeek: 'asc' },
         { periodNumber: 'asc' }
@@ -204,9 +208,75 @@ router.get('/teachers', authenticate, async (req, res) => {
 router.get('/staff', authenticate, async (req, res) => {
   try {
     const staff = await prisma.user.findMany({
-      where: { schoolId: req.user.schoolId, role: { in: ['TEACHER', 'CLERK', 'ACCOUNTANT', 'LIBRARIAN', 'NURSE', 'DRIVER', 'WARDEN'] } }
+      where: { 
+        schoolId: req.user.schoolId, 
+        role: { in: ['TEACHER', 'CLERK', 'ACCOUNTANT', 'LIBRARIAN', 'NURSE', 'DRIVER', 'WARDEN'] } 
+      },
+      include: {
+        staffProfile: true,
+        teacherProfile: true
+      }
     });
-    res.json(staff);
+
+    const formattedStaff = staff.map(s => {
+      const profile = s.teacherProfile || s.staffProfile || {};
+      return {
+        id: s.id,
+        name: s.name,
+        role: s.role,
+        phoneNumber: s.phoneNumber,
+        email: s.email,
+        isActive: s.isActive,
+        employeeCode: profile.employeeCode || null,
+        department: profile.department || null,
+        dateOfJoining: profile.joiningDate || profile.createdAt || null,
+        policeVerification: profile.policeVerificationStatus || 'Pending'
+      };
+    });
+
+    res.json(formattedStaff);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post('/staff', authenticate, authorize(['super_admin', 'principal']), async (req, res) => {
+  try {
+    const { name, phoneNumber, email, role, employeeCode, department } = req.body;
+    
+    // Create base user
+    const newUser = await prisma.user.create({
+      data: {
+        schoolId: req.user.schoolId,
+        name,
+        phoneNumber,
+        email,
+        role: role.toUpperCase(),
+      }
+    });
+
+    // Create specific profile based on role
+    if (role.toUpperCase() === 'TEACHER') {
+      await prisma.teacherProfile.create({
+        data: {
+          userId: newUser.id,
+          schoolId: req.user.schoolId,
+          employeeCode,
+          department
+        }
+      });
+    } else {
+      await prisma.staffProfile.create({
+        data: {
+          userId: newUser.id,
+          schoolId: req.user.schoolId,
+          employeeCode,
+          department
+        }
+      });
+    }
+
+    res.json({ success: true, user: newUser });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

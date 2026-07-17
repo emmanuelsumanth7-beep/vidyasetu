@@ -114,15 +114,7 @@ export default function StaffDirectory() {
   const fetchStaff = async () => {
     try {
       const data = await api.get('/staff');
-      // Mock some extended data since backend doesn't return everything yet
-      const extendedData = data.map((d: any, i: number) => ({
-        ...d,
-        employeeCode: d.employeeCode || `EMP-${1000 + i}`,
-        department: d.department || (d.role.toLowerCase() === 'teacher' ? 'Academics' : 'Administration'),
-        dateOfJoining: d.dateOfJoining || '2024-06-15',
-        policeVerification: i % 3 === 0 ? 'Pending' : 'Verified'
-      }));
-      setStaff(extendedData);
+      setStaff(data);
     } catch (err) {
       console.error('Failed to fetch staff:', err);
     } finally {
@@ -152,7 +144,7 @@ export default function StaffDirectory() {
       resetForm();
       setToastMessage(`${role.charAt(0).toUpperCase() + role.slice(1)} added successfully.`);
       setTimeout(() => setToastMessage(''), 4000);
-      fetchStaff(); // Refresh list to get mock data if backend doesn't return full profile
+      fetchStaff();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to add staff member.';
       setFormError(message);

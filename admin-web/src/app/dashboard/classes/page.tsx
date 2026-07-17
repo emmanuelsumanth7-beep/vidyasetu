@@ -57,21 +57,20 @@ export default function ClassesTimetablePage() {
   const fetchTimetable = async (classId: string) => {
     try {
       setLoading(true);
-      // 1. Try Real API
       const data = await api.get(`/classes/${classId}/timetable`);
-      setTimetable(data);
+      // Map API data (dayOfWeek is uppercase, subject is object) to UI format
+      const formatted = data.map((t: any) => ({
+        id: t.id,
+        dayOfWeek: t.dayOfWeek.charAt(0) + t.dayOfWeek.slice(1).toLowerCase(), // MONDAY -> Monday
+        periodNumber: t.periodNumber,
+        subject: t.subject?.name || 'Unknown',
+        teacher: t.teacher || { name: 'TBA' }
+      }));
+      setTimetable(formatted);
     } catch (err: any) {
-      console.warn("Real Timetable API failed, falling back to mock:", err);
-      // MOCK TIMETABLE DATA: INSTANT EXECUTION
-      const mockTimetable = [
-        { id: '1', dayOfWeek: 'Monday', periodNumber: 1, subject: 'Mathematics', teacher: { name: 'Sumanth Emmanuel' } },
-        { id: '2', dayOfWeek: 'Monday', periodNumber: 2, subject: 'Physics', teacher: { name: 'Albert Einstein' } },
-        { id: '3', dayOfWeek: 'Tuesday', periodNumber: 3, subject: 'Chemistry', teacher: { name: 'Marie Curie' } },
-        { id: '4', dayOfWeek: 'Wednesday', periodNumber: 1, subject: 'English', teacher: { name: 'William Shakespeare' } },
-        { id: '5', dayOfWeek: 'Thursday', periodNumber: 4, subject: 'Biology', teacher: { name: 'Charles Darwin' } },
-        { id: '6', dayOfWeek: 'Friday', periodNumber: 5, subject: 'History', teacher: { name: 'Julius Caesar' } },
-      ];
-      setTimetable(mockTimetable);
+      console.error("Failed to fetch timetable:", err);
+      setError("Failed to load timetable.");
+      setTimetable([]);
     } finally {
       setLoading(false);
     }
@@ -81,7 +80,6 @@ export default function ClassesTimetablePage() {
     const fetchInitialData = async () => {
       try {
         setLoading(true);
-        // 1. Try Real API
         const [classesData, teachersData] = await Promise.all([
           api.get('/classes'),
           api.get('/teachers')
@@ -93,30 +91,14 @@ export default function ClassesTimetablePage() {
           await fetchTimetable(classesData[0].id);
         }
       } catch (err: any) {
-        console.warn("Real Classes API failed, falling back to mock:", err);
-        // MOCK CLASSES AND TEACHERS: INSTANT EXECUTION
-        const classesData = [
-          { id: 'class-1', name: 'Class 10-A' },
-          { id: 'class-2', name: 'Class 10-B' },
-          { id: 'class-3', name: 'Class 9-A' },
-          { id: 'class-4', name: 'Class 8-C' }
-        ];
-        const teachersData = [
-          { id: 't1', name: 'Sumanth Emmanuel' },
-          { id: 't2', name: 'Albert Einstein' },
-          { id: 't3', name: 'Marie Curie' }
-        ];
-        
-        setClasses(classesData);
-        setTeachers(teachersData);
-        if (classesData.length > 0) {
-          setSelectedClassId(classesData[0].id);
-          await fetchTimetable(classesData[0].id);
-        }
+        console.error("Failed to fetch classes/teachers:", err);
+        setError("Failed to load classes.");
+        setClasses([]);
       } finally {
         setLoading(false);
       }
     };
+    
     fetchInitialData();
   }, []);
 
