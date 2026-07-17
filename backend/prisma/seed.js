@@ -118,9 +118,13 @@ async function main() {
   const studentUser2 = await prisma.user.create({ data: { schoolId: school.id, name: 'Ananya Verma', role: 'STUDENT', phoneNumber: '+917777777772' }});
   const studentProfile2 = await prisma.studentProfile.create({ data: { userId: studentUser2.id, schoolId: school.id, admissionNumber: 'ADM-2026-02', admissionDate: new Date('2026-04-01'), dob: new Date('2010-08-20'), gender: 'FEMALE', bloodGroup: 'B_POS' }});
 
+  const studentUser3 = await prisma.user.create({ data: { schoolId: school.id, name: 'Rohit Sharma', role: 'STUDENT', phoneNumber: '+917777777773' }});
+  const studentProfile3 = await prisma.studentProfile.create({ data: { userId: studentUser3.id, schoolId: school.id, admissionNumber: 'ADM-2026-03', admissionDate: new Date('2026-04-01'), dob: new Date('2009-02-10'), gender: 'MALE', bloodGroup: 'A_POS' }});
+
   // Parent Links
   await prisma.parentStudentLink.create({ data: { parentUserId: parent1.id, parentProfileId: parentProfile1.id, studentProfileId: studentProfile1.id, relationship: 'FATHER' }});
   await prisma.parentStudentLink.create({ data: { parentUserId: parent1.id, parentProfileId: parentProfile1.id, studentProfileId: studentProfile2.id, relationship: 'FATHER' }});
+  await prisma.parentStudentLink.create({ data: { parentUserId: parent1.id, parentProfileId: parentProfile1.id, studentProfileId: studentProfile3.id, relationship: 'FATHER' }});
 
   console.log('Created Users & Profiles.');
 
@@ -131,6 +135,7 @@ async function main() {
   // 7. Enrollments
   await prisma.enrollment.create({ data: { studentProfileId: studentProfile1.id, classId: class8A.id, academicYearId: currentYear.id, rollNumber: 1, status: 'ACTIVE' }});
   await prisma.enrollment.create({ data: { studentProfileId: studentProfile2.id, classId: class8A.id, academicYearId: currentYear.id, rollNumber: 2, status: 'ACTIVE' }});
+  await prisma.enrollment.create({ data: { studentProfileId: studentProfile3.id, classId: class9A.id, academicYearId: currentYear.id, rollNumber: 1, status: 'ACTIVE' }});
   
   console.log('Created Classes & Enrollments.');
 
@@ -164,6 +169,19 @@ async function main() {
       audience: 'EVERYONE',
       postedByUserId: principal.id
     }
+  });
+
+  // 9. Timetable
+  await prisma.timetable.createMany({
+    data: [
+      { classId: class8A.id, academicYearId: currentYear.id, dayOfWeek: 'MONDAY', periodNumber: 1, subjectId: subjectMath.id, teacherUserId: teacher1.id, startTime: '09:00', endTime: '09:40' },
+      { classId: class8A.id, academicYearId: currentYear.id, dayOfWeek: 'MONDAY', periodNumber: 2, subjectId: subjectSci.id, teacherUserId: teacher2.id, startTime: '09:40', endTime: '10:20' },
+      { classId: class8A.id, academicYearId: currentYear.id, dayOfWeek: 'TUESDAY', periodNumber: 1, subjectId: subjectSci.id, teacherUserId: teacher2.id, startTime: '09:00', endTime: '09:40' },
+      { classId: class8A.id, academicYearId: currentYear.id, dayOfWeek: 'TUESDAY', periodNumber: 2, subjectId: subjectMath.id, teacherUserId: teacher1.id, startTime: '09:40', endTime: '10:20' },
+      
+      { classId: class9A.id, academicYearId: currentYear.id, dayOfWeek: 'MONDAY', periodNumber: 1, subjectId: subjectSci.id, teacherUserId: teacher2.id, startTime: '09:00', endTime: '09:40' },
+      { classId: class9A.id, academicYearId: currentYear.id, dayOfWeek: 'MONDAY', periodNumber: 2, subjectId: subjectMath.id, teacherUserId: teacher1.id, startTime: '09:40', endTime: '10:20' },
+    ]
   });
 
   console.log('Created Operations Data.');
