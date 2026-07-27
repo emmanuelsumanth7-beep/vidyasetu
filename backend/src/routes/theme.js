@@ -264,14 +264,12 @@ router.post(
         action:      'school_logo_uploaded',
         targetTable: 'School',
         targetId:    req.params.id,
-        details: {
+        details: JSON.stringify({
           logoUrl,
           themeExtracted:     !!themeConfig,
           extractionFallback: themeConfig?._fallback ?? !themeConfig,
           codeSet:            !!newCode,
-        },
-        ipAddress: req.ip,
-        userAgent: req.get('user-agent'),
+        }),
       },
     });
 

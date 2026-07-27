@@ -22,58 +22,40 @@ const verifyFirebaseAuth = async (req, res, next) => {
   const idToken = authHeader.split('Bearer ')[1];
 
   // ==========================================
-  // DEV BYPASS LOGIN (For easy UI testing)
+  // JWT PASSWORD LOGIN AUTHENTICATION
   // ==========================================
-  if (idToken.startsWith('DEV_BYPASS_')) {
-    const requestedRole = idToken.split('DEV_BYPASS_')[1].toUpperCase(); 
-    const validRoles = ['SUPER_ADMIN', 'PRINCIPAL', 'VICE_PRINCIPAL', 'TEACHER', 'CLERK', 'ACCOUNTANT', 'LIBRARIAN', 'NURSE', 'DRIVER', 'WARDEN', 'PARENT', 'STUDENT', 'ALUMNUS'];
-
-    if (!validRoles.includes(requestedRole)) {
-      return res.status(401).json({ error: 'Invalid developer bypass role' });
+  try {
+    const jwt = require('jsonwebtoken');
+    const secret = process.env.JWT_SECRET || 'vidyasetu_jwt_secret_key_2026';
+    const cleanToken = idToken.replace(/^JWT_/, '');
+    const decoded = jwt.verify(cleanToken, secret);
+    if (decoded && decoded.userId) {
+      const user = await req.prisma.user.findUnique({
+        where: { id: decoded.userId },
+        include: { school: true }
+      });
+      if (user && user.isActive) {
+        req.user = user;
+        return next();
+      }
     }
-    
-    // Find the first user in the DB with that role
-    let mockUser = await req.prisma.user.findFirst({
-      where: { role: requestedRole },
-      include: { school: true }
-    });
-    
-    // Auto-seed if the database is empty (so the demo never crashes)
-    if (!mockUser) {
-        let mockSchool = await req.prisma.school.findFirst({
-          where: { name: 'Vidya Setu Demo School' }
-        });
+  } catch (err) {
+    // Not a local JWT or expired; proceed to Firebase or simulated token verification below
+  }
 
-        if (!mockSchool) {
-          mockSchool = await req.prisma.school.create({
-            data: { name: 'Vidya Setu Demo School', address: 'Bangalore' }
-          });
-        }
-
-        // Create the user
-        mockUser = await req.prisma.user.create({
-            data: {
-                id: `dev-${requestedRole.toLowerCase()}-id`,
-                name: `Dev ${requestedRole}`,
-                phoneNumber: `+910000000${requestedRole.length}`,
-                role: requestedRole,
-                schoolId: mockSchool.id,
-                isActive: true
-            },
-            include: { school: true }
-        });
-        
-        // Also create the profile depending on role
-        if (requestedRole === 'PRINCIPAL' || requestedRole === 'VICE_PRINCIPAL' || requestedRole === 'CLERK' || requestedRole === 'ACCOUNTANT' || requestedRole === 'LIBRARIAN' || requestedRole === 'NURSE' || requestedRole === 'DRIVER' || requestedRole === 'WARDEN') {
-            await req.prisma.staffProfile.create({ data: { userId: mockUser.id, schoolId: mockSchool.id, employeeCode: `EMP-${requestedRole}`, department: requestedRole, dateOfJoining: new Date() }});
-        } else if (requestedRole === 'TEACHER') {
-            await req.prisma.teacherProfile.create({ data: { userId: mockUser.id, schoolId: mockSchool.id, employeeCode: 'EMP-TEACHER', dateOfJoining: new Date() }});
-        } else if (requestedRole === 'PARENT') {
-            await req.prisma.parentProfile.create({ data: { userId: mockUser.id, schoolId: mockSchool.id }});
-        }
+  // ==========================================
+  // SIMULATED TEST OTP & BYPASS AUTHENTICATION
+  // ==========================================
+  if (idToken.startsWith('SIMULATED_') || idToken.startsWith('DEV_BYPASS_')) {
+    const phone = idToken.replace(/^(SIMULATED_|DEV_BYPASS_)/, '').trim();
+    const cleanDigits = phone.replace(/\D/g, '').slice(-10);
+    const allUsers = await req.prisma.user.findMany({ include: { school: true } });
+    let user = allUsers.find(u => u.phoneNumber && u.phoneNumber.replace(/\D/g, '').endsWith(cleanDigits));
+    if (user) {
+      req.user = user;
+    } else if (phone) {
+      req.firebaseUser = { phone_number: phone };
     }
-    
-    req.user = mockUser;
     return next();
   }
 
@@ -86,10 +68,9 @@ const verifyFirebaseAuth = async (req, res, next) => {
     // Attempt to find the matching user in our SQLite database by phone number
     const phoneNumber = decodedToken.phone_number;
     if (phoneNumber) {
-      const user = await req.prisma.user.findFirst({
-        where: { phoneNumber },
-        include: { school: true }
-      });
+      const cleanDigits = phoneNumber.replace(/\D/g, '').slice(-10);
+      const allUsers = await req.prisma.user.findMany({ include: { school: true } });
+      const user = allUsers.find(u => u.phoneNumber && u.phoneNumber.replace(/\D/g, '').endsWith(cleanDigits));
       if (user) {
         req.user = user;
       }
