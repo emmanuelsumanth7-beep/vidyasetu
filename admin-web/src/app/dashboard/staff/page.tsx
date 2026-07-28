@@ -153,6 +153,27 @@ export default function StaffDirectory() {
     }
   };
 
+  const handleToggleSuspend = async () => {
+    if (!selectedMember) return;
+    const newActiveStatus = selectedMember.isActive === false ? true : false;
+    try {
+      await api.put(`/staff/${selectedMember.id}`, { isActive: newActiveStatus });
+      setStaff((prev) =>
+        prev.map((m) => (m.id === selectedMember.id ? { ...m, isActive: newActiveStatus } : m))
+      );
+      setSelectedMember((prev) => (prev ? { ...prev, isActive: newActiveStatus } : null));
+      setToastMessage(
+        newActiveStatus
+          ? `${selectedMember.name}'s account has been reactivated successfully.`
+          : `${selectedMember.name}'s account has been suspended.`
+      );
+      setTimeout(() => setToastMessage(''), 4000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update staff account status.';
+      alert(msg);
+    }
+  };
+
   const renderSkeletons = () => (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
       <div className="p-4 border-b border-gray-100">
@@ -354,9 +375,21 @@ export default function StaffDirectory() {
             </div>
             
             <div className="mt-8 pt-6 border-t border-gray-100">
-              <button className="w-full bg-white border-2 border-red-100 text-red-600 font-bold py-2.5 rounded-lg hover:bg-red-50 transition-colors">
-                Suspend Account
+              <button
+                onClick={handleToggleSuspend}
+                className={`w-full border-2 font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                  selectedMember.isActive !== false
+                    ? 'bg-white border-red-200 text-red-600 hover:bg-red-50'
+                    : 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100'
+                }`}
+              >
+                {selectedMember.isActive !== false ? 'Suspend Account' : 'Reactivate Account'}
               </button>
+              <p className="text-xs text-gray-400 text-center mt-2">
+                {selectedMember.isActive !== false
+                  ? 'Suspended staff will be immediately locked out of portal access and login authentication.'
+                  : 'Reactivating will instantly restore system access and privileges for this staff member.'}
+              </p>
             </div>
           </div>
         </div>
