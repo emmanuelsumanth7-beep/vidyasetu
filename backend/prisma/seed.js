@@ -63,7 +63,7 @@ async function main() {
       address:      'Tech Park, Phase 1, Bangalore',
       code:         'vidyasetu-intl',
       primaryColor: seedTheme.primary,
-      themeConfig:  seedTheme,
+      themeConfig:  JSON.stringify(seedTheme),
     }
   });
   console.log(`Created school: ${school.name}`);
