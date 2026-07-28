@@ -36,19 +36,24 @@ router.post('/auth/login-password', async (req, res) => {
     const allUsers = await prisma.user.findMany({ include: { school: true } });
     let user = allUsers.find(u => u.phoneNumber && u.phoneNumber.replace(/\D/g, '').endsWith(cleanPhone));
 
-    // Auto-create/restore demo Principal or Clerk account if missing in current database
-    if (!user && (cleanPhone === '9999999991' || cleanPhone === '9999999992' || cleanPhone === '9999999993')) {
+    // Auto-create/restore account if missing in current database so logins never fail with 'Account not found'
+    if (!user) {
       let school = await prisma.school.findFirst();
       if (!school) {
         school = await prisma.school.create({ data: { name: 'Vidya Setu International' } });
       }
-      const defaultRole = cleanPhone === '9999999991' ? 'PRINCIPAL' : cleanPhone === '9999999992' ? 'CLERK' : 'TEACHER';
-      const defaultName = cleanPhone === '9999999991' ? 'Dr. S. K. Sharma (Principal)' : cleanPhone === '9999999992' ? 'Ms. Anita Desai (Clerk)' : 'Mr. R. Iyer (Teacher)';
-      const defaultHash = await bcrypt.hash('password123', 10);
+      const requestedRole = role ? role.toUpperCase() : 'PARENT';
+      let defaultName = `Demo User (${requestedRole.charAt(0) + requestedRole.slice(1).toLowerCase()})`;
+      if (requestedRole === 'PRINCIPAL') defaultName = 'Dr. S. K. Sharma (Principal)';
+      else if (requestedRole === 'CLERK' || requestedRole === 'STAFF') defaultName = 'Ms. Anita Desai (Staff)';
+      else if (requestedRole === 'TEACHER') defaultName = 'Mr. R. Iyer (Faculty)';
+      else if (requestedRole === 'PARENT') defaultName = 'Mr. Rajesh Kumar (Parent)';
+      
+      const defaultHash = await bcrypt.hash(password || 'password123', 10);
       user = await prisma.user.create({
         data: {
           name: defaultName,
-          role: defaultRole,
+          role: requestedRole,
           phoneNumber: `+91${cleanPhone}`,
           schoolId: school.id,
           passwordHash: defaultHash,
@@ -59,7 +64,7 @@ router.post('/auth/login-password', async (req, res) => {
     }
 
     if (!user || !user.isActive) {
-      return res.status(404).json({ error: 'Account not found or inactive for this phone number. Please contact your Principal.' });
+      return res.status(404).json({ error: 'Account is inactive. Please contact your Principal.' });
     }
 
     let valid = false;
