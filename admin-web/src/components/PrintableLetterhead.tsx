@@ -54,7 +54,7 @@ export const PrintableFooter: React.FC = () => {
           <div className="w-40 border-b border-gray-700 mb-2"></div>
           <p className="text-xs font-semibold text-gray-800 font-serif uppercase">Signature of Clerk / Prepared By</p>
           <p className="text-[10px] text-gray-500 italic font-serif mt-1">
-            Official Document Record from Manasa Innovative P U College.
+            Official Document Record from {SchoolConfig.name}.
           </p>
         </div>
         <div className="text-right flex flex-col items-end">

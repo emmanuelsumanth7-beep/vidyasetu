@@ -62,15 +62,15 @@ export const DEFAULT_THEME: ThemeConfig = {
   textOnPrimary:   '#FFFFFF',
   textOnSecondary: '#FFFFFF',
   textOnAccent:    '#000000',
-  logoUrl:         '/manasa-logo.png',
-  appName:         'Manasa Innovative P U College',
+  logoUrl:         '/jips.png',
+  appName:         'Jnanasagara International Public School',
 };
 
 // ── School code helpers ──────────────────────────────────────────────────────
 
 export function getSchoolCode(): string | null {
-  if (typeof window === 'undefined') return 'manasa';
-  return localStorage.getItem(STORAGE_KEY_CODE) || 'manasa';
+  if (typeof window === 'undefined') return 'jips';
+  return localStorage.getItem(STORAGE_KEY_CODE) || 'jips';
 }
 
 export function setSchoolCode(code: string): void {

@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Firebase phone-auth automatically puts the verified number on the
+    // ID token as `phone_number` (E.164 format, e.g. +919876543210).
+    function myPhone() {
+      return request.auth.token.phone_number;
+    }
+
+    // One doc per phone number, doc ID = the E.164 phone number itself.
+    // This is the source of truth for role + linked IDs. It is written
+    // only by the school admin tooling / Cloud Functions (Admin SDK),
+    // never directly by clients.
+    match /users/{phoneId} {
+      allow read: if signedIn() && phoneId == myPhone();
+      allow write: if false;
+    }
+
+    // A parent may read a student doc only if their verified phone number
+    // is listed in that student's parentPhoneNumbers array.
+    match /students/{studentId} {
+      allow read: if signedIn() &&
+        myPhone() in resource.data.parentPhoneNumbers;
+      allow write: if false;
+    }
+
+    // Class metadata (name/section) is low-sensitivity — any signed-in
+    // user can read it so the class dropdown on the login screen works.
+    match /classes/{classId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // A teacher may read the roster for a class only if their verified
+    // phone number is in that class's teacherPhoneNumbers array.
+    match /classRosters/{classId} {
+      allow read: if signedIn() &&
+        myPhone() in get(/databases/$(database)/documents/classes/$(classId)).data.teacherPhoneNumbers;
+      allow write: if false;
+    }
+
+    // Deny everything else by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

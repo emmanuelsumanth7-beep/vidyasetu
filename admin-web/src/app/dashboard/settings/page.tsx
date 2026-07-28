@@ -118,19 +118,31 @@ export default function SettingsDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
                   <label className="text-sm font-semibold text-[var(--color-text-primary)]">Institution Name</label>
-                  <input type="text" defaultValue="Manasa Innovative P U College" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
+                  <input type="text" defaultValue="Jnanasagara International Public School" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-semibold text-[var(--color-text-primary)]">Institution Code</label>
-                  <input type="text" defaultValue="manasa" disabled className="w-full border border-[var(--color-border)] bg-[var(--color-glass)] rounded-lg p-2.5 text-[var(--color-text-secondary)]" />
+                  <input type="text" defaultValue="jips" disabled className="w-full border border-[var(--color-border)] bg-[var(--color-glass)] rounded-lg p-2.5 text-[var(--color-text-secondary)]" />
                 </div>
                 <div className="space-y-1 md:col-span-2">
                   <label className="text-sm font-semibold text-[var(--color-text-primary)]">Address</label>
-                  <textarea rows={3} defaultValue="Manasa Innovative P U College Campus, Karnataka, India" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
+                  <textarea rows={3} defaultValue="Jnanasagara International Public School Campus, Karnataka, India" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-sm font-semibold text-[var(--color-text-primary)]">College Affiliation Code</label>
-                  <input type="text" defaultValue="PU-KAR-2026" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
+                  <label className="text-sm font-semibold text-[var(--color-text-primary)]">School Affiliation / Board Code</label>
+                  <input type="text" defaultValue="ICSE-KAR-2026" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold text-[var(--color-text-primary)]">UDISE+ School Code</label>
+                  <input type="text" defaultValue="29230501101" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all font-mono text-blue-700 font-bold" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold text-[var(--color-text-primary)]">CRP (Cluster Resource Person) & Circle</label>
+                  <input type="text" defaultValue="Holenarasipura Education Cluster (CRP)" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold text-[var(--color-text-primary)]">Block Education Office (BEO)</label>
+                  <input type="text" defaultValue="Holenarasipura BEO Office, Hassan District" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
                 </div>
               </div>
             </div>
