@@ -448,6 +448,7 @@ model School {
 
   users         User[]
   academicYears AcademicYear[]
+  substituteAssignments SubstituteAssignment[]
 
   @@index([isActive])
   @@index([code])
@@ -494,6 +495,8 @@ model User {
   parentLinksAsParent ParentStudentLink[]
   pushTokens          PushDeviceToken[]
   auditLogs           AuditLog[]
+  substituteAssignments SubstituteAssignment[] @relation("SubstituteToUser")
+  assignedSubstitutes   SubstituteAssignment[] @relation("AssignedByToUser")
 
   @@unique([schoolId, phoneNumber])
   @@index([schoolId, role])
@@ -617,6 +620,7 @@ model Class {
 
   enrollments Enrollment[]
   timetables  Timetable[]
+  substituteAssignments SubstituteAssignment[]
 
   @@unique([schoolId, academicYearId, grade, section])
   @@index([schoolId, academicYearId])
@@ -1565,3 +1569,20 @@ model DataRetentionPolicy {
 //   CHECK ("netPay" = "basicPay" + "allowances" - "deductionsPF" - "deductionsESI" - "deductionsTDS");
 //
 // ============================================================================
+
+model SubstituteAssignment {
+  id               String   @id @default(uuid())
+  schoolId         String
+  school           School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  classId          String
+  class            Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  date             DateTime
+  substituteUserId String
+  substitute       User     @relation("SubstituteToUser", fields: [substituteUserId], references: [id], onDelete: Restrict)
+  assignedByUserId String
+  assignedBy       User     @relation("AssignedByToUser", fields: [assignedByUserId], references: [id], onDelete: Restrict)
+  createdAt        DateTime @default(now())
+
+  @@unique([classId, date])
+  @@index([schoolId])
+}
