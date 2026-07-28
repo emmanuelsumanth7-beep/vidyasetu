@@ -1,9 +1,0 @@
-{
-  "version": 2,
-  "framework": "nextjs",
-  "buildCommand": "cd admin-web && npm run build",
-  "outputDirectory": "admin-web/.next",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "regions": ["bom1"]
-}
