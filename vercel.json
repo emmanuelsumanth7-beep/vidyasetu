@@ -1,8 +1,8 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "cd admin-web && npm run build",
-  "installCommand": "cd admin-web && npm install",
-  "outputDirectory": "admin-web/.next",
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "cleanUrls": true,
+  "trailingSlash": false,
   "regions": ["bom1"]
 }
