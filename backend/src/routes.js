@@ -547,7 +547,7 @@ router.post('/staff', authenticate, authorize(['super_admin', 'principal']), asy
           schoolId: req.user.schoolId,
           employeeCode,
           qualification: department || null,
-          subjects: Array.isArray(subjects) ? subjects : [],
+          subjects: Array.isArray(subjects) ? JSON.stringify(subjects) : (subjects ? JSON.stringify(subjects) : null),
           dateOfJoining: new Date()
         }
       });
@@ -598,7 +598,7 @@ router.put('/staff/:id', authenticate, async (req, res) => {
         data: {
           ...(employeeCode !== undefined ? { employeeCode } : {}),
           ...(department !== undefined ? { qualification: department || null } : {}),
-          ...(Array.isArray(subjects) ? { subjects } : {})
+          ...(subjects !== undefined ? { subjects: Array.isArray(subjects) ? JSON.stringify(subjects) : (typeof subjects === 'string' ? subjects : null) } : {})
         }
       });
     } else if (user.staffProfile) {
@@ -890,7 +890,7 @@ router.post('/students', authenticate, async (req, res) => {
           motherName: motherName || null,
           stream: stream || null,
           combination: combination || null,
-          customFields: customFields || null
+          customFields: customFields ? (typeof customFields === 'string' ? customFields : JSON.stringify(customFields)) : null
         }
       });
       if (emergencyContact) {
@@ -914,7 +914,7 @@ router.post('/students', authenticate, async (req, res) => {
 router.put('/students/:id', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, phoneNumber, email, dob, gender, bloodGroup, rfidCardUid, emergencyContact, customFields, admissionNumber } = req.body;
+    const { name, phoneNumber, email, dob, gender, bloodGroup, rfidCardUid, emergencyContact, customFields, admissionNumber, fatherName, motherName, stream, combination, category, parentalConsent } = req.body;
     const student = await prisma.studentProfile.findFirst({ where: { id, schoolId: req.user.schoolId }, include: { user: true } });
     if (!student) return res.status(404).json({ error: 'Not found' });
     
@@ -936,7 +936,13 @@ router.put('/students/:id', authenticate, async (req, res) => {
         ...(gender ? { gender: gender.toUpperCase() } : {}),
         ...(bloodGroup ? { bloodGroup: bloodGroup.replace('+', '_POS').replace('-', '_NEG').replace(' ', '_') } : {}),
         ...(rfidCardUid !== undefined ? { rfidCardUid: rfidCardUid || null } : {}),
-        ...(customFields !== undefined ? { customFields } : {}),
+        ...(fatherName !== undefined ? { fatherName } : {}),
+        ...(motherName !== undefined ? { motherName } : {}),
+        ...(stream !== undefined ? { stream } : {}),
+        ...(combination !== undefined ? { combination } : {}),
+        ...(category !== undefined ? { category } : {}),
+        ...(parentalConsent !== undefined ? { parentalConsent: Boolean(parentalConsent) } : {}),
+        ...(customFields !== undefined ? { customFields: customFields ? (typeof customFields === 'string' ? customFields : JSON.stringify(customFields)) : null } : {}),
       }
     });
     if (emergencyContact !== undefined) {

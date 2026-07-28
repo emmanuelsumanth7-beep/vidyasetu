@@ -264,6 +264,20 @@ model StudentProfile {
   nationality        String      @default("Indian")
   previousSchoolName String?
   isRteAdmission     Boolean     @default(false)
+  fatherName         String?
+  motherName         String?
+  stream             String?
+  combination        String?
+  customFields       String?
+  parentalConsent    Boolean     @default(false)
+  emergencyContact   String?
+  retentionExpiry    DateTime?
+  aadhaar            String?
+  medicalConditions  String?
+  allergies          String?
+  transportRoute     String?
+  house              String?
+  section            String?
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
   deletedAt          DateTime? // soft delete only — see report retention note
@@ -287,6 +301,7 @@ model TeacherProfile {
   schoolId         String
   employeeCode     String
   qualification    String?
+  subjects         String?
   dateOfJoining    DateTime
   policeVerifiedAt DateTime? // POCSO-recommended background-check record
   createdAt        DateTime  @default(now())
