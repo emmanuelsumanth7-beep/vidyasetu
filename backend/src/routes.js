@@ -370,11 +370,24 @@ router.get('/classes', authenticate, async (req, res) => {
   }
 });
 
-router.post('/classes', authenticate, authorize(['principal']), async (req, res) => {
+router.post('/classes', authenticate, authorize(['super_admin', 'principal', 'vice_principal', 'clerk']), async (req, res) => {
   try {
-    const { name } = req.body; // e.g. "5-A"
-    const [grade, section] = name.split('-');
-    
+    const { name, grade: bodyGrade, section: bodySection, capacity, classTeacherUserId } = req.body; // e.g. "5-A"
+    let grade = bodyGrade;
+    let section = bodySection;
+    if (!grade && name && typeof name === 'string') {
+      if (name.includes('-')) {
+        const parts = name.split('-');
+        grade = parts[0]?.trim();
+        section = parts[1]?.trim();
+      } else {
+        grade = name.trim();
+        section = section || 'A';
+      }
+    }
+    grade = (grade || '1').toString().trim();
+    section = (section || 'A').toString().trim();
+
     let currentYear = await prisma.academicYear.findFirst({
         where: { schoolId: req.user.schoolId, isCurrent: true }
     });
@@ -384,12 +397,36 @@ router.post('/classes', authenticate, authorize(['principal']), async (req, res)
         });
     }
 
+    let existingClass = await prisma.class.findFirst({
+      where: {
+        schoolId: req.user.schoolId,
+        academicYearId: currentYear.id,
+        grade,
+        section
+      }
+    });
+
+    if (existingClass) {
+      if (capacity !== undefined || classTeacherUserId !== undefined) {
+        existingClass = await prisma.class.update({
+          where: { id: existingClass.id },
+          data: {
+            ...(capacity !== undefined ? { capacity: capacity ? Number(capacity) : null } : {}),
+            ...(classTeacherUserId !== undefined ? { classTeacherUserId: classTeacherUserId || null } : {})
+          }
+        });
+      }
+      return res.json(existingClass);
+    }
+
     const created = await prisma.class.create({
       data: {
         schoolId: req.user.schoolId,
         academicYearId: currentYear.id,
-        grade: grade || '1',
-        section: section || 'A'
+        grade,
+        section,
+        capacity: capacity ? Number(capacity) : null,
+        classTeacherUserId: classTeacherUserId || null
       }
     });
     res.json(created);
