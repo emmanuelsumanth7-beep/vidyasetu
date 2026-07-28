@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+dist
+android
+backend/prisma/*.db
+*.apk
+*.zip
+*.log
+admin-web/out
+admin-web/.next
+admin-web/android
+admin-web/node_modules
