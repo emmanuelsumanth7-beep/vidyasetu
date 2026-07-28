@@ -73,63 +73,59 @@ export default function DashboardLayout({
 
   if (!user) return <div className="h-screen w-full flex items-center justify-center font-data" style={{color:'#AEAEB2'}}>Loading workspace…</div>;
 
-  // Role-based Navigation mapping
+  // Role-based Navigation mapping (100% Synced with Quick Access Grid)
   let navItems: NavItem[] = [];
   if (user.role === 'principal' || user.role === 'admin') {
     navItems = [
       { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
+      { name: 'Students', href: '/dashboard/students', icon: GraduationCap },
+      { name: 'Classes', href: '/dashboard/classes', icon: CalendarClock },
+      { name: 'Grades', href: '/dashboard/grades', icon: Award },
+      { name: 'Staff', href: '/dashboard/staff', icon: Users },
+      { name: 'Attendance', href: '/dashboard/attendance', icon: Calendar },
+      { name: 'Staff Leaves', href: '/dashboard/leaves', icon: CalendarDays },
       { name: 'Payroll', href: '/dashboard/payroll', icon: CreditCard },
       { name: 'Expenses', href: '/dashboard/expenses', icon: BarChart },
-      { name: 'Staff Leaves', href: '/dashboard/leaves', icon: Calendar },
-      { name: 'Attendance', href: '/dashboard/attendance', icon: Calendar },
-      { name: 'Students', href: '/dashboard/students', icon: GraduationCap },
-      { name: 'Staff', href: '/dashboard/staff', icon: Users },
-      { name: 'Classes', href: '/dashboard/classes', icon: CalendarClock },
       { name: 'Fees', href: '/dashboard/fees', icon: CreditCard },
-      { name: 'Notices', href: '/dashboard/notices', icon: Bell },
       { name: 'Transport', href: '/dashboard/transport', icon: Bus },
-      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
+      { name: 'Approvals', href: '/dashboard/approvals', icon: CheckSquare },
+      { name: 'Notices', href: '/dashboard/notices', icon: Bell },
+      { name: 'Certificates', href: '/dashboard/certificates', icon: Award },
+      { name: 'Messages', href: '/dashboard/messages', icon: MessageSquare },
       { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart },
+      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
       { name: 'Settings', href: '/dashboard/settings', icon: Settings },
     ];
-  } else if (user.role === 'teacher' || user.role === 'staff') {
+  } else if (user.role === 'teacher' || user.role === 'staff' || user.role === 'clerk') {
     navItems = [
       { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
-      { name: 'Approvals', href: '/dashboard/approvals', icon: CheckSquare },
-      { name: 'Classes', href: '/dashboard/classes', icon: Users },
-      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
-      { name: 'Timetable', href: '/dashboard/classes', icon: CalendarClock },
-      { name: 'Homework', href: '/dashboard/homework', icon: BookOpen },
-      { name: 'Notices', href: '/dashboard/notices', icon: MessageSquare },
+      { name: 'Students', href: '/dashboard/students', icon: GraduationCap },
+      { name: 'Classes', href: '/dashboard/classes', icon: CalendarClock },
       { name: 'Grades', href: '/dashboard/grades', icon: Award },
-    ];
-  } else if (user.role === 'clerk') {
-    navItems = [
-      { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
-      { name: 'Students', href: '/dashboard/students', icon: Users },
-      { name: 'Fees', href: '/dashboard/fees', icon: CreditCard },
+      { name: 'Homework', href: '/dashboard/homework', icon: BookOpen },
+      { name: 'Class Diary', href: '/dashboard/diary', icon: BookMarked },
+      { name: 'Attendance', href: '/dashboard/attendance', icon: Calendar },
+      { name: 'Staff Leaves', href: '/dashboard/leaves', icon: CalendarDays },
       { name: 'Approvals', href: '/dashboard/approvals', icon: CheckSquare },
       { name: 'Notices', href: '/dashboard/notices', icon: Bell },
-      { name: 'Grades', href: '/dashboard/grades', icon: Award },
-      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
       { name: 'Certificates', href: '/dashboard/certificates', icon: Award },
+      { name: 'Expenses', href: '/dashboard/expenses', icon: BarChart },
+      { name: 'Transport', href: '/dashboard/transport', icon: Bus },
+      { name: 'Messages', href: '/dashboard/messages', icon: MessageSquare },
+      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
     ];
-  } else if (user.role === 'parent') {
+  } else if (user.role === 'parent' || user.role === 'student') {
     navItems = [
       { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
       { name: 'Attendance', href: '/dashboard/parent-attendance', icon: Calendar },
       { name: 'Homework', href: '/dashboard/homework', icon: BookOpen },
-      { name: 'Diary', href: '/dashboard/diary', icon: BookMarked },
-      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
+      { name: 'Class Diary', href: '/dashboard/diary', icon: BookMarked },
       { name: 'Grades', href: '/dashboard/grades', icon: Award },
       { name: 'Fees', href: '/dashboard/fees', icon: CreditCard },
+      { name: 'Transport', href: '/dashboard/transport', icon: Bus },
       { name: 'Notices', href: '/dashboard/notices', icon: Bell },
       { name: 'Messages', href: '/dashboard/messages', icon: MessageSquare },
-    ];
-  } else if (user.role === 'student') {
-    navItems = [
-      { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
-      { name: 'Homework', href: '/dashboard/homework', icon: BookOpen },
+      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
     ];
   }
 

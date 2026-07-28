@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/lib/LanguageContext';
 import { readUserSession } from '@/lib/session';
 import { SchoolConfig } from '@/config/school.config';
-import { Info, ChevronRight, Lock, Sparkles, TrendingUp, Users, Calendar, CreditCard } from 'lucide-react';
+import { Info, ChevronRight, Lock, Sparkles, TrendingUp, Users, Calendar, CreditCard, Bus, BarChart3, Settings as SettingsIcon, BookOpen, BookMarked } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
   FeePaymentIcon, ProfileIcon, RemarksIcon, AbsentInfoIcon,
@@ -14,7 +14,7 @@ import {
   ClassCompletedIcon, DocumentInfoIcon, AttendanceIcon, StaffIcon
 } from '@/components/GridIcons';
 
-/* ─── Module Registry ─────────────────────────────────────────────────────── */
+/* ─── Module Registry (100% Synchronized with Floating & Mobile Nav Bar) ───────────────────── */
 interface Module {
   id: string;
   title: string;
@@ -27,22 +27,35 @@ interface Module {
 }
 
 const MODULES: Module[] = [
-  { id: 'students',         title: 'Students',     icon: ProfileIcon,        href: '/dashboard/students',       accentHex: '#1B2A4A', allowedRoles: ['principal','teacher','clerk'], category: 'Academics' },
-  { id: 'class_completed',  title: 'Classes',           icon: ClassCompletedIcon, href: '/dashboard/classes',        accentHex: '#34C759', allowedRoles: ['principal','teacher'], category: 'Academics' },
-  { id: 'exam_marks',       title: 'Grades',        icon: GradesIcon,         href: '/dashboard/grades',         accentHex: '#FF9500', allowedRoles: ['principal','teacher','student','parent'], category: 'Academics' },
-  { id: 'study_material',   title: 'Study',    icon: StudyMaterialIcon,  href: '/dashboard/study-material', accentHex: '#5AC8FA', allowedRoles: ['principal','teacher','staff'], category: 'Academics' },
-  { id: 'calendar',         title: 'Calendar',  icon: CalendarIcon,       href: '/dashboard/calendar',       accentHex: '#AF52DE', allowedRoles: ['principal','teacher','parent','student','clerk'], category: 'Academics' },
-  { id: 'staff',            title: 'Staff',        icon: StaffIcon,          href: '/dashboard/staff',          accentHex: '#C49B2A', allowedRoles: ['principal','clerk'], category: 'Staff & HR' },
+  // Academics
+  { id: 'students',         title: 'Students',     icon: ProfileIcon,        href: '/dashboard/students',       accentHex: '#1B2A4A', allowedRoles: ['principal','teacher','clerk','staff'], category: 'Academics' },
+  { id: 'class_completed',  title: 'Classes',      icon: ClassCompletedIcon, href: '/dashboard/classes',        accentHex: '#34C759', allowedRoles: ['principal','teacher','staff'], category: 'Academics' },
+  { id: 'exam_marks',       title: 'Grades',       icon: GradesIcon,         href: '/dashboard/grades',         accentHex: '#FF9500', allowedRoles: ['principal','teacher','staff','student','parent'], category: 'Academics' },
+  { id: 'study_material',   title: 'Study Mat.',   icon: StudyMaterialIcon,  href: '/dashboard/study-material', accentHex: '#5AC8FA', allowedRoles: ['principal','teacher','staff'], category: 'Academics' },
+  { id: 'homework',         title: 'Homework',     icon: BookOpen,           href: '/dashboard/homework',       accentHex: '#30B0C7', allowedRoles: ['principal','teacher','staff','parent','student'], category: 'Academics' },
+  { id: 'diary',            title: 'Class Diary',  icon: BookMarked,         href: '/dashboard/diary',          accentHex: '#FF2D55', allowedRoles: ['principal','teacher','staff','parent'], category: 'Academics' },
+  { id: 'calendar',         title: 'Calendar',     icon: CalendarIcon,       href: '/dashboard/calendar',       accentHex: '#AF52DE', allowedRoles: ['principal','teacher','staff','parent','student','clerk'], category: 'Academics' },
+
+  // Staff & HR
+  { id: 'staff',            title: 'Staff Directory', icon: StaffIcon,       href: '/dashboard/staff',          accentHex: '#C49B2A', allowedRoles: ['principal','clerk','staff'], category: 'Staff & HR' },
   { id: 'attendance',       title: 'Attendance',   icon: AttendanceIcon,     href: '/dashboard/attendance',     accentHex: '#30B0C7', allowedRoles: ['principal','teacher','staff'], category: 'Staff & HR' },
-  { id: 'absent',           title: 'Absents',       icon: AbsentInfoIcon,     href: '/dashboard/attendance',     accentHex: '#FF3B30', allowedRoles: ['principal','teacher','staff'], category: 'Staff & HR' },
-  { id: 'leaves',           title: 'Leaves',    icon: CalendarIcon,       href: '/dashboard/leaves',         accentHex: '#FF9500', allowedRoles: ['principal','teacher','staff','clerk'], category: 'Staff & HR' },
-  { id: 'staff_attendance', title: 'Staff Attd',  icon: BiometricsIcon,     href: '#',                         accentHex: '#1B2A4A', allowedRoles: ['principal','clerk'], category: 'Staff & HR' },
-  { id: 'document_info',    title: 'Approvals',         icon: DocumentInfoIcon,   href: '/dashboard/approvals',      accentHex: '#FF9500', allowedRoles: ['principal','teacher','clerk','parent','student'], badge: '3', category: 'Operations' },
-  { id: 'notifications',    title: 'Notices',           icon: NotificationIcon,   href: '/dashboard/notices',        accentHex: '#FF2D55', allowedRoles: ['principal','teacher','clerk'], badge: '5', category: 'Operations' },
-  { id: 'finance',          title: 'Finance',  icon: FeePaymentIcon,     href: '/dashboard/fees',           accentHex: '#34C759', allowedRoles: ['principal','clerk'], category: 'Finance' },
-  { id: 'salary',           title: 'Payroll',           icon: SystemIcon,         href: '/dashboard/payroll',        accentHex: '#FFCC00', allowedRoles: ['principal','teacher','clerk','counselor'], category: 'Finance' },
-  { id: 'office_print',     title: 'Certificates',      icon: DocumentIcon,       href: '/dashboard/certificates',   accentHex: '#FF9500', allowedRoles: ['principal','clerk'], category: 'Operations' },
-  { id: 'chat',             title: 'Messages',          icon: RemarksIcon,        href: '/dashboard/messages',       accentHex: '#AF52DE', allowedRoles: ['principal','teacher','student','parent'], category: 'Operations' },
+  { id: 'parent_attd',      title: 'My Attendance', icon: AttendanceIcon,    href: '/dashboard/parent-attendance', accentHex: '#34C759', allowedRoles: ['parent','student'], category: 'Academics' },
+  { id: 'leaves',           title: 'Staff Leaves', icon: CalendarIcon,       href: '/dashboard/leaves',         accentHex: '#FF9500', allowedRoles: ['principal','teacher','staff','clerk'], category: 'Staff & HR' },
+  { id: 'staff_attendance', title: 'Biometrics',   icon: BiometricsIcon,     href: '/dashboard/attendance',     accentHex: '#1B2A4A', allowedRoles: ['principal','clerk','staff'], category: 'Staff & HR' },
+
+  // Finance & Analytics
+  { id: 'finance',          title: 'Fee Collection', icon: FeePaymentIcon,   href: '/dashboard/fees',           accentHex: '#34C759', allowedRoles: ['principal','clerk','staff','parent'], category: 'Finance & Analytics' },
+  { id: 'salary',           title: 'Payroll',      icon: SystemIcon,         href: '/dashboard/payroll',        accentHex: '#FFCC00', allowedRoles: ['principal','teacher','clerk','staff','counselor'], category: 'Finance & Analytics' },
+  { id: 'expenses',         title: 'Expenses',     icon: BarChart3,          href: '/dashboard/expenses',       accentHex: '#FF3B30', allowedRoles: ['principal','clerk','staff'], category: 'Finance & Analytics' },
+  { id: 'analytics',        title: 'Analytics',    icon: TrendingUp,         href: '/dashboard/analytics',      accentHex: '#5AC8FA', allowedRoles: ['principal','staff'], category: 'Finance & Analytics' },
+
+  // Operations & Administration
+  { id: 'transport',        title: 'Transport',    icon: Bus,                href: '/dashboard/transport',      accentHex: '#FF9500', allowedRoles: ['principal','clerk','staff','parent'], category: 'Operations' },
+  { id: 'document_info',    title: 'Approvals',    icon: DocumentInfoIcon,   href: '/dashboard/approvals',      accentHex: '#AF52DE', allowedRoles: ['principal','teacher','clerk','staff','parent','student'], badge: '3', category: 'Operations' },
+  { id: 'notifications',    title: 'Notices',      icon: NotificationIcon,   href: '/dashboard/notices',        accentHex: '#FF2D55', allowedRoles: ['principal','teacher','clerk','staff','parent'], badge: '5', category: 'Operations' },
+  { id: 'office_print',     title: 'Certificates', icon: DocumentIcon,       href: '/dashboard/certificates',   accentHex: '#C49B2A', allowedRoles: ['principal','clerk','staff'], category: 'Operations' },
+  { id: 'chat',             title: 'Messages',     icon: RemarksIcon,        href: '/dashboard/messages',       accentHex: '#30B0C7', allowedRoles: ['principal','teacher','staff','student','parent'], category: 'Operations' },
+  { id: 'settings',         title: 'Settings',     icon: SettingsIcon,       href: '/dashboard/settings',       accentHex: '#6C7278', allowedRoles: ['principal','staff','admin'], category: 'Operations' },
 ];
 
 function getGreeting(): string {

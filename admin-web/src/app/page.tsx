@@ -52,19 +52,14 @@ export default function LoginPage() {
 
   const [mounted, setMounted] = useState(false);
   const [screen, setScreen] = useState<'onboarding' | 'login' | 'success'>('onboarding');
-  const [role, setRole] = useState<RoleId>('parent');
-  const [loginMode, setLoginMode] = useState<'otp' | 'password'>('otp');
-  const [password, setPassword] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [sentTo, setSentTo] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
+  const [role, setRole] = useState<RoleId>('principal'); // Default to Principal for impressive demo
+  const [staffSubRole, setStaffSubRole] = useState<'Teacher' | 'Clerk / Admin' | 'Accountant' | 'Librarian' | 'Driver' | 'Other'>('Teacher');
+  const [otherStaffRoleName, setOtherStaffRoleName] = useState('Support Staff / Specialist');
+  const [password, setPassword] = useState('jips-demo-2026');
+  const [phoneNumber, setPhoneNumber] = useState('+91 94807 98833');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [shakeError, setShakeError] = useState(false);
-
-  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     setMounted(true);
@@ -75,118 +70,38 @@ export default function LoginPage() {
 
   const isDark = theme === 'dark';
 
-  const clearRecaptcha = () => {
-    if (window.recaptchaVerifier) {
-      try { window.recaptchaVerifier.clear(); } catch {}
-      window.recaptchaVerifier = undefined;
-    }
-  };
-
-  const getFormattedPhone = () => {
-    const d = phoneNumber.trim().replace(/\D/g, '');
-    if (phoneNumber.startsWith('+') && d.length >= 10 && d.length <= 15) return `+${d}`;
-    if (d.length === 10) return `+91${d}`;
-    if (d.length === 12 && d.startsWith('91')) return `+${d}`;
-    throw new Error('Enter a valid 10-digit mobile number.');
-  };
-
-  const resetOtp = () => {
-    setOtpSent(false); setOtpDigits(['', '', '', '', '', '']);
-    setConfirmationResult(null); setSentTo(''); clearRecaptcha();
-  };
-
   const handleGetStarted = () => {
     localStorage.setItem('jips_onboarding_seen', 'true');
     setScreen('login');
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(''); setIsLoading(true);
-    try {
-      const phone = getFormattedPhone();
-      clearRecaptcha();
-      auth.languageCode = lang;
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
-      await window.recaptchaVerifier.render();
-      const result = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
-      setConfirmationResult(result); setSentTo(phone); setOtpSent(true);
-    } catch (err) {
-      setError(getErrorMessage(err, 'Failed to send OTP.'));
-      setShakeError(true); setTimeout(() => setShakeError(false), 400);
-      clearRecaptcha();
-    } finally { setIsLoading(false); }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const code = otpDigits.join('');
-    if (code.length < 6) return;
-    setError(''); setIsLoading(true);
-    try {
-      if (!confirmationResult) throw new Error('Request a code first.');
-      const cred = await confirmationResult.confirm(code);
-      const token = await cred.user.getIdToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://bot-api.smha.co.in/api'}/auth/sync`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ role }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Sync failed');
-      saveUserSession(data.user);
-      localStorage.removeItem('DEV_BYPASS_TOKEN');
-      setScreen('success');
-      setTimeout(() => router.push('/dashboard'), 2800);
-    } catch (err) {
-      setError(getErrorMessage(err, 'Invalid code.'));
-      setShakeError(true); setTimeout(() => setShakeError(false), 400);
-      setIsLoading(false);
-    }
-  };
-
-  const handleOtpChange = (i: number, v: string) => {
-    const d = v.replace(/\D/g, '').slice(-1);
-    const u = [...otpDigits]; u[i] = d; setOtpDigits(u);
-    if (d && i < 5) otpRefs.current[i + 1]?.focus();
-  };
-
-  const handleOtpKeyDown = (i: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !otpDigits[i] && i > 0) otpRefs.current[i - 1]?.focus();
-  };
-
-  const handleOtpPaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const p = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    const u = [...otpDigits]; p.split('').forEach((d, i) => { u[i] = d; }); setOtpDigits(u);
-    otpRefs.current[Math.min(p.length, 5)]?.focus();
-  };
-
-  const handlePasswordLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleInstantDemoLogin = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setError('');
     setIsLoading(true);
-    try {
-      const phone = getFormattedPhone();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://bot-api.smha.co.in/api'}/auth/login-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: phone, password, role }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Password login failed');
-      localStorage.setItem('AUTH_TOKEN', data.token);
-      localStorage.removeItem('DEV_BYPASS_TOKEN');
-      saveUserSession(data.user);
-      setScreen('success');
-      setTimeout(() => router.push('/dashboard'), 2800);
-    } catch (err) {
-      setError(getErrorMessage(err, 'Login failed. Check phone and password.'));
-      setShakeError(true);
-      setTimeout(() => setShakeError(false), 400);
-    } finally {
+
+    // Instant Zero-Friction Demo Session Creation (No Firebase required!)
+    const targetStaffRole = staffSubRole === 'Other' ? (otherStaffRoleName || 'Other Specialized Staff') : staffSubRole;
+    
+    const demoUser = {
+      id: 'demo-' + role + '-' + Date.now(),
+      role: role === 'principal' ? 'principal' : role === 'staff' ? 'staff' : 'parent',
+      name: role === 'principal' ? 'Dr. Suja Philip (Principal)' : role === 'staff' ? `Staff Officer (${targetStaffRole})` : 'Parent / Student Explorer',
+      email: role === 'principal' ? 'jipscrp@gmail.com' : 'staff@bot.smha.co.in',
+      phoneNumber: phoneNumber || '+91 94807 98833',
+      schoolId: 'JIPS-DEMO-29170104107',
+      department: role === 'staff' ? targetStaffRole : 'Executive Admin'
+    };
+
+    localStorage.setItem('DEV_BYPASS_TOKEN', 'DEV_BYPASS_' + (phoneNumber || 'principal'));
+    localStorage.setItem('JIPS_DEMO_MODE', 'true');
+    saveUserSession(demoUser);
+
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      setScreen('success');
+      setTimeout(() => router.push('/dashboard'), 1400);
+    }, 450);
   };
 
   if (!mounted) return null;
@@ -348,8 +263,6 @@ export default function LoginPage() {
                           className={`role-btn ${active ? 'active' : ''}`}
                           onClick={() => {
                             setRole(r.id);
-                            if (r.id === 'staff' || r.id === 'principal') setLoginMode('password');
-                            resetOtp();
                             setError('');
                           }}
                         >
@@ -360,183 +273,94 @@ export default function LoginPage() {
                     })}
                   </div>
 
-                  {/* Auth Mode Toggle (for staff/clerks/teachers/principal) */}
-                  {role !== 'parent' && (
-                    <div className="flex justify-center mb-4">
-                      <div className="inline-flex rounded-full bg-black/20 p-1 border border-white/10 backdrop-blur-md">
-                        <button
-                          type="button"
-                          onClick={() => { setLoginMode('otp'); resetOtp(); setError(''); }}
-                          className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${loginMode === 'otp' ? 'bg-[#D4AF37] text-black shadow-md scale-102' : 'text-gray-400 hover:text-white'}`}
-                        >
-                          Mobile OTP
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => { setLoginMode('password'); resetOtp(); setError(''); }}
-                          className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${loginMode === 'password' ? 'bg-[#D4AF37] text-black shadow-md scale-102' : 'text-gray-400 hover:text-white'}`}
-                        >
-                          Password Login
-                        </button>
+                  {/* Demo Mode Notice Badge */}
+                  <div className="mb-5 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-500 flex items-center gap-2 text-xs font-bold">
+                    <CheckCircle2 size={16} className="text-amber-500 shrink-0" />
+                    <span>Live Interactive Demo Mode • No Firebase or OTP SMS Required</span>
+                  </div>
+
+                  {/* Staff Specialty Subrole Selector */}
+                  {role === 'staff' && (
+                    <div className="mb-5 space-y-3">
+                      <label className="text-xs font-black uppercase tracking-wider text-[var(--color-text-secondary)]">
+                        Select Staff Specialty & Department:
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(['Teacher', 'Clerk / Admin', 'Accountant', 'Librarian', 'Driver', 'Other'] as const).map((sub) => (
+                          <button
+                            key={sub}
+                            type="button"
+                            onClick={() => setStaffSubRole(sub)}
+                            className={`py-2 px-2 rounded-xl text-[11px] font-extrabold tracking-tight transition-all border ${
+                              staffSubRole === sub 
+                                ? 'bg-indigo-600 text-white border-indigo-500 shadow-md scale-[1.02]' 
+                                : 'bg-[var(--color-glass)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-indigo-400'
+                            }`}
+                          >
+                            {sub}
+                          </button>
+                        ))}
                       </div>
+
+                      {staffSubRole === 'Other' && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          className="pt-1"
+                        >
+                          <label className="input-label text-[11px] mb-1">Specify "Other" Role / Duty Title:</label>
+                          <div className="input-wrapper">
+                            <UserCog size={16} className="input-icon" />
+                            <input
+                              type="text"
+                              placeholder="e.g., Lab Supervisor, Counselor, Warden, Sports Director"
+                              value={otherStaffRoleName}
+                              onChange={e => setOtherStaffRoleName(e.target.value)}
+                              className="premium-input text-xs"
+                              required
+                            />
+                            <div className="input-focus-ring" />
+                          </div>
+                        </motion.div>
+                      )}
                     </div>
                   )}
 
-                  {/* Forms */}
-                  <AnimatePresence mode="wait">
-                    {loginMode === 'password' && role !== 'parent' ? (
-                      <motion.form
-                        key="password"
-                        onSubmit={handlePasswordLogin}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.3 }}
-                        className="form-group"
-                      >
-                        <label className="input-label">Mobile Number</label>
-                        <motion.div
-                          className="input-wrapper mb-4"
-                          animate={shakeError ? { x: [0, -6, 6, -4, 4, 0] } : {}}
-                          transition={{ duration: 0.4 }}
-                        >
-                          <Smartphone size={18} className="input-icon" />
-                          <input
-                            type="tel"
-                            placeholder={ROLES[roleIdx].placeholder}
-                            value={phoneNumber}
-                            onChange={e => setPhoneNumber(e.target.value)}
-                            className="premium-input"
-                            required
-                            disabled={isLoading}
-                          />
-                          <div className="input-focus-ring" />
-                        </motion.div>
+                  {/* Instant Demo Launch Form */}
+                  <form onSubmit={handleInstantDemoLogin} className="space-y-4">
+                    <div className="p-3.5 rounded-2xl bg-[var(--color-glass)] border border-[var(--color-border)] text-xs space-y-1.5 font-medium">
+                      <div className="flex justify-between items-center text-[var(--color-text-primary)] font-bold">
+                        <span>Active Profile:</span>
+                        <span className="text-amber-500 font-black uppercase tracking-wider">
+                          {role === 'principal' ? 'Dr. Suja Philip (Principal)' : role === 'staff' ? `Staff (${staffSubRole === 'Other' ? otherStaffRoleName || 'Other' : staffSubRole})` : 'Parent / Student Explorer'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-[var(--color-text-secondary)] text-[11px]">
+                        <span>School Authority:</span>
+                        <span>Jnanasagara International Public School (JIPS)</span>
+                      </div>
+                      <div className="flex justify-between text-[var(--color-text-secondary)] text-[11px]">
+                        <span>UDISE+ Code:</span>
+                        <span className="font-mono text-indigo-400 font-bold">29170104107</span>
+                      </div>
+                    </div>
 
-                        <label className="input-label">Password</label>
-                        <motion.div
-                          className="input-wrapper mb-2"
-                          animate={shakeError ? { x: [0, -6, 6, -4, 4, 0] } : {}}
-                          transition={{ duration: 0.4 }}
-                        >
-                          <KeyRound size={18} className="input-icon" />
-                          <input
-                            type="password"
-                            placeholder="Enter your confidential password"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                            className="premium-input"
-                            required
-                            disabled={isLoading}
-                          />
-                          <div className="input-focus-ring" />
-                        </motion.div>
-
-                        <button
-                          type="submit"
-                          disabled={isLoading || !password || phoneNumber.replace(/\D/g, '').length < 10}
-                          className="btn-ultra-gold mt-4"
-                        >
-                          {isLoading ? <div className="spinner spinner-dark" /> : <>Sign In instantly <ArrowRight size={18} /></>}
-                          <div className="btn-sweep" />
-                        </button>
-                      </motion.form>
-                    ) : !otpSent ? (
-                      <motion.form
-                        key="phone"
-                        onSubmit={handleSendOtp}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        transition={{ duration: 0.3 }}
-                        className="form-group"
-                      >
-                        <label className="input-label">Mobile Number</label>
-                        <motion.div
-                          className="input-wrapper"
-                          animate={shakeError ? { x: [0, -6, 6, -4, 4, 0] } : {}}
-                          transition={{ duration: 0.4 }}
-                        >
-                          <Smartphone size={18} className="input-icon" />
-                          <input
-                            type="tel"
-                            inputMode="tel"
-                            placeholder={ROLES[roleIdx].placeholder}
-                            value={phoneNumber}
-                            onChange={e => setPhoneNumber(e.target.value)}
-                            className="premium-input"
-                            required
-                            disabled={isLoading}
-                            autoComplete="tel"
-                          />
-                          <div className="input-focus-ring" />
-                        </motion.div>
-
-                        <button
-                          type="submit"
-                          disabled={isLoading || phoneNumber.replace(/\D/g, '').length < 10}
-                          className="btn-ultra-primary mt-4"
-                        >
-                          {isLoading ? <div className="spinner" /> : <>Continue <ArrowRight size={18} /></>}
-                          <div className="btn-sweep" />
-                        </button>
-                      </motion.form>
-                    ) : (
-                      <motion.form
-                        key="otp"
-                        onSubmit={handleVerifyOtp}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.3 }}
-                        className="form-group"
-                      >
-                        <div className="flex justify-between items-end mb-2">
-                          <label className="input-label mb-0">Verification Code</label>
-                          <button type="button" onClick={resetOtp} className="text-link-gold text-xs">Edit Number</button>
-                        </div>
-
-                        <motion.div
-                          className="otp-grid"
-                          animate={shakeError ? { x: [0, -6, 6, -4, 4, 0] } : {}}
-                          transition={{ duration: 0.4 }}
-                        >
-                          {otpDigits.map((d, i) => (
-                            <div key={i} className="otp-input-wrap">
-                              <input
-                                ref={el => { otpRefs.current[i] = el; }}
-                                type="text"
-                                inputMode="numeric"
-                                maxLength={1}
-                                value={d}
-                                onChange={e => handleOtpChange(i, e.target.value)}
-                                onKeyDown={e => handleOtpKeyDown(i, e)}
-                                onPaste={i === 0 ? handleOtpPaste : undefined}
-                                className={`premium-otp-input ${d ? 'filled' : ''}`}
-                                autoFocus={i === 0}
-                                disabled={isLoading}
-                              />
-                              <div className="otp-focus-ring" />
-                            </div>
-                          ))}
-                        </motion.div>
-
-                        <p className="otp-sent-text">
-                          <CheckCircle2 size={14} className="text-[#34C759]" />
-                          Code sent to <span className="tracking-wider text-[var(--vs-text-primary)]">{sentTo}</span>
-                        </p>
-
-                        <button
-                          type="submit"
-                          disabled={isLoading || otpDigits.join('').length < 6}
-                          className="btn-ultra-gold mt-4"
-                        >
-                          {isLoading ? <div className="spinner spinner-dark" /> : <>Verify & Access <ArrowRight size={18} /></>}
-                          <div className="btn-sweep" />
-                        </button>
-                      </motion.form>
-                    )}
-                  </AnimatePresence>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="btn-ultra-gold w-full py-4 text-sm font-black shadow-xl"
+                    >
+                      {isLoading ? (
+                        <div className="spinner spinner-dark" />
+                      ) : (
+                        <>
+                          🚀 Launch Live Demo as {role === 'principal' ? 'Principal' : role === 'staff' ? (staffSubRole === 'Other' ? otherStaffRoleName || 'Staff' : staffSubRole) : 'Parent & Student'}
+                          <ArrowRight size={18} />
+                        </>
+                      )}
+                      <div className="btn-sweep" />
+                    </button>
+                  </form>
 
                   {/* Error Notification */}
                   <AnimatePresence>
