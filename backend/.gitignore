@@ -3,3 +3,10 @@ node_modules
 .env
 
 /generated/prisma
+
+*.apk
+*.aab
+*.keystore
+*.log
+admin-web copy/
+
