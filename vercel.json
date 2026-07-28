@@ -1,7 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "framework": "nextjs",
+  "buildCommand": "cd admin-web && npm run build",
+  "outputDirectory": "admin-web/.next",
   "cleanUrls": true,
   "trailingSlash": false,
   "regions": ["bom1"]

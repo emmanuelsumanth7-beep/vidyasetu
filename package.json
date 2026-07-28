@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "cd admin-web && npm run dev",
-    "build": "cd admin-web && npm install && BUILD_CAPACITOR=true npm run build && cd .. && rm -rf dist && cp -r admin-web/out dist",
+    "build": "cd admin-web && npm install && npm run build",
+    "build:mobile": "cd admin-web && npm install && BUILD_CAPACITOR=true npm run build",
     "preview": "cd admin-web && npm run start"
   },
   "dependencies": {
