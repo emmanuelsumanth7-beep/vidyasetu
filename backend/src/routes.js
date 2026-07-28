@@ -564,12 +564,58 @@ router.post('/staff', authenticate, authorize(['super_admin', 'principal']), asy
       passwordHash = await bcrypt.hash(password.trim(), 10);
     }
 
+    // Check if staff member already exists by phone number or employeeCode
+    let existingUser = null;
+    if (phoneNumber) {
+      existingUser = await prisma.user.findFirst({
+        where: { schoolId: req.user.schoolId, phoneNumber: phoneNumber.toString().trim() },
+        include: { teacherProfile: true, staffProfile: true }
+      });
+    }
+    if (!existingUser && employeeCode) {
+      const tp = await prisma.teacherProfile.findFirst({ where: { schoolId: req.user.schoolId, employeeCode: employeeCode.toString().trim() }, include: { user: true } });
+      const sp = await prisma.staffProfile.findFirst({ where: { schoolId: req.user.schoolId, employeeCode: employeeCode.toString().trim() }, include: { user: true } });
+      if (tp && tp.user) existingUser = { ...tp.user, teacherProfile: tp };
+      else if (sp && sp.user) existingUser = { ...sp.user, staffProfile: sp };
+    }
+
+    if (existingUser) {
+      const updatedUser = await prisma.user.update({
+        where: { id: existingUser.id },
+        data: {
+          ...(name ? { name } : {}),
+          ...(email !== undefined ? { email } : {}),
+          ...(role ? { role: role.toUpperCase() } : {}),
+          ...(passwordHash ? { passwordHash } : {})
+        }
+      });
+      if (role.toUpperCase() === 'TEACHER' && existingUser.teacherProfile) {
+        await prisma.teacherProfile.update({
+          where: { id: existingUser.teacherProfile.id },
+          data: {
+            ...(employeeCode ? { employeeCode } : {}),
+            ...(department !== undefined ? { qualification: department || null } : {}),
+            ...(subjects !== undefined ? { subjects: Array.isArray(subjects) ? JSON.stringify(subjects) : (subjects ? JSON.stringify(subjects) : null) } : {})
+          }
+        });
+      } else if (existingUser.staffProfile) {
+        await prisma.staffProfile.update({
+          where: { id: existingUser.staffProfile.id },
+          data: {
+            ...(employeeCode ? { employeeCode } : {}),
+            ...(department !== undefined ? { department } : {})
+          }
+        });
+      }
+      return res.json({ success: true, user: updatedUser, updated: true });
+    }
+
     // Create base user
     const newUser = await prisma.user.create({
       data: {
         schoolId: req.user.schoolId,
         name,
-        phoneNumber,
+        phoneNumber: phoneNumber ? phoneNumber.toString().trim() : `+91STAFF${Date.now()}`,
         email,
         role: role.toUpperCase(),
         passwordHash,
@@ -577,12 +623,13 @@ router.post('/staff', authenticate, authorize(['super_admin', 'principal']), asy
     });
 
     // Create specific profile based on role
+    const finalEmpCode = employeeCode || `EMP-${Date.now()}`;
     if (role.toUpperCase() === 'TEACHER') {
       await prisma.teacherProfile.create({
         data: {
           userId: newUser.id,
           schoolId: req.user.schoolId,
-          employeeCode,
+          employeeCode: finalEmpCode,
           qualification: department || null,
           subjects: Array.isArray(subjects) ? JSON.stringify(subjects) : (subjects ? JSON.stringify(subjects) : null),
           dateOfJoining: new Date()
@@ -593,7 +640,7 @@ router.post('/staff', authenticate, authorize(['super_admin', 'principal']), asy
         data: {
           userId: newUser.id,
           schoolId: req.user.schoolId,
-          employeeCode,
+          employeeCode: finalEmpCode,
           department,
           dateOfJoining: new Date()
         }
@@ -904,6 +951,52 @@ router.post('/students', authenticate, async (req, res) => {
     let school = await prisma.school.findFirst({ where: { id: req.user.schoolId } });
     
     const result = await prisma.$transaction(async (tx) => {
+      const admNo = (rollNumber || req.body.admissionNumber || `ADM-${Date.now()}`).toString().trim();
+      let student = await tx.studentProfile.findFirst({
+        where: { schoolId: req.user.schoolId, admissionNumber: admNo },
+        include: { user: true }
+      });
+
+      // Prevent RFID card unique constraint conflicts
+      let validRfid = rfidCardUid || undefined;
+      if (validRfid) {
+        const rfidOwner = await tx.studentProfile.findFirst({ where: { rfidCardUid: validRfid } });
+        if (rfidOwner && (!student || rfidOwner.id !== student.id)) {
+          validRfid = undefined;
+        }
+      }
+
+      if (student) {
+        // Update existing student and associated user account without throwing a constraint error
+        await tx.user.update({
+          where: { id: student.userId },
+          data: { name: name.trim() }
+        });
+        const updatedStudent = await tx.studentProfile.update({
+          where: { id: student.id },
+          data: {
+            dob: dob ? new Date(dob) : undefined,
+            gender: (gender || 'OTHER').toUpperCase(),
+            bloodGroup: bloodGroup ? bloodGroup.replace('+', '_POS').replace('-', '_NEG').replace(' ', '_') : undefined,
+            rfidCardUid: validRfid,
+            category: category !== undefined ? category : undefined,
+            fatherName: fatherName !== undefined ? fatherName : undefined,
+            motherName: motherName !== undefined ? motherName : undefined,
+            stream: stream !== undefined ? stream : undefined,
+            combination: combination !== undefined ? combination : undefined,
+            customFields: customFields !== undefined ? (customFields ? (typeof customFields === 'string' ? customFields : JSON.stringify(customFields)) : null) : undefined
+          }
+        });
+        if (emergencyContact) {
+          await tx.studentHealthRecord.upsert({
+            where: { studentProfileId: student.id },
+            create: { studentProfileId: student.id, emergencyContactPhone: emergencyContact, emergencyContactName: fatherName || motherName || 'Parent / Guardian' },
+            update: { emergencyContactPhone: emergencyContact }
+          });
+        }
+        return { ...updatedStudent, name: name.trim(), rollNumber: updatedStudent.admissionNumber, updated: true };
+      }
+
       const user = await tx.user.create({
         data: {
           schoolId: req.user.schoolId,
@@ -912,16 +1005,16 @@ router.post('/students', authenticate, async (req, res) => {
           phoneNumber: `+91TEMP${crypto.randomUUID().slice(0,8)}`
         }
       });
-      const student = await tx.studentProfile.create({
+      student = await tx.studentProfile.create({
         data: {
           userId: user.id,
           schoolId: req.user.schoolId,
-          admissionNumber: rollNumber || `ADM-${Date.now()}`,
+          admissionNumber: admNo,
           admissionDate: new Date(),
           dob: dob ? new Date(dob) : new Date(),
           gender: (gender || 'OTHER').toUpperCase(),
           bloodGroup: bloodGroup ? bloodGroup.replace('+', '_POS').replace('-', '_NEG').replace(' ', '_') : undefined,
-          rfidCardUid: rfidCardUid || undefined,
+          rfidCardUid: validRfid,
           category: category || undefined,
           fatherName: fatherName || null,
           motherName: motherName || null,
@@ -1512,7 +1605,11 @@ router.post('/fees/pay', authenticate, async (req, res) => {
     const receipt = await prisma.$transaction(async (tx) => {
       const count = await tx.feeReceipt.count({ where: { studentProfile: { schoolId: req.user.schoolId } } });
       const year  = new Date().getFullYear();
-      const receiptNumber = `RCP-${year}-${String(count + 1).padStart(3, '0')}`;
+      let receiptNumber = `RCP-${year}-${String(count + 1).padStart(3, '0')}`;
+      const existingRcp = await tx.feeReceipt.findFirst({ where: { receiptNumber, studentProfile: { schoolId: req.user.schoolId } } });
+      if (existingRcp) {
+        receiptNumber = `RCP-${year}-${String(count + 1).padStart(3, '0')}-${Math.floor(Math.random()*10000)}`;
+      }
       
       // Parse breakdown from req.body if it's sent as a stringified JSON or object array
       let finalBreakdown = req.body.breakdown || [];
@@ -2018,15 +2115,28 @@ router.post('/payroll/slips', authenticate, async (req, res) => {
     const ded = Number(deductions) || 0;
     const net = basic + allow - ded;
     
-    const slip = await prisma.salarySlip.create({
-      data: {
+    const slip = await prisma.salarySlip.upsert({
+      where: {
+        staffUserId_monthYear: {
+          staffUserId: staffId,
+          monthYear
+        }
+      },
+      create: {
         staffUserId: staffId,
         monthYear,
         basicPay: basic,
         allowances: allow,
-        deductionsPF: ded, // Mapping all deductions here for simplicity
+        deductionsPF: ded,
         netPay: net,
         status: 'DRAFT',
+        generatedAt: new Date()
+      },
+      update: {
+        basicPay: basic,
+        allowances: allow,
+        deductionsPF: ded,
+        netPay: net,
         generatedAt: new Date()
       }
     });
