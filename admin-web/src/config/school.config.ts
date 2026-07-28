@@ -2,23 +2,23 @@ export const SchoolConfig = {
   name: "Jnanasagara International Public School",
   shortName: "JIPS",
   logoPath: '/jips.png',
-  privacyEmail: 'info@jnanasagara.smha.co.in',
-  tagline: "Innovating Education — Empowering Tomorrow",
-  address: "Q6WW+452, Hassan, Holenarasipura, Karnataka 573211",
-  phone: "+91-7760353170",
-  email: "info@jnanasagara.smha.co.in",
-  website: "manasa.smha.co.in",
-  affiliation: "Recognized & Approved Board",
-  principal: "Principal Venkatesh",
-  trust: "Jnanasagara Educational & Innovative Trust",
+  privacyEmail: 'jipscrp@gmail.com',
+  tagline: "Empowering Future Leaders | Nagesh Education Trust",
+  address: "Nagasamudra Road, Byrapura, Channarayapatna, Hassan District, Karnataka - 573116",
+  phone: "+91-9480798833 / 08176-252077",
+  email: "jipscrp@gmail.com",
+  website: "bot.smha.co.in",
+  affiliation: "CBSE Affiliation No: 830485 | Mysore Sahodaya School Complex",
+  principal: "Dr. Suja Philip (Principal)",
+  trust: "Nagesh Education Trust",
   
   // CRP (Cluster Resource Person) & Educational Cluster Details
   crpDetails: {
-    cluster: "Holenarasipura Education Cluster (CRP)",
-    block: "Holenarasipura Block Education Office (BEO)",
+    cluster: "Channarayapatna Education Cluster (CRP)",
+    block: "Channarayapatna Block Education Office (BEO)",
     district: "Hassan District Education Authority",
     state: "Department of School Education, Karnataka",
-    udiseCode: "29230501101"
+    udiseCode: "29170104107"
   },
 
   // IMPORTANT: Change this for each school to prevent APK clashes on Android.

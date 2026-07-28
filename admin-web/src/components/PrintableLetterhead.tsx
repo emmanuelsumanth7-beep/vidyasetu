@@ -60,7 +60,7 @@ export const PrintableFooter: React.FC = () => {
         <div className="text-right flex flex-col items-end">
           <div className="w-52 border-b-2 border-gray-950 mb-2"></div>
           <p className="text-sm font-black text-gray-950 font-serif uppercase tracking-wider">Signature of Principal</p>
-          <p className="text-xs font-bold text-indigo-950 font-serif mt-0.5">{SchoolConfig.principal || 'Principal Venkatesh'}</p>
+          <p className="text-xs font-bold text-indigo-950 font-serif mt-0.5">{SchoolConfig.principal || 'Dr. Suja Philip (Principal)'}</p>
         </div>
       </div>
     </div>

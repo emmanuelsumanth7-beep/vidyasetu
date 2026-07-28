@@ -126,23 +126,23 @@ export default function SettingsDashboard() {
                 </div>
                 <div className="space-y-1 md:col-span-2">
                   <label className="text-sm font-semibold text-[var(--color-text-primary)]">Address</label>
-                  <textarea rows={3} defaultValue="Jnanasagara International Public School Campus, Karnataka, India" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
+                  <textarea rows={3} defaultValue="Nagasamudra Road, Byrapura, Channarayapatna, Hassan District, Karnataka - 573116" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-semibold text-[var(--color-text-primary)]">School Affiliation / Board Code</label>
-                  <input type="text" defaultValue="ICSE-KAR-2026" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
+                  <input type="text" defaultValue="CBSE Affiliation No: 830485" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-semibold text-[var(--color-text-primary)]">UDISE+ School Code</label>
-                  <input type="text" defaultValue="29230501101" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all font-mono text-blue-700 font-bold" />
+                  <input type="text" defaultValue="29170104107" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all font-mono text-blue-700 font-bold" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-semibold text-[var(--color-text-primary)]">CRP (Cluster Resource Person) & Circle</label>
-                  <input type="text" defaultValue="Holenarasipura Education Cluster (CRP)" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
+                  <input type="text" defaultValue="Channarayapatna Education Cluster (CRP)" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-semibold text-[var(--color-text-primary)]">Block Education Office (BEO)</label>
-                  <input type="text" defaultValue="Holenarasipura BEO Office, Hassan District" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
+                  <input type="text" defaultValue="Channarayapatna BEO Office, Hassan District" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
                 </div>
               </div>
             </div>
