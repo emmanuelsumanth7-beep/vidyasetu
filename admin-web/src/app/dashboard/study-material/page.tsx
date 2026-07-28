@@ -223,7 +223,7 @@ export default function StudyMaterialUpload() {
                   <p className="text-sm font-semibold text-emerald-600 mb-2">{mat.subject}</p>
                   <p className="text-xs text-ink-secondary mb-4 font-data">Uploaded by: {mat.teacher?.name || 'Staff'} • {new Date(mat.createdAt).toLocaleDateString()}</p>
                   <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
-                    <a href={mat.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-interactive-blue flex items-center gap-1 hover:underline">
+                    <a href={mat.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-blue-600 flex items-center gap-1 hover:underline">
                       <Download size={16} /> Open Resource
                     </a>
                     {['principal', 'clerk', 'teacher'].includes(userRole) && (

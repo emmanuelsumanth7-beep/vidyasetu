@@ -15,8 +15,8 @@
  *
  * CSS custom properties written by applyTheme()
  * ─────────────────────────────────────────────
- *   --vs-primary          e.g. #007AFF
- *   --vs-secondary        e.g. #5856D6
+ *   --vs-primary          e.g. #1B2A4A
+ *   --vs-secondary        e.g. #C49B2A
  *   --vs-accent           e.g. #FF9500
  *   --vs-text-on-primary  e.g. #FFFFFF
  *   --vs-text-on-secondary
@@ -56,21 +56,21 @@ export interface ThemeConfig {
 }
 
 export const DEFAULT_THEME: ThemeConfig = {
-  primary:         '#007AFF',
-  secondary:       '#5856D6',
+  primary:         '#1B2A4A',
+  secondary:       '#D4AF37',
   accent:          '#FF9500',
   textOnPrimary:   '#FFFFFF',
   textOnSecondary: '#FFFFFF',
   textOnAccent:    '#000000',
-  logoUrl:         null,
-  appName:         'Vidya Setu',
+  logoUrl:         '/manasa-logo.png',
+  appName:         'Manasa Innovative P U College',
 };
 
 // ── School code helpers ──────────────────────────────────────────────────────
 
 export function getSchoolCode(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(STORAGE_KEY_CODE);
+  if (typeof window === 'undefined') return 'manasa';
+  return localStorage.getItem(STORAGE_KEY_CODE) || 'manasa';
 }
 
 export function setSchoolCode(code: string): void {

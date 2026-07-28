@@ -14,7 +14,11 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Connect to the backend socket server
-    const newSocket = io('https://3d234415f1f4f78f-112-133-211-54.serveousercontent.com', {
+    const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL 
+      ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '')
+      : 'https://bot-api.smha.co.in';
+      
+    const newSocket = io(SOCKET_URL, {
       transports: ['websocket', 'polling']
     });
 

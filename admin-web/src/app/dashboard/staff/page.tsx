@@ -182,7 +182,7 @@ export default function StaffDirectory() {
           </div>
           <button 
             onClick={() => setShowAddModal(true)}
-            className="bg-interactive-blue hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             <UserPlus size={18} />
             <span>Add Staff</span>
@@ -200,7 +200,7 @@ export default function StaffDirectory() {
                 placeholder="Search by name or code…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-interactive-blue focus:border-transparent transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
               />
             </div>
             <div className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2">
@@ -283,7 +283,7 @@ export default function StaffDirectory() {
             </button>
             
             <div className="flex flex-col items-center text-center mb-8 mt-4">
-              <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-50 rounded-full flex items-center justify-center text-interactive-blue mb-4 shadow-sm border border-blue-100">
+              <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-50 rounded-full flex items-center justify-center text-blue-600 mb-4 shadow-sm border border-blue-100">
                 <span className="text-3xl font-display font-bold">{selectedMember.name.charAt(0)}</span>
               </div>
               <h2 className="text-2xl font-bold text-ink-primary font-display">{selectedMember.name}</h2>
@@ -347,7 +347,7 @@ export default function StaffDirectory() {
                       <FileCheck2 size={18} className="text-gray-400" />
                       <span className="font-medium text-ink-primary">Qualifications</span>
                     </div>
-                    <button className="text-interactive-blue text-sm font-semibold hover:underline">View Docs</button>
+                    <button className="text-blue-600 text-sm font-semibold hover:underline">View Docs</button>
                   </div>
                 </div>
               </div>
@@ -369,7 +369,7 @@ export default function StaffDirectory() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg relative z-10 animate-scale-in flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
               <h2 className="text-xl font-bold text-ink-primary font-display flex items-center gap-2">
-                <UserPlus size={20} className="text-interactive-blue" />
+                <UserPlus size={20} className="text-blue-600" />
                 Add New Staff Member
               </h2>
               <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -394,7 +394,7 @@ export default function StaffDirectory() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-interactive-blue focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
                       placeholder="e.g. Anita Sharma"
                     />
                   </div>
@@ -405,7 +405,7 @@ export default function StaffDirectory() {
                       type="text"
                       value={employeeCode}
                       onChange={(e) => setEmployeeCode(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-interactive-blue focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
                       placeholder="EMP-1024"
                     />
                   </div>
@@ -416,7 +416,7 @@ export default function StaffDirectory() {
                       type="text"
                       value={department}
                       onChange={(e) => setDepartment(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-interactive-blue focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
                       placeholder="e.g. Science"
                     />
                   </div>
@@ -428,7 +428,7 @@ export default function StaffDirectory() {
                       required
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-interactive-blue focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
                       placeholder="+91..."
                     />
                   </div>
@@ -439,7 +439,7 @@ export default function StaffDirectory() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-interactive-blue focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
                       placeholder="name@school.com"
                     />
                   </div>
@@ -449,7 +449,7 @@ export default function StaffDirectory() {
                     <select
                       value={role}
                       onChange={(e) => setRole(e.target.value as StaffRole)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-interactive-blue focus:border-transparent transition-all bg-white"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all bg-white"
                     >
                       {ROLES.map((r) => (
                         <option key={r.value} value={r.value}>
@@ -457,6 +457,18 @@ export default function StaffDirectory() {
                         </option>
                       ))}
                     </select>
+                  </div>
+
+                  <div className="space-y-2 col-span-2">
+                    <label className="text-sm font-bold text-gray-700">Initial Login Password</label>
+                    <input
+                      type="text"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
+                      placeholder="Assign an initial password (e.g. manasa_clerk2026)"
+                    />
+                    <p className="text-xs text-gray-500">When set, the staff member can instantly sign into the portal using Password Login without requiring mobile OTP SMS verification.</p>
                   </div>
                 </div>
               </form>
@@ -475,7 +487,7 @@ export default function StaffDirectory() {
                 type="submit"
                 form="add-staff-form"
                 disabled={isSubmitting}
-                className="bg-interactive-blue hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center min-w-[120px]"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center min-w-[120px]"
               >
                 {isSubmitting ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

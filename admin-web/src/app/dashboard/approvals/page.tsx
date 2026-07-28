@@ -145,7 +145,7 @@ export default function ApprovalsPage() {
 
       {/* Drafting Form for Teachers */}
       {isDrafting && !isPrincipal && (
-        <section className="bg-white/40 backdrop-blur-2xl rounded-[32px] border border-white/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] overflow-hidden mb-6 animate-slide-up">
+        <section className="glass-card/40 backdrop-blur-2xl rounded-[32px] border border-white/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] overflow-hidden mb-6 animate-slide-up">
           <div className="p-8">
             <h3 className="text-2xl font-bold font-display text-gray-900 mb-6">Draft New Document</h3>
             <form onSubmit={handleDraftSubmit} className="space-y-6">
@@ -154,7 +154,7 @@ export default function ApprovalsPage() {
                 <input 
                   type="text" 
                   required
-                  className="w-full bg-white/50 border border-gray-200/50 rounded-2xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-gray-400"
+                  className="w-full glass-card/50 border border-[var(--color-border)]/50 rounded-2xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-gray-400"
                   placeholder="e.g. Annual Sports Day Report" 
                   value={draftTitle}
                   onChange={e => setDraftTitle(e.target.value)}
@@ -164,14 +164,14 @@ export default function ApprovalsPage() {
                 <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-widest">Document Content</label>
                 <textarea 
                   required
-                  className="w-full bg-white/50 border border-gray-200/50 rounded-2xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-gray-400 min-h-[200px] resize-y"
+                  className="w-full glass-card/50 border border-[var(--color-border)]/50 rounded-2xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-gray-400 min-h-[200px] resize-y"
                   placeholder="Write your report or document content here..." 
                   value={draftContent}
                   onChange={e => setDraftContent(e.target.value)}
                 />
               </div>
               <div className="flex justify-end gap-3 pt-4">
-                <button type="button" onClick={() => setIsDrafting(false)} className="px-6 py-3 font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100/50 rounded-2xl transition-all">
+                <button type="button" onClick={() => setIsDrafting(false)} className="px-6 py-3 font-bold text-gray-500 hover:text-gray-700 hover:bg-black/10 dark:bg-white/10/50 rounded-2xl transition-all">
                   Cancel
                 </button>
                 <button type="submit" className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold uppercase tracking-widest shadow-lg hover:bg-indigo-700 transition-all disabled:opacity-50" disabled={!draftTitle || !draftContent}>
@@ -184,14 +184,14 @@ export default function ApprovalsPage() {
       )}
 
       {loading ? (
-        <div className="h-64 bg-white/20 backdrop-blur-md rounded-[32px] shadow-sm border border-white/40 animate-pulse" />
+        <div className="h-64 glass-card/20 backdrop-blur-md rounded-[32px] shadow-sm border border-white/40 animate-pulse" />
       ) : (
         <div className={`grid grid-cols-1 ${viewingDoc ? 'lg:grid-cols-2' : ''} gap-6`}>
           
           {/* Document List */}
           <div className={`flex flex-col gap-4 ${viewingDoc ? 'hidden lg:flex' : ''}`}>
             {documents.length === 0 ? (
-              <div className="bg-white/40 backdrop-blur-2xl rounded-[32px] border border-white/50 p-16 flex flex-col items-center justify-center text-center">
+              <div className="glass-card/40 backdrop-blur-2xl rounded-[32px] border border-white/50 p-16 flex flex-col items-center justify-center text-center">
                 <div className="w-20 h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4"><FileText size={32} /></div>
                 <h3 className="text-xl font-bold font-display text-gray-900">No documents</h3>
                 <p className="text-gray-500 mt-2">No documents found in the system.</p>
@@ -199,7 +199,7 @@ export default function ApprovalsPage() {
             ) : documents.map(doc => (
               <div 
                 key={doc.id} 
-                className={`bg-white/60 backdrop-blur-xl rounded-[24px] border ${viewingDoc?.id === doc.id ? 'border-indigo-500 ring-2 ring-indigo-500/20' : 'border-white/50'} shadow-sm hover:shadow-md transition-all cursor-pointer`}
+                className={`glass-card/60 backdrop-blur-xl rounded-[24px] border ${viewingDoc?.id === doc.id ? 'border-indigo-500 ring-2 ring-indigo-500/20' : 'border-white/50'} shadow-sm hover:shadow-md transition-all cursor-pointer`}
                 onClick={() => setViewingDoc(doc)}
               >
                 <div className="p-5 flex justify-between items-center">
@@ -240,17 +240,17 @@ export default function ApprovalsPage() {
 
           {/* Document Viewer */}
           {viewingDoc && (
-            <div className="bg-white/60 backdrop-blur-2xl rounded-[32px] border border-white/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] flex flex-col h-full overflow-hidden animate-slide-up">
-              <div className="p-6 border-b border-white/50 flex justify-between items-center bg-white/30">
+            <div className="glass-card/60 backdrop-blur-2xl rounded-[32px] border border-white/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] flex flex-col h-full overflow-hidden animate-slide-up">
+              <div className="p-6 border-b border-white/50 flex justify-between items-center glass-card/30">
                 <h3 className="text-xl font-bold text-gray-900 font-display">Document Viewer</h3>
-                <button onClick={() => setViewingDoc(null)} className="text-gray-500 hover:text-gray-900 bg-white/50 hover:bg-white/80 p-2 rounded-full transition-all">
+                <button onClick={() => setViewingDoc(null)} className="text-gray-500 hover:text-gray-900 glass-card/50 hover:glass-card/80 p-2 rounded-full transition-all">
                   <X size={20} />
                 </button>
               </div>
               
               {/* Document Content - Needs to look like a real document but respect dark mode */}
-              <div className="p-10 flex-1 bg-white/90 text-gray-900 font-serif relative overflow-y-auto min-h-[400px]">
-                <h1 className="text-3xl font-bold mb-8 text-center border-b border-gray-200 pb-6">
+              <div className="p-10 flex-1 glass-card/90 text-gray-900 font-serif relative overflow-y-auto min-h-[400px]">
+                <h1 className="text-3xl font-bold mb-8 text-center border-b border-[var(--color-border)] pb-6">
                   {viewingDoc.title}
                 </h1>
                 
@@ -265,7 +265,7 @@ export default function ApprovalsPage() {
                       <div className="font-[cursive] text-4xl text-gray-900 -rotate-2 mb-2 text-shadow-sm opacity-80" style={{ fontFamily: '"Brush Script MT", cursive' }}>
                         {viewingDoc.signedBy?.name || 'Authorized Signatory'}
                       </div>
-                      <div className="text-xs font-medium text-gray-500 border-t border-gray-200 pt-2 uppercase tracking-widest">
+                      <div className="text-xs font-medium text-gray-500 border-t border-[var(--color-border)] pt-2 uppercase tracking-widest">
                         Digitally Signed<br/>
                         {new Date(viewingDoc.signedAt || new Date()).toLocaleString()}
                       </div>
@@ -279,7 +279,7 @@ export default function ApprovalsPage() {
 
               {/* Action Bar (Only for Principal on Pending Docs) */}
               {isPrincipal && viewingDoc.status === 'pending' && (
-                <div className="p-6 bg-white/40 border-t border-white/50 flex justify-end gap-4">
+                <div className="p-6 glass-card/40 border-t border-white/50 flex justify-end gap-4">
                   <button onClick={() => handleReject(viewingDoc.id)} className="px-6 py-3 bg-red-50 text-red-600 font-bold uppercase tracking-widest rounded-2xl hover:bg-red-100 transition-all border border-red-100">
                     Reject & Return
                   </button>
@@ -299,10 +299,10 @@ export default function ApprovalsPage() {
       {/* Secure Sign Modal */}
       {showSignModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-fade-in" onClick={() => { setShowSignModal(false); setAuthPassword(''); setAuthError(''); }}>
-          <div className="bg-white/80 backdrop-blur-2xl rounded-[32px] border border-white/50 shadow-2xl w-full max-w-md overflow-hidden animate-modal-scale" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b border-white/50 flex justify-between items-center bg-white/40">
+          <div className="glass-card/80 backdrop-blur-2xl rounded-[32px] border border-white/50 shadow-2xl w-full max-w-md overflow-hidden animate-modal-scale" onClick={e => e.stopPropagation()}>
+            <div className="p-6 border-b border-white/50 flex justify-between items-center glass-card/40">
               <h3 className="text-xl font-bold text-gray-900 font-display">Security Verification</h3>
-              <button className="text-gray-500 hover:text-gray-900 bg-white/50 hover:bg-white/80 p-2 rounded-full transition-all" onClick={() => { setShowSignModal(false); setAuthPassword(''); setAuthError(''); }}>
+              <button className="text-gray-500 hover:text-gray-900 glass-card/50 hover:glass-card/80 p-2 rounded-full transition-all" onClick={() => { setShowSignModal(false); setAuthPassword(''); setAuthError(''); }}>
                 <X size={20} />
               </button>
             </div>
@@ -334,15 +334,15 @@ export default function ApprovalsPage() {
                       placeholder="Enter your password" 
                       value={authPassword}
                       onChange={e => setAuthPassword(e.target.value)}
-                      className="w-full bg-white/50 border border-gray-200/50 rounded-2xl py-4 pl-12 pr-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold placeholder:font-medium placeholder:text-gray-400"
+                      className="w-full glass-card/50 border border-[var(--color-border)]/50 rounded-2xl py-4 pl-12 pr-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold placeholder:font-medium placeholder:text-gray-400"
                       autoFocus
                     />
                   </div>
                 </div>
               </div>
               
-              <div className="p-6 bg-white/40 border-t border-white/50 flex justify-end gap-3">
-                <button type="button" onClick={() => { setShowSignModal(false); setAuthPassword(''); setAuthError(''); }} className="px-6 py-3 font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100/50 rounded-2xl transition-all">
+              <div className="p-6 glass-card/40 border-t border-white/50 flex justify-end gap-3">
+                <button type="button" onClick={() => { setShowSignModal(false); setAuthPassword(''); setAuthError(''); }} className="px-6 py-3 font-bold text-gray-500 hover:text-gray-700 hover:bg-black/10 dark:bg-white/10/50 rounded-2xl transition-all">
                   Cancel
                 </button>
                 <button type="submit" className="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-bold uppercase tracking-widest shadow-xl hover:shadow-2xl hover:bg-indigo-700 transition-all disabled:opacity-50" disabled={isSigning || !authPassword}>

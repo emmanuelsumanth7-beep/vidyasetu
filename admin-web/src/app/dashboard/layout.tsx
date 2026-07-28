@@ -4,8 +4,11 @@ import { useRouter } from 'next/navigation';
 import { SocketProvider } from '@/components/SocketProvider';
 import { useEffect, useState } from 'react';
 import { FloatingNav } from '@/components/layout/FloatingNav';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { clearUserSession, readUserSession, type ClientUser } from '@/lib/session';
+import { SchoolConfig } from '@/config/school.config';
+import { NotificationBell } from '@/components/NotificationBell';
 import { 
   LayoutDashboard, 
   Users, 
@@ -18,12 +21,13 @@ import {
   CalendarClock, 
   Bus, 
   BarChart, 
-  Settings,
   MessageSquare,
   Award,
   BookMarked,
   LogOut,
   RefreshCw,
+  CalendarDays,
+  Settings,
   type LucideIcon
 } from 'lucide-react';
 
@@ -84,6 +88,7 @@ export default function DashboardLayout({
       { name: 'Fees', href: '/dashboard/fees', icon: CreditCard },
       { name: 'Notices', href: '/dashboard/notices', icon: Bell },
       { name: 'Transport', href: '/dashboard/transport', icon: Bus },
+      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
       { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart },
       { name: 'Settings', href: '/dashboard/settings', icon: Settings },
     ];
@@ -92,9 +97,11 @@ export default function DashboardLayout({
       { name: 'Home', href: '/dashboard', icon: LayoutDashboard },
       { name: 'Approvals', href: '/dashboard/approvals', icon: CheckSquare },
       { name: 'Classes', href: '/dashboard/classes', icon: Users },
+      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
       { name: 'Timetable', href: '/dashboard/classes', icon: CalendarClock },
       { name: 'Homework', href: '/dashboard/homework', icon: BookOpen },
       { name: 'Notices', href: '/dashboard/notices', icon: MessageSquare },
+      { name: 'Grades', href: '/dashboard/grades', icon: Award },
     ];
   } else if (user.role === 'clerk') {
     navItems = [
@@ -103,6 +110,9 @@ export default function DashboardLayout({
       { name: 'Fees', href: '/dashboard/fees', icon: CreditCard },
       { name: 'Approvals', href: '/dashboard/approvals', icon: CheckSquare },
       { name: 'Notices', href: '/dashboard/notices', icon: Bell },
+      { name: 'Grades', href: '/dashboard/grades', icon: Award },
+      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
+      { name: 'Certificates', href: '/dashboard/certificates', icon: Award },
     ];
   } else if (user.role === 'parent') {
     navItems = [
@@ -110,6 +120,7 @@ export default function DashboardLayout({
       { name: 'Attendance', href: '/dashboard/parent-attendance', icon: Calendar },
       { name: 'Homework', href: '/dashboard/homework', icon: BookOpen },
       { name: 'Diary', href: '/dashboard/diary', icon: BookMarked },
+      { name: 'Calendar', href: '/dashboard/calendar', icon: CalendarDays },
       { name: 'Grades', href: '/dashboard/grades', icon: Award },
       { name: 'Fees', href: '/dashboard/fees', icon: CreditCard },
       { name: 'Notices', href: '/dashboard/notices', icon: Bell },
@@ -137,35 +148,40 @@ export default function DashboardLayout({
           <header
             className="md:hidden flex items-center justify-between px-4 h-14 shrink-0 relative z-10 w-full"
             style={{
-              background: 'rgba(242,242,247,0.80)',
+              background: 'var(--nav-bg)',
               backdropFilter: 'blur(32px) saturate(1.8)',
               WebkitBackdropFilter: 'blur(32px) saturate(1.8)',
-              borderBottom: '1px solid rgba(60,60,67,0.10)',
-              boxShadow: '0 1px 0 rgba(255,255,255,0.80) inset',
+              borderBottom: '1px solid var(--nav-border)',
             }}
           >
             <div className="flex items-center gap-2.5">
-              <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-white"
-                style={{ background: 'linear-gradient(135deg,#007AFF,#5856D6)', boxShadow: '0 4px 12px rgba(0,122,255,0.30)' }}
-              >
-                <BookOpen size={14} />
-              </div>
-              <span className="font-black text-lg tracking-tight truncate max-w-[130px]" style={{ color: '#1C1C1E' }}>
-                Vidya Setu
+              {SchoolConfig.logoPath ? (
+                <img src={SchoolConfig.logoPath} alt="Logo" className="w-8 h-8 rounded-xl object-contain" />
+              ) : (
+                <div
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-white"
+                  style={{ background: 'linear-gradient(135deg,#1B2A4A,#C49B2A)', boxShadow: '0 4px 12px rgba(27,42,74,0.30)' }}
+                >
+                  <BookOpen size={14} />
+                </div>
+              )}
+              <span className="font-black text-lg tracking-tight truncate max-w-[130px]" style={{ color: 'var(--color-text-primary)' }}>
+                {SchoolConfig.shortName}
               </span>
             </div>
             <div className="flex items-center gap-2">
+              <NotificationBell />
               <span
                 className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"
-                style={{ background: 'rgba(0,122,255,0.10)', color: '#007AFF', border: '1px solid rgba(0,122,255,0.18)' }}
+                style={{ background: 'rgba(27,42,74,0.10)', color: '#1B2A4A', border: '1px solid rgba(27,42,74,0.18)' }}
               >
                 {user.role}
               </span>
+              <ThemeToggle />
               <button
                 onClick={handleSignOut}
                 className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
-                style={{ color: '#6C7278', background: 'rgba(60,60,67,0.06)' }}
+                style={{ color: 'var(--nav-icon-inactive)', background: 'var(--color-glass)' }}
               >
                 <LogOut size={15} />
               </button>
@@ -183,13 +199,23 @@ export default function DashboardLayout({
           </main>
         </div>
 
+        {/* Desktop Top Right Controls */}
+        <div className="hidden md:flex fixed top-8 right-10 z-50 items-center gap-4">
+          <NotificationBell />
+          <ThemeToggle />
+        </div>
+
         {/* Global Floating Refresh Button */}
         <button
           onClick={handleRefresh}
-          className="fixed bottom-24 md:bottom-10 right-4 md:right-10 bg-interactive-blue text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all z-50 group"
+          className="fixed bottom-24 md:bottom-10 right-4 md:right-10 text-white w-12 h-12 rounded-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50 group"
+          style={{ 
+            background: 'linear-gradient(135deg, #1B2A4A, #2A4A7A)',
+            boxShadow: '0 8px 24px rgba(27,42,74,0.40), 0 1px 0 rgba(255,255,255,0.15) inset'
+          }}
           title="Force Sync / Refresh"
         >
-          <RefreshCw size={20} className="group-active:animate-spin" />
+          <RefreshCw size={18} className="group-active:animate-spin" />
         </button>
 
         {/* Mobile bottom nav */}

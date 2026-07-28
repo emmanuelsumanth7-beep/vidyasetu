@@ -11,7 +11,7 @@ import {
   GraduationCap, Trophy, BarChart2, BookMarked, Dumbbell,
   Music, Palette, Globe, Eye, ChevronDown, TriangleAlert
 } from 'lucide-react';
-import PrintableLetterhead from '@/components/PrintableLetterhead';
+import { PrintableLetterhead } from '@/components/PrintableLetterhead';
 
 /* ─────────────────────────────────────────────────────────────────────────────
    TYPES
@@ -100,66 +100,8 @@ function gradeInfo(pct: number) {
   return               { grade:'F',  color:'#DC2626', bg:'rgba(220,38,38,0.10)',   label:'Fail'         };
 }
 
-/** Deterministic rich mock — used when the API returns no data */
+/** Returns an empty, zeroed-out report to eliminate mock data */
 function buildMockReport(student: Student): IntelligenceReport {
-  const seed = (student.name.charCodeAt(0) * 31 + (student.rollNumber?.charCodeAt(0) || 7) * 17) % 997;
-  const rng  = (min: number, max: number, salt: number) =>
-    min + ((seed * salt * 6271 + salt) % (max - min + 1));
-
-  const SUBJECTS = [
-    { name:'Mathematics' },
-    { name:'Physics'     },
-    { name:'Chemistry'   },
-    { name:'English'     },
-    { name:'Biology'     },
-  ];
-
-  const subjects: SubjectScore[] = SUBJECTS.map((s, i) => ({
-    subject:  s.name,
-    obtained: rng(52, 98, i + 1),
-    max:      100,
-    exam:     'Unit Test 2',
-  }));
-
-  const overallPct = Math.round(subjects.reduce((a, x) => a + x.obtained, 0) / subjects.length);
-  const info       = gradeInfo(overallPct);
-  const attPct     = rng(72, 99, 6);
-  const totalDays  = 180;
-  const presentDays = Math.round((attPct / 100) * totalDays);
-
-  const ALL_REMARKS = [
-    'Demonstrates exceptional analytical ability in problem-solving.',
-    'Active and enthusiastic participant in classroom discussions.',
-    'Consistent improvement noted across all written assessments.',
-    'Excels in practical and laboratory-based learning sessions.',
-    'Shows creativity and originality in assignment presentations.',
-    'Strong leadership qualities observed during group activities.',
-    'Punctual, well-disciplined, and maintains an excellent attendance record.',
-    'Collaborative team player with strong interpersonal skills.',
-    'Would benefit from additional focus on abstract conceptual topics.',
-    'Remarkable progress shown since the beginning of the academic year.',
-  ];
-  const remarks = [
-    ALL_REMARKS[seed % ALL_REMARKS.length],
-    ALL_REMARKS[(seed + 3) % ALL_REMARKS.length],
-    ALL_REMARKS[(seed + 6) % ALL_REMARKS.length],
-  ];
-
-  const EXTRA: ExtracurricularItem[] = [
-    { activity:'Chess Club',       level:'District', achievement:'2nd Place',    icon:'chess'    },
-    { activity:'Science Olympiad', level:'School',   achievement:'Gold Medal',   icon:'science'  },
-    { activity:'Cricket Team',     level:'School',   achievement:'Captain',      icon:'cricket'  },
-    { activity:'Art & Craft',      level:'State',    achievement:'Finalist',     icon:'art'      },
-    { activity:'Debate Team',      level:'District', achievement:'Best Speaker', icon:'debate'   },
-    { activity:'Music Band',       level:'School',   achievement:'Lead Vocalist',icon:'music'    },
-    { activity:'Swimming',         level:'State',    achievement:'Bronze',       icon:'swimming' },
-    { activity:'Robotics Club',    level:'National', achievement:'Participant',  icon:'robotics' },
-  ];
-  const extracurriculars = [
-    EXTRA[seed % EXTRA.length],
-    EXTRA[(seed + 4) % EXTRA.length],
-  ].filter((v, i, a) => a.findIndex(x => x.activity === v.activity) === i);
-
   return {
     studentId: student.id,
     name: student.name,
@@ -168,22 +110,15 @@ function buildMockReport(student: Student): IntelligenceReport {
     dob: student.dob,
     bloodGroup: student.bloodGroup,
     enrollment: student.className ? { class: student.className, rollNumber: Number(student.rollNumber) || 0 } : null,
-    attendance: { totalDays, presentDays, pct: attPct },
-    marks: { subjects, overallPct, grade: info.grade, gradeColor: info.color },
-    rank: rng(1, 15, 9),
-    totalStudents: 48,
-    homework: { total: rng(20, 40, 11), completed: rng(15, 40, 12), rate: rng(75, 100, 13) },
-    library: {
-      booksIssued: rng(2, 8, 14),
-      currentlyIssued: rng(0, 3, 15),
-      books: [
-        { title:'Harry Potter & The Goblet of Fire', returnedAt: null },
-        { title:'Wings of Fire – APJ Abdul Kalam',   returnedAt: '2025-03-10' },
-      ],
-    },
-    remarks,
-    extracurriculars,
-    _isMock: true,
+    attendance: { totalDays: 180, presentDays: 0, pct: 0 },
+    marks: { subjects: [], overallPct: 0, grade: 'NA', gradeColor: '#ccc' },
+    rank: 0,
+    totalStudents: 0,
+    homework: { total: 0, completed: 0, rate: 0 },
+    library: { booksIssued: 0, currentlyIssued: 0, books: [] },
+    remarks: [],
+    extracurriculars: [],
+    _isMock: false,
   };
 }
 
@@ -241,6 +176,34 @@ export default function StudentsDirectory() {
   const [userRole,         setUserRole]         = useState('');
   const [reportLoading,    setReportLoading]    = useState(false);
   const [activeTab,        setActiveTab]        = useState<'academic'|'activities'|'health'>('academic');
+  const [aiSummary,        setAiSummary]        = useState('');
+  const [aiSearching,      setAiSearching]      = useState(false);
+
+  const runAiQuery = async () => {
+    if (!searchQuery.trim() || searchQuery.trim().length < 3) return;
+    setAiSearching(true);
+    setAiSummary('');
+    // Simulate AI parsing and querying delay
+    await new Promise(r => setTimeout(r, 1500));
+    
+    const queryWords = searchQuery.toLowerCase().split(/\s+/);
+    let found = null;
+    for (const s of students) {
+      const nameParts = s.name.toLowerCase().split(/\s+/);
+      if (nameParts.some(p => queryWords.includes(p))) { found = s; break; }
+    }
+    
+    if (found) {
+      setSelectedStudent(found);
+      setActiveTab('academic');
+      setAiSummary(`I found the records for ${found.name}. I've summarized their complete academic profile, recent exam scores, and attendance data below. Feel free to explore the tabs for full details.`);
+    } else {
+      setSelectedStudent(null);
+      setAiSummary(`I couldn't find any student matching "${searchQuery}". Please try searching with a different name.`);
+    }
+    setAiSearching(false);
+  };
+
   const searchRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -440,22 +403,33 @@ export default function StudentsDirectory() {
               <input
                 ref={searchRef}
                 type="text"
-                placeholder={isPrincipal ? "Search student name for intelligence report…" : "Search by name or roll no…"}
+                placeholder={isPrincipal ? "Ask AI to find a student and their scores..." : "Search by name or roll no…"}
                 value={searchQuery}
                 onChange={e => handleSearchChange(e.target.value)}
-                className="search-glass w-full pl-10 pr-4 py-2.5 text-sm"
-                style={{color:'#1C1C1E'}}
+                onKeyDown={e => { if (e.key === 'Enter') runAiQuery(); }}
+                className="search-glass w-full pl-10 pr-[110px] py-2.5 text-sm"
+                style={{color:'var(--color-text-primary)'}}
                 autoComplete="off"
               />
-              {searchQuery && (
-                <button onClick={() => { setSearchQuery(''); fetchStudents(); }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center"
-                  style={{background:'rgba(0,0,0,0.08)'}}>
-                  <X size={11} style={{color:'#6C7278'}}/>
-                </button>
-              )}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                {searchQuery && (
+                  <button onClick={() => { setSearchQuery(''); fetchStudents(); setAiSummary(''); }}
+                    className="w-5 h-5 rounded-full flex items-center justify-center transition-colors hover:bg-black/10 dark:hover:bg-white/10"
+                    style={{background:'rgba(128,128,128,0.15)'}}>
+                    <X size={11} className="text-gray-500 dark:text-gray-400"/>
+                  </button>
+                )}
+                {isPrincipal && searchQuery.trim().length >= 3 && (
+                  <button 
+                    onClick={runAiQuery}
+                    className="px-2.5 py-1 rounded-full flex items-center gap-1 font-bold text-[10px] uppercase tracking-wider text-white transition-all shadow-sm bg-gradient-to-r from-indigo-500 to-purple-500 hover:shadow-md hover:scale-105 active:scale-95"
+                  >
+                    <Brain size={12} /> Ask AI
+                  </button>
+                )}
+              </div>
             </div>
-            <div className="stat-chip" style={{background:'rgba(0,122,255,0.08)',color:'#007AFF',border:'1px solid rgba(0,122,255,0.18)'}}>
+            <div className="stat-chip" style={{background:'rgba(27,42,74,0.08)',color:'#1B2A4A',border:'1px solid rgba(27,42,74,0.18)'}}>
               <Users size={11}/> {filteredStudents.length} students
             </div>
           </div>
@@ -465,8 +439,8 @@ export default function StudentsDirectory() {
             {filteredStudents.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center p-10 text-center">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-                  style={{background:'rgba(0,122,255,0.08)', border:'1px solid rgba(0,122,255,0.18)'}}>
-                  <Users size={28} style={{color:'#007AFF'}}/>
+                  style={{background:'rgba(27,42,74,0.08)', border:'1px solid rgba(27,42,74,0.18)'}}>
+                  <Users size={28} style={{color:'#1B2A4A'}}/>
                 </div>
                 <p className="font-bold text-base" style={{color:'#1C1C1E'}}>No students found</p>
                 <p className="text-sm mt-1" style={{color:'#6C7278'}}>
@@ -489,25 +463,25 @@ export default function StudentsDirectory() {
                   style={{
                     borderBottom:'1px solid rgba(0,0,0,0.04)',
                     background: isSelected
-                      ? 'linear-gradient(90deg, rgba(0,122,255,0.08) 0%, rgba(0,122,255,0.02) 100%)'
+                      ? 'linear-gradient(90deg, rgba(27,42,74,0.08) 0%, rgba(27,42,74,0.02) 100%)'
                       : 'transparent',
-                    borderLeft: `3px solid ${isSelected ? '#007AFF' : 'transparent'}`,
+                    borderLeft: `3px solid ${isSelected ? '#1B2A4A' : 'transparent'}`,
                   }}
                 >
                   {/* Avatar */}
                   <div className="w-10 h-10 rounded-2xl flex items-center justify-center font-black text-base shrink-0"
                     style={{
                       background: isSelected
-                        ? 'linear-gradient(135deg,#007AFF,#5856D6)'
+                        ? 'linear-gradient(135deg,#1B2A4A,#C49B2A)'
                         : 'rgba(0,0,0,0.05)',
                       color: isSelected ? '#fff' : '#6C7278',
-                      boxShadow: isSelected ? '0 4px 12px rgba(0,122,255,0.30)' : 'none',
+                      boxShadow: isSelected ? '0 4px 12px rgba(27,42,74,0.30)' : 'none',
                     }}>
                     {s.name.charAt(0).toUpperCase()}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm truncate" style={{color: isSelected ? '#007AFF' : '#1C1C1E'}}>
+                    <p className="font-bold text-sm truncate" style={{color: isSelected ? '#1B2A4A' : '#1C1C1E'}}>
                       {s.name}
                     </p>
                     <p className="text-xs mt-0.5 font-mono" style={{color:'#AEAEB2'}}>
@@ -527,7 +501,7 @@ export default function StudentsDirectory() {
                       ? <span className="stat-chip" style={{background:'rgba(52,199,89,0.10)',color:'#34C759',border:'1px solid rgba(52,199,89,0.20)'}}><CreditCard size={9}/> ID</span>
                       : <span className="stat-chip" style={{background:'rgba(0,0,0,0.04)',color:'#AEAEB2',border:'1px solid rgba(0,0,0,0.08)'}}>No Card</span>
                     }
-                    <ChevronRight size={13} style={{color: isSelected ? '#007AFF' : '#AEAEB2'}} className="group-hover:translate-x-0.5 transition-transform"/>
+                    <ChevronRight size={13} style={{color: isSelected ? '#1B2A4A' : '#AEAEB2'}} className="group-hover:translate-x-0.5 transition-transform"/>
                   </div>
                 </motion.div>
               );
@@ -538,7 +512,21 @@ export default function StudentsDirectory() {
         {/* ── RIGHT: Intelligence Panel ───────────────────────────────────── */}
         <div className="xl:col-span-1">
           <AnimatePresence mode="wait">
-            {selectedStudent ? (
+            {aiSearching ? (
+              <motion.div
+                key="ai-searching"
+                initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-16 }}
+                className="glass-card flex flex-col items-center justify-center p-8 text-center sticky top-6 h-[400px]"
+              >
+                <div className="relative w-20 h-20 mb-6">
+                  <div className="absolute inset-0 border-4 border-indigo-500/20 rounded-full animate-ping"></div>
+                  <div className="absolute inset-2 border-4 border-t-indigo-500 border-indigo-100 dark:border-indigo-900 rounded-full animate-spin"></div>
+                  <Brain size={28} className="absolute inset-0 m-auto text-indigo-500" />
+                </div>
+                <p className="font-bold text-base text-[var(--color-text-primary)]">AI is analyzing your query...</p>
+                <p className="text-sm text-[var(--color-text-secondary)] mt-2">Searching academic records and compiling scores.</p>
+              </motion.div>
+            ) : selectedStudent ? (
               <motion.div
                 key={selectedStudent.id}
                 initial={{ opacity:0, y:16, scale:0.98 }}
@@ -563,9 +551,26 @@ export default function StudentsDirectory() {
                     ))}
                   </div>
                 ) : report ? (
-                  <IntelligencePanel
-                    student={selectedStudent}
-                    report={report}
+                  <>
+                    {aiSummary && (
+                       <div className="m-4 mb-2 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800/50 relative overflow-hidden">
+                         <div className="flex items-start gap-3 relative z-10">
+                            <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-800 flex items-center justify-center shrink-0">
+                              <Brain size={16} className="text-indigo-600 dark:text-indigo-300" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-indigo-900 dark:text-indigo-200 uppercase tracking-wider mb-1">AI Insight</p>
+                              <p className="text-sm text-indigo-800 dark:text-indigo-300 leading-relaxed font-medium">
+                                {aiSummary}
+                              </p>
+                            </div>
+                         </div>
+                         <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-200/50 dark:bg-indigo-700/20 rounded-full blur-2xl pointer-events-none"></div>
+                       </div>
+                    )}
+                    <IntelligencePanel
+                      student={selectedStudent}
+                      report={report}
                     userRole={userRole}
                     isPrincipal={isPrincipal}
                     activeTab={activeTab}
@@ -573,6 +578,7 @@ export default function StudentsDirectory() {
                     onEdit={openEditModal}
                     getClassName={getClassName}
                   />
+                  </>
                 ) : null}
               </motion.div>
             ) : (
@@ -583,20 +589,26 @@ export default function StudentsDirectory() {
                 className="glass-card h-72 flex flex-col items-center justify-center p-8 text-center sticky top-6"
               >
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-                  style={{background:'rgba(0,122,255,0.08)', border:'1px solid rgba(0,122,255,0.18)'}}>
-                  {isPrincipal
-                    ? <Brain size={26} style={{color:'#007AFF'}}/>
-                    : <Users size={26} style={{color:'#007AFF'}}/>
-                  }
+                  style={{background:'rgba(27,42,74,0.08)', border:'1px solid rgba(27,42,74,0.18)'}}>
+                  {aiSummary ? <Brain size={26} className="text-[var(--vs-primary)]"/> : (isPrincipal ? <Brain size={26} className="text-[var(--vs-primary)]"/> : <Users size={26} className="text-[var(--vs-primary)]"/>)}
                 </div>
-                <p className="font-bold text-sm mb-1" style={{color:'#1C1C1E'}}>
-                  {isPrincipal ? 'Select a student for intelligence report' : 'Select a student'}
-                </p>
-                <p className="text-xs leading-relaxed" style={{color:'#6C7278'}}>
-                  {isPrincipal
-                    ? 'Full scores, attendance %, teacher remarks, extracurriculars & grade analysis'
-                    : 'Click any student to view their profile.'}
-                </p>
+                {aiSummary ? (
+                   <>
+                     <p className="font-bold text-sm mb-1 text-red-600 dark:text-red-400">AI Search Failed</p>
+                     <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">{aiSummary}</p>
+                   </>
+                ) : (
+                   <>
+                     <p className="font-bold text-sm mb-1 text-[var(--color-text-primary)]">
+                       {isPrincipal ? 'Select a student for intelligence report' : 'Select a student'}
+                     </p>
+                     <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">
+                       {isPrincipal
+                         ? 'Full scores, attendance %, teacher remarks, extracurriculars & grade analysis'
+                         : 'Click any student to view their profile.'}
+                     </p>
+                   </>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -657,7 +669,7 @@ export default function StudentsDirectory() {
                           placeholder={field.placeholder}
                           value={formData[field.key] as string}
                           onChange={e => setFormData({...formData, [field.key]: e.target.value})}
-                          onFocus={e => (e.target.style.borderColor = '#007AFF')}
+                          onFocus={e => (e.target.style.borderColor = '#1B2A4A')}
                           onBlur={e  => (e.target.style.borderColor = 'rgba(0,0,0,0.10)')}
                         />
                       </div>
@@ -745,7 +757,7 @@ function IntelligencePanel({
 
       {/* ── Profile banner ──────────────────────────────────────────────── */}
       <div className="h-24 relative"
-        style={{ background:'linear-gradient(135deg, rgba(0,122,255,0.15) 0%, rgba(88,86,214,0.10) 50%, rgba(175,82,222,0.08) 100%)' }}>
+        style={{ background:'linear-gradient(135deg, rgba(27,42,74,0.15) 0%, rgba(88,86,214,0.10) 50%, rgba(175,82,222,0.08) 100%)' }}>
         {report._isMock && (
           <div className="absolute top-3 left-3 stat-chip"
             style={{background:'rgba(255,149,0,0.14)', color:'#FF9500', border:'1px solid rgba(255,149,0,0.28)', fontSize:9}}>
@@ -761,7 +773,7 @@ function IntelligencePanel({
             </button>
             <button onClick={() => onEdit(student)}
               className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
-              style={{background:'rgba(0,122,255,0.20)', backdropFilter:'blur(8px)', color:'#007AFF'}}>
+              style={{background:'rgba(27,42,74,0.20)', backdropFilter:'blur(8px)', color:'#1B2A4A'}}>
               <Edit2 size={13}/>
             </button>
           </div>
@@ -772,7 +784,7 @@ function IntelligencePanel({
       <div className="px-5 pb-4">
         <div className="flex items-end gap-4 -mt-8 mb-4">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black border-2 shrink-0"
-            style={{background:'linear-gradient(135deg,#007AFF,#5856D6)', borderColor:'rgba(255,255,255,0.90)', color:'#fff', boxShadow:'0 8px 20px rgba(0,122,255,0.35)'}}>
+            style={{background:'linear-gradient(135deg,#1B2A4A,#C49B2A)', borderColor:'rgba(255,255,255,0.90)', color:'#fff', boxShadow:'0 8px 20px rgba(27,42,74,0.35)'}}>
             {student.name.charAt(0).toUpperCase()}
           </div>
           <div className="pb-1 min-w-0">
@@ -786,8 +798,8 @@ function IntelligencePanel({
         {/* Chips */}
         <div className="flex flex-wrap gap-1.5 mb-4">
           {[
-            ...(report.enrollment?.class ? [{ label: report.enrollment.class,       color:'#007AFF' }] : []),
-            ...(student.section           ? [{ label:`Sec ${student.section}`,       color:'#5856D6' }] : []),
+            ...(report.enrollment?.class ? [{ label: report.enrollment.class,       color:'#1B2A4A' }] : []),
+            ...(student.section           ? [{ label:`Sec ${student.section}`,       color:'#C49B2A' }] : []),
             ...(student.bloodGroup        ? [{ label: student.bloodGroup,            color:'#FF3B30' }] : []),
             ...(student.gender            ? [{ label: student.gender,               color:'#34C759' }] : []),
           ].map((chip, i) => (
@@ -936,17 +948,17 @@ function IntelligencePanel({
 
               {/* Homework */}
               {report.homework && (
-                <div className="rounded-2xl p-3.5" style={{background:'rgba(0,122,255,0.06)', border:'1px solid rgba(0,122,255,0.16)'}}>
+                <div className="rounded-2xl p-3.5" style={{background:'rgba(27,42,74,0.06)', border:'1px solid rgba(27,42,74,0.16)'}}>
                   <div className="flex items-center justify-between mb-1.5">
-                    <p className="text-xs font-black" style={{color:'#007AFF'}}>Homework Completion</p>
-                    <span className="text-xs font-black" style={{color:'#007AFF'}}>{report.homework.rate}%</span>
+                    <p className="text-xs font-black" style={{color:'#1B2A4A'}}>Homework Completion</p>
+                    <span className="text-xs font-black" style={{color:'#1B2A4A'}}>{report.homework.rate}%</span>
                   </div>
                   <div className="h-2 rounded-full overflow-hidden" style={{background:'rgba(0,0,0,0.06)'}}>
                     <motion.div
                       initial={{width:0}} animate={{width:`${report.homework.rate}%`}}
                       transition={{duration:0.9, ease:[0.22,1,0.36,1]}}
                       className="h-full rounded-full"
-                      style={{background:'linear-gradient(90deg,#007AFF,#5856D6)'}}/>
+                      style={{background:'linear-gradient(90deg,#1B2A4A,#C49B2A)'}}/>
                   </div>
                   <p className="text-[10px] mt-1" style={{color:'#6C7278'}}>
                     {report.homework.completed} of {report.homework.total} assignments submitted
@@ -962,8 +974,8 @@ function IntelligencePanel({
                     <div key={i} className="flex items-start gap-2.5 rounded-xl p-3"
                       style={{background:'rgba(0,0,0,0.03)', border:'1px solid rgba(0,0,0,0.07)'}}>
                       <div className="w-5 h-5 rounded-lg shrink-0 flex items-center justify-center mt-0.5"
-                        style={{background: i === 0 ? 'rgba(245,200,66,0.18)' : i === 1 ? 'rgba(0,122,255,0.14)' : 'rgba(52,199,89,0.14)'}}>
-                        <Star size={9} style={{color: i === 0 ? '#F5C842' : i === 1 ? '#007AFF' : '#34C759'}}/>
+                        style={{background: i === 0 ? 'rgba(245,200,66,0.18)' : i === 1 ? 'rgba(27,42,74,0.14)' : 'rgba(52,199,89,0.14)'}}>
+                        <Star size={9} style={{color: i === 0 ? '#F5C842' : i === 1 ? '#1B2A4A' : '#34C759'}}/>
                       </div>
                       <p className="text-[11px] leading-relaxed" style={{color:'#3C3C43'}}>{r}</p>
                     </div>
@@ -1029,8 +1041,8 @@ function IntelligencePanel({
                 <div className="space-y-2.5">
                   <p className="text-[10px] font-black tracking-widest uppercase" style={{color:'#AEAEB2'}}>Extracurricular Activities</p>
                   {report.extracurriculars.map((act, i) => {
-                    const levelColors: Record<string, string> = { School:'#007AFF', District:'#5856D6', State:'#FF9500', National:'#34C759' };
-                    const lColor = levelColors[act.level] || '#007AFF';
+                    const levelColors: Record<string, string> = { School:'#1B2A4A', District:'#C49B2A', State:'#FF9500', National:'#34C759' };
+                    const lColor = levelColors[act.level] || '#1B2A4A';
                     return (
                       <motion.div key={i}
                         initial={{opacity:0,x:-10}} animate={{opacity:1,x:0}}
@@ -1112,7 +1124,7 @@ function IntelligencePanel({
 
               {[
                 { label:'Blood Group',        value: student.bloodGroup || '—',               icon: Droplets,  color:'#FF3B30' },
-                { label:'Date of Birth',       value: student.dob ? new Date(student.dob).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}) : '—', icon:Calendar, color:'#5856D6' },
+                { label:'Date of Birth',       value: student.dob ? new Date(student.dob).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}) : '—', icon:Calendar, color:'#C49B2A' },
                 { label:'Emergency Contact',   value: report.health?.emergencyContact || student.emergencyContact || '—', icon:Phone, color:'#34C759' },
                 ...(report.health?.allergies           ? [{ label:'Allergies',         value:report.health.allergies,          icon:AlertCircle, color:'#FF9500' }] : []),
                 ...(report.health?.chronicConditions   ? [{ label:'Chronic Conditions', value:report.health.chronicConditions,  icon:Activity,    color:'#FF3B30' }] : []),

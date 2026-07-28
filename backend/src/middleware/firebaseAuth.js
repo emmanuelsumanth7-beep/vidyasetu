@@ -19,7 +19,7 @@ const verifyFirebaseAuth = async (req, res, next) => {
     return res.status(401).json({ error: 'Missing or invalid Authorization header' });
   }
 
-  const idToken = authHeader.split('Bearer ')[1];
+  const idToken = authHeader.split('Bearer ')[1].trim();
 
   // ==========================================
   // JWT PASSWORD LOGIN AUTHENTICATION

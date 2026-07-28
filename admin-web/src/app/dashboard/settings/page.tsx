@@ -6,13 +6,39 @@ import {
   ShieldCheck,
   Palette,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  KeyRound,
+  Lock
 } from 'lucide-react';
+import { api } from '@/lib/api';
 
 export default function SettingsDashboard() {
   const [activeTab, setActiveTab] = useState('school');
   const [isSaving, setIsSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters.');
+      return;
+    }
+    setIsUpdatingPassword(true);
+    setPasswordError('');
+    try {
+      await api.post('/auth/set-password', { newPassword });
+      setToastMessage('Password updated successfully!');
+      setNewPassword('');
+      setTimeout(() => setToastMessage(''), 3000);
+    } catch (err) {
+      setPasswordError(err instanceof Error ? err.message : 'Failed to set password.');
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
 
   const handleSave = () => {
     setIsSaving(true);
@@ -27,13 +53,13 @@ export default function SettingsDashboard() {
     <div className="max-w-6xl mx-auto w-full animate-fade-in space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-ink-primary font-display tracking-tight">System Settings</h1>
-          <p className="text-ink-secondary mt-1">Global configuration, academic years, and security policies.</p>
+          <h1 className="text-3xl font-bold text-[var(--color-text-primary)] font-display tracking-tight">System Settings</h1>
+          <p className="text-[var(--color-text-secondary)] mt-1">Global configuration, academic years, and security policies.</p>
         </div>
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-interactive-blue hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors shadow-[var(--shadow-glass)] disabled:opacity-50 flex items-center gap-2"
         >
           {isSaving ? <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" /> : <CheckCircle2 size={18} />}
           {isSaving ? 'Saving...' : 'Save Changes'}
@@ -41,39 +67,39 @@ export default function SettingsDashboard() {
       </div>
 
       {toastMessage && (
-        <div className="bg-green-50 text-green-800 p-4 rounded-lg flex items-center gap-2 border border-green-200 animate-in slide-in-from-top-2">
+        <div className="bg-[#34C759]/10 text-[#34C759] p-4 rounded-lg flex items-center gap-2 border border-[#34C759]/20 animate-in slide-in-from-top-2">
           <CheckCircle2 size={20} />
           <span className="font-medium">{toastMessage}</span>
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+      <div className="bg-[var(--surface)] rounded-xl shadow-[var(--shadow-glass)] border border-[var(--color-border)] overflow-hidden flex flex-col md:flex-row min-h-[600px]">
         {/* Sidebar */}
-        <div className="w-full md:w-64 bg-gray-50/50 border-r border-gray-100 p-4 space-y-2">
+        <div className="w-full md:w-64 bg-[var(--color-glass)] border-r border-[var(--color-border)] p-4 space-y-2">
           <button
             onClick={() => setActiveTab('school')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left font-medium transition-colors ${activeTab === 'school' ? 'bg-interactive-blue text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left font-medium transition-colors ${activeTab === 'school' ? 'bg-blue-600 text-white shadow-[var(--shadow-glass)]' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-glass-2)]'}`}
           >
             <Building2 size={20} />
             School Profile
           </button>
           <button
             onClick={() => setActiveTab('academic')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left font-medium transition-colors ${activeTab === 'academic' ? 'bg-interactive-blue text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left font-medium transition-colors ${activeTab === 'academic' ? 'bg-blue-600 text-white shadow-[var(--shadow-glass)]' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-glass-2)]'}`}
           >
             <Calendar size={20} />
             Academic Years
           </button>
           <button
             onClick={() => setActiveTab('security')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left font-medium transition-colors ${activeTab === 'security' ? 'bg-interactive-blue text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left font-medium transition-colors ${activeTab === 'security' ? 'bg-blue-600 text-white shadow-[var(--shadow-glass)]' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-glass-2)]'}`}
           >
             <ShieldCheck size={20} />
             Security & Roles
           </button>
           <button
             onClick={() => setActiveTab('theme')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left font-medium transition-colors ${activeTab === 'theme' ? 'bg-interactive-blue text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left font-medium transition-colors ${activeTab === 'theme' ? 'bg-blue-600 text-white shadow-[var(--shadow-glass)]' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-glass-2)]'}`}
           >
             <Palette size={20} />
             Branding
@@ -85,26 +111,26 @@ export default function SettingsDashboard() {
           {activeTab === 'school' && (
             <div className="space-y-6 animate-in fade-in duration-300">
               <div>
-                <h2 className="text-xl font-bold text-ink-primary">School Profile</h2>
-                <p className="text-gray-500 text-sm mt-1">Basic information about the institution.</p>
+                <h2 className="text-xl font-bold text-[var(--color-text-primary)]">School Profile</h2>
+                <p className="text-[var(--color-text-secondary)] text-sm mt-1">Basic information about the institution.</p>
               </div>
-              <hr className="border-gray-100" />
+              <hr className="border-[var(--color-border)]" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
-                  <label className="text-sm font-semibold text-gray-700">Institution Name</label>
-                  <input type="text" defaultValue="Vidya Setu International" className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-interactive-blue focus:border-interactive-blue outline-none transition-all" />
+                  <label className="text-sm font-semibold text-[var(--color-text-primary)]">Institution Name</label>
+                  <input type="text" defaultValue="Manasa Innovative P U College" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-sm font-semibold text-gray-700">Institution Code</label>
-                  <input type="text" defaultValue="vidyasetu-intl" disabled className="w-full border border-gray-200 bg-gray-50 rounded-lg p-2.5 text-gray-500" />
+                  <label className="text-sm font-semibold text-[var(--color-text-primary)]">Institution Code</label>
+                  <input type="text" defaultValue="manasa" disabled className="w-full border border-[var(--color-border)] bg-[var(--color-glass)] rounded-lg p-2.5 text-[var(--color-text-secondary)]" />
                 </div>
                 <div className="space-y-1 md:col-span-2">
-                  <label className="text-sm font-semibold text-gray-700">Address</label>
-                  <textarea rows={3} defaultValue="Tech Park, Phase 1, Bangalore" className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-interactive-blue focus:border-interactive-blue outline-none transition-all" />
+                  <label className="text-sm font-semibold text-[var(--color-text-primary)]">Address</label>
+                  <textarea rows={3} defaultValue="Manasa Innovative P U College Campus, Karnataka, India" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-sm font-semibold text-gray-700">CBSE Affiliation Code</label>
-                  <input type="text" defaultValue="CBSE-883920" className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-interactive-blue focus:border-interactive-blue outline-none transition-all" />
+                  <label className="text-sm font-semibold text-[var(--color-text-primary)]">College Affiliation Code</label>
+                  <input type="text" defaultValue="PU-KAR-2026" className="w-full border border-[var(--color-border)] rounded-lg p-2.5 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all" />
                 </div>
               </div>
             </div>
@@ -114,34 +140,34 @@ export default function SettingsDashboard() {
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-xl font-bold text-ink-primary">Academic Years</h2>
-                  <p className="text-gray-500 text-sm mt-1">Manage terms and active sessions.</p>
+                  <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Academic Years</h2>
+                  <p className="text-[var(--color-text-secondary)] text-sm mt-1">Manage terms and active sessions.</p>
                 </div>
-                <button className="text-interactive-blue font-semibold hover:underline text-sm">+ Add New Session</button>
+                <button className="text-blue-600 font-semibold hover:underline text-sm">+ Add New Session</button>
               </div>
-              <hr className="border-gray-100" />
+              <hr className="border-[var(--color-border)]" />
               
               <div className="space-y-4">
                 {/* Active Session */}
-                <div className="border border-green-200 bg-green-50/50 rounded-xl p-5 flex items-center justify-between relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
+                <div className="border border-[#34C759]/20 bg-[#34C759]/10 rounded-xl p-5 flex items-center justify-between relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-[#34C759]/100"></div>
                   <div>
                     <div className="flex items-center gap-3">
-                      <h3 className="font-bold text-lg text-ink-primary">2026-2027</h3>
-                      <span className="bg-green-100 text-green-700 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Active</span>
+                      <h3 className="font-bold text-lg text-[var(--color-text-primary)]">2026-2027</h3>
+                      <span className="bg-[#34C759]/20 text-[#34C759] text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Active</span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">April 1, 2026 — March 31, 2027</p>
+                    <p className="text-sm text-[var(--color-text-secondary)] mt-1">April 1, 2026 — March 31, 2027</p>
                   </div>
-                  <button className="text-gray-400 hover:text-gray-700 font-medium">Edit</button>
+                  <button className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] font-medium">Edit</button>
                 </div>
 
                 {/* Past Session */}
-                <div className="border border-gray-200 bg-white rounded-xl p-5 flex items-center justify-between opacity-70">
+                <div className="border border-[var(--color-border)] bg-[var(--surface)] rounded-xl p-5 flex items-center justify-between opacity-70">
                   <div>
-                    <h3 className="font-bold text-lg text-ink-primary">2025-2026</h3>
-                    <p className="text-sm text-gray-600 mt-1">April 1, 2025 — March 31, 2026</p>
+                    <h3 className="font-bold text-lg text-[var(--color-text-primary)]">2025-2026</h3>
+                    <p className="text-sm text-[var(--color-text-secondary)] mt-1">April 1, 2025 — March 31, 2026</p>
                   </div>
-                  <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors">Set Active</button>
+                  <button className="bg-[var(--color-glass-2)] text-[var(--color-text-primary)] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[var(--color-glass-3)] transition-colors">Set Active</button>
                 </div>
               </div>
             </div>
@@ -150,12 +176,12 @@ export default function SettingsDashboard() {
           {activeTab === 'security' && (
             <div className="space-y-6 animate-in fade-in duration-300">
               <div>
-                <h2 className="text-xl font-bold text-ink-primary">Security & Roles</h2>
-                <p className="text-gray-500 text-sm mt-1">Configure Multi-Factor Authentication (MFA) and access control.</p>
+                <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Security & Roles</h2>
+                <p className="text-[var(--color-text-secondary)] text-sm mt-1">Configure Multi-Factor Authentication (MFA) and access control.</p>
               </div>
-              <hr className="border-gray-100" />
+              <hr className="border-[var(--color-border)]" />
               
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex gap-3 text-blue-800">
+              <div className="bg-[var(--vs-primary)]/10 border border-[var(--vs-primary)]/20 rounded-lg p-4 flex gap-3 text-[var(--vs-primary)]">
                 <AlertCircle className="shrink-0 mt-0.5" size={20} />
                 <p className="text-sm">Enforcing MFA will require users in these roles to set up an Authenticator App (Google/Microsoft) on their next login.</p>
               </div>
@@ -167,14 +193,48 @@ export default function SettingsDashboard() {
                   { role: 'Teachers', enforced: false },
                   { role: 'Clerks', enforced: false }
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg bg-gray-50/30">
-                    <span className="font-semibold text-gray-800">{item.role}</span>
+                  <div key={idx} className="flex items-center justify-between p-4 border border-[var(--color-border)] rounded-lg bg-[var(--color-glass)]">
+                    <span className="font-semibold text-[var(--color-text-primary)]">{item.role}</span>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" className="sr-only peer" defaultChecked={item.enforced} />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-interactive-blue"></div>
+                      <div className="w-11 h-6 bg-[var(--color-glass-3)] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--surface)] after:border-[var(--color-border)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-[var(--color-border)]">
+                <div className="flex items-center gap-2 mb-3">
+                  <KeyRound className="text-[var(--vs-secondary,#D4AF37)]" size={20} />
+                  <h3 className="text-lg font-bold text-[var(--color-text-primary)]">Account Password Management</h3>
+                </div>
+                <p className="text-sm text-[var(--color-text-secondary)] mb-4">Set or rotate your personal login password for fast access without SMS OTP verification.</p>
+
+                <form onSubmit={handleUpdatePassword} className="max-w-md space-y-4 p-5 bg-[var(--color-glass)] rounded-xl border border-[var(--color-border)]">
+                  {passwordError && (
+                    <div className="text-xs bg-red-50 text-red-700 p-2 rounded border border-red-200">{passwordError}</div>
+                  )}
+                  <div>
+                    <label className="text-xs font-bold text-[var(--color-text-primary)] uppercase tracking-wider block mb-1">New Password</label>
+                    <div className="relative">
+                      <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="password"
+                        placeholder="Enter at least 6 characters"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full pl-9 pr-4 py-2 rounded-lg border border-[var(--color-border)] bg-white text-gray-800 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isUpdatingPassword || !newPassword}
+                    className="w-full bg-[#1B2A4A] hover:bg-[#253963] text-white py-2 rounded-lg font-bold text-sm transition-all disabled:opacity-50 shadow-md flex justify-center items-center gap-2"
+                  >
+                    {isUpdatingPassword ? 'Updating...' : 'Save New Password'}
+                  </button>
+                </form>
               </div>
             </div>
           )}
@@ -182,34 +242,44 @@ export default function SettingsDashboard() {
           {activeTab === 'theme' && (
             <div className="space-y-6 animate-in fade-in duration-300">
               <div>
-                <h2 className="text-xl font-bold text-ink-primary">Branding & Theme</h2>
-                <p className="text-gray-500 text-sm mt-1">Customize how the ERP and Mobile App look.</p>
+                <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Branding & Theme</h2>
+                <p className="text-[var(--color-text-secondary)] text-sm mt-1">Customize how the ERP and Mobile App look.</p>
               </div>
-              <hr className="border-gray-100" />
+              <hr className="border-[var(--color-border)]" />
               
               <div className="grid grid-cols-2 gap-8">
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 block mb-2">Primary Color</label>
+                  <label className="text-sm font-semibold text-[var(--color-text-primary)] block mb-2">Primary Color</label>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#4F46E5] shadow-inner border border-gray-200"></div>
-                    <input type="text" defaultValue="#4F46E5" className="border border-gray-300 rounded-lg p-2.5 w-full font-mono text-gray-600" />
+                    <div className="w-12 h-12 rounded-full bg-[#1B2A4A] shadow-inner border border-[var(--color-border)]"></div>
+                    <input type="text" defaultValue="#1B2A4A" className="border border-[var(--color-border)] rounded-lg p-2.5 w-full font-mono text-[var(--color-text-secondary)]" />
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 block mb-2">Secondary Color</label>
+                  <label className="text-sm font-semibold text-[var(--color-text-primary)] block mb-2">Secondary Color</label>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#7C3AED] shadow-inner border border-gray-200"></div>
-                    <input type="text" defaultValue="#7C3AED" className="border border-gray-300 rounded-lg p-2.5 w-full font-mono text-gray-600" />
+                    <div className="w-12 h-12 rounded-full bg-[#D4AF37] shadow-inner border border-[var(--color-border)]"></div>
+                    <input type="text" defaultValue="#D4AF37" className="border border-[var(--color-border)] rounded-lg p-2.5 w-full font-mono text-[var(--color-text-secondary)]" />
                   </div>
                 </div>
               </div>
 
               <div className="mt-6">
-                <label className="text-sm font-semibold text-gray-700 block mb-2">School Logo</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer">
-                  <Palette size={32} className="mb-2 text-gray-400" />
-                  <p className="font-medium text-ink-primary">Click to upload or drag and drop</p>
+                <label className="text-sm font-semibold text-[var(--color-text-primary)] block mb-2">School Logo</label>
+                <div className="border-2 border-dashed border-[var(--color-border)] rounded-xl p-8 flex flex-col items-center justify-center bg-[var(--color-glass)] text-[var(--color-text-secondary)] hover:bg-[var(--color-glass-2)] transition-colors cursor-pointer">
+                  <Palette size={32} className="mb-2 text-[var(--color-text-tertiary)]" />
+                  <p className="font-medium text-[var(--color-text-primary)]">Click to upload or drag and drop</p>
                   <p className="text-sm">SVG, PNG, JPG (max 2MB)</p>
+                </div>
+              </div>
+
+              <div className="mt-8 border-t border-[var(--color-border)] pt-8">
+                <h3 className="text-lg font-bold text-[var(--color-text-primary)] mb-4">Appearance</h3>
+                <div className="flex items-center justify-between p-4 bg-[var(--color-glass)] rounded-xl border border-[var(--color-border)]">
+                  <div>
+                    <p className="font-semibold text-[var(--color-text-primary)]">Dark Mode</p>
+                    <p className="text-sm text-[var(--color-text-secondary)]">Switch between light and dark aesthetics.</p>
+                  </div>
                 </div>
               </div>
             </div>

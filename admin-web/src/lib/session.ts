@@ -34,7 +34,7 @@ export function normalizeRole(role?: string): ClientRole {
   const normalized = (role || 'parent').toLowerCase() as ClientRole;
   if (normalized === 'super_admin') return 'admin';
   if (normalized === 'vice_principal') return 'principal';
-  if (['accountant', 'librarian', 'nurse', 'driver', 'warden'].includes(normalized)) return 'staff';
+  if (['accountant', 'librarian', 'nurse', 'warden'].includes(normalized)) return 'staff';
   return normalized;
 }
 
@@ -75,6 +75,7 @@ export function readUserSession(): ClientUser | null {
 export function clearUserSession() {
   if (typeof window === 'undefined') return;
   localStorage.removeItem('token');
+  localStorage.removeItem('AUTH_TOKEN');
   localStorage.removeItem('user');
   localStorage.removeItem('DEV_BYPASS_TOKEN');
   localStorage.removeItem('mfa_token');

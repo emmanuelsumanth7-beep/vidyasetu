@@ -5,6 +5,8 @@ import { api } from '@/lib/api';
 import { useSocket } from '@/components/SocketProvider';
 import { Bell, Plus, X, AlertCircle, CheckCircle, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { sendNotification } from '@/lib/notifications';
+import { readUserSession } from '@/lib/session';
 
 interface Notice {
   id: string;
@@ -79,6 +81,20 @@ export default function NoticesDashboard() {
       setBody('');
       setAudience('all');
       setToastMessage('Notice published successfully.');
+      
+      const user = readUserSession();
+      if (user?.schoolId) {
+        sendNotification({
+          type: 'notice_published',
+          title: 'New Notice',
+          body: title,
+          metadata: { audience },
+          createdBy: user.name || 'Admin',
+          schoolId: user.schoolId,
+          targetAudience: audience as any || 'all',
+        }).catch(console.error);
+      }
+
       setTimeout(() => setToastMessage(''), 4000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Publish failed';

@@ -1,21 +1,12 @@
 import type { Metadata, Viewport } from 'next';
-import { Outfit, Space_Mono } from 'next/font/google';
+
 import './globals.css';
+import './login.css';
+import { AppBackground } from '@/components/AppBackground';
 import { LanguageProvider } from '@/lib/LanguageContext';
 import ThemeProvider from '@/components/ThemeProvider';
-
-const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-outfit',
-  display: 'swap',
-});
-
-const spaceMono = Space_Mono({
-  weight: ['400', '700'],
-  subsets: ['latin'],
-  variable: '--font-space-mono',
-  display: 'swap',
-});
+import { ThemeProvider as NextThemeProvider } from 'next-themes';
+import { SchoolConfig } from '@/config/school.config';
 
 export const metadata: Metadata = {
   title: 'Vidya Setu Workspace',
@@ -36,26 +27,40 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${spaceMono.variable}`}>
-      <body className="antialiased overflow-x-hidden w-full">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+      </head>
+      <body className="antialiased overflow-x-hidden w-full font-outfit">
         <LanguageProvider>
-          {/* Unregister any stale service workers */}
-          <script dangerouslySetInnerHTML={{ __html: `
-            if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for (var r of registrations) r.unregister();
-              });
+          {/* Inject dynamic white-label theme */}
+          <style dangerouslySetInnerHTML={{ __html: `
+            :root {
+              --vs-primary: ${SchoolConfig.theme.primaryLight};
+              --vs-secondary: ${SchoolConfig.theme.secondaryLight};
+              --vs-accent: #FF9500;
+              --color-primary-rgb: 0, 122, 255;
+            }
+            .dark {
+              --vs-primary: ${SchoolConfig.theme.primaryDark};
+              --vs-secondary: ${SchoolConfig.theme.secondaryDark};
             }
           `}} />
+
           {/*
             ThemeProvider runs the theme init sequence on the client:
               1. Immediately applies any cached school theme (zero-flash).
               2. Background-refreshes if the cache is stale.
               3. Redirects to /school-setup on first launch (no code stored).
           */}
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
+          <NextThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ThemeProvider>
+              <AppBackground />
+              {children}
+            </ThemeProvider>
+          </NextThemeProvider>
         </LanguageProvider>
       </body>
     </html>

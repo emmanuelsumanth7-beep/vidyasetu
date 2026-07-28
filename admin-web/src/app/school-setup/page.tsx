@@ -92,7 +92,7 @@ export default function SchoolSetupPage() {
         aria-hidden="true"
         style={{
           background:
-            'radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,122,255,0.25) 0%, transparent 60%), ' +
+            'radial-gradient(ellipse 80% 50% at 20% 10%, rgba(27,42,74,0.25) 0%, transparent 60%), ' +
             'radial-gradient(ellipse 60% 40% at 80% 90%, rgba(175,82,222,0.22) 0%, transparent 55%)',
         }}
       />
@@ -110,8 +110,8 @@ export default function SchoolSetupPage() {
             style={{
               background: status === 'success'
                 ? `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`
-                : 'linear-gradient(135deg,#007AFF,#5856D6)',
-              boxShadow: '0 10px 30px rgba(0,122,255,0.35)',
+                : 'linear-gradient(135deg,#1B2A4A,#C49B2A)',
+              boxShadow: '0 10px 30px rgba(27,42,74,0.35)',
             }}
           >
             {status === 'success'

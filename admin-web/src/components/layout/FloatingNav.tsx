@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Shield, LogOut, Phone, Mail, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { SchoolConfig } from '@/config/school.config';
 interface FloatingNavProps {
   navItems: { name: string; href: string; icon: any }[];
   user: { name: string; role: string; phoneNumber?: string; email?: string };
@@ -29,10 +29,14 @@ export function FloatingNav({ navItems, user, onSignOut }: FloatingNavProps) {
     >
       {/* Brand logo */}
       <div
-        className="w-11 h-11 mb-7 rounded-2xl flex items-center justify-center text-white shrink-0"
-        style={{ background: 'linear-gradient(135deg,#007AFF,#5856D6)', boxShadow: '0 6px 20px rgba(0,122,255,0.35)' }}
+        className="w-11 h-11 mb-7 rounded-2xl flex items-center justify-center text-white shrink-0 overflow-hidden"
+        style={{ background: SchoolConfig.logoPath ? 'transparent' : 'linear-gradient(135deg,#1B2A4A,#C49B2A)', boxShadow: SchoolConfig.logoPath ? 'none' : '0 6px 20px rgba(27,42,74,0.35)' }}
       >
-        <BookOpen size={19} />
+        {SchoolConfig.logoPath ? (
+          <img src={SchoolConfig.logoPath} alt="Logo" className="w-8 h-8 object-contain" />
+        ) : (
+          <BookOpen size={19} />
+        )}
       </div>
 
       {/* Nav items */}
@@ -47,17 +51,17 @@ export function FloatingNav({ navItems, user, onSignOut }: FloatingNavProps) {
                   layoutId="glass-nav-active"
                   className="absolute inset-0 rounded-xl -z-10"
                   style={{
-                    background: 'rgba(0,122,255,0.12)',
-                    border: '1px solid rgba(0,122,255,0.22)',
+                    background: 'rgba(27,42,74,0.12)',
+                    border: '1px solid rgba(27,42,74,0.22)',
                   }}
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
               <div
                 className="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200"
-                style={{ color: isActive ? '#007AFF' : '#AEAEB2' }}
-                onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLDivElement).style.color = '#6C7278'; }}
-                onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLDivElement).style.color = '#AEAEB2'; }}
+                style={{ color: isActive ? 'var(--nav-icon-active)' : 'var(--nav-icon-inactive)' }}
+                onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLDivElement).style.color = 'var(--nav-icon-active)'; }}
+                onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLDivElement).style.color = 'var(--nav-icon-inactive)'; }}
               >
                 <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
               </div>
@@ -91,10 +95,10 @@ export function FloatingNav({ navItems, user, onSignOut }: FloatingNavProps) {
           onClick={() => setShowProfile(!showProfile)}
           className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-white transition-all"
           style={{
-            background: showProfile ? 'linear-gradient(135deg,#007AFF,#5856D6)' : 'rgba(0,122,255,0.10)',
-            border: '1px solid rgba(0,122,255,0.20)',
-            color: showProfile ? '#fff' : '#007AFF',
-            boxShadow: showProfile ? '0 6px 20px rgba(0,122,255,0.30)' : 'none',
+            background: showProfile ? 'linear-gradient(135deg,#1B2A4A,#C49B2A)' : 'rgba(27,42,74,0.10)',
+            border: '1px solid rgba(27,42,74,0.20)',
+            color: showProfile ? '#fff' : '#1B2A4A',
+            boxShadow: showProfile ? '0 6px 20px rgba(27,42,74,0.30)' : 'none',
           }}
         >
           {user.name.charAt(0)}
@@ -118,13 +122,13 @@ export function FloatingNav({ navItems, user, onSignOut }: FloatingNavProps) {
             >
               <div className="flex items-center gap-3 pb-3" style={{ borderBottom: '1px solid rgba(60,60,67,0.08)' }}>
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-black text-lg shrink-0"
-                  style={{ background: 'linear-gradient(135deg,#007AFF,#5856D6)', boxShadow: '0 4px 14px rgba(0,122,255,0.30)' }}>
+                  style={{ background: 'linear-gradient(135deg,#1B2A4A,#C49B2A)', boxShadow: '0 4px 14px rgba(27,42,74,0.30)' }}>
                   {user.name.charAt(0)}
                 </div>
                 <div className="overflow-hidden">
                   <p className="font-bold text-sm truncate" style={{ color: '#1C1C1E' }}>{user.name}</p>
                   <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full mt-0.5 inline-block"
-                    style={{ background: 'rgba(0,122,255,0.10)', color: '#007AFF', border: '1px solid rgba(0,122,255,0.18)' }}>
+                    style={{ background: 'rgba(27,42,74,0.10)', color: '#1B2A4A', border: '1px solid rgba(27,42,74,0.18)' }}>
                     {user.role}
                   </span>
                 </div>
@@ -153,7 +157,7 @@ export function FloatingNav({ navItems, user, onSignOut }: FloatingNavProps) {
           onClick={onSignOut}
           title="Sign Out"
           className="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200"
-          style={{ color: '#AEAEB2', border: '1px solid transparent' }}
+          style={{ color: 'var(--nav-icon-inactive)', border: '1px solid transparent' }}
           onMouseEnter={e => {
             const el = e.currentTarget as HTMLButtonElement;
             el.style.color = '#FF3B30';
@@ -162,7 +166,7 @@ export function FloatingNav({ navItems, user, onSignOut }: FloatingNavProps) {
           }}
           onMouseLeave={e => {
             const el = e.currentTarget as HTMLButtonElement;
-            el.style.color = '#AEAEB2';
+            el.style.color = 'var(--nav-icon-inactive)';
             el.style.background = 'transparent';
             el.style.borderColor = 'transparent';
           }}

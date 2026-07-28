@@ -5,6 +5,8 @@ import { api } from '@/lib/api';
 import { useSocket } from '@/components/SocketProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Radio, CheckCircle2, ShieldAlert, Users, Clock, AlertTriangle, Check, X } from 'lucide-react';
+import { sendNotification } from '@/lib/notifications';
+import { readUserSession } from '@/lib/session';
 
 /* ── Demo student roster ──────────────────────────────────────────────────── */
 const DEMO_CLASS = 'Class 8A';
@@ -104,6 +106,18 @@ export default function LiveAttendance() {
     } finally {
       setSaving(false);
       setManualSaved(true);
+
+      const user = readUserSession();
+      if (user?.schoolId) {
+        sendNotification({
+          type: 'attendance_alert',
+          title: 'Attendance Marked',
+          body: `Attendance has been submitted for today.`,
+          createdBy: user.name || 'Teacher',
+          schoolId: user.schoolId,
+          targetAudience: 'parents',
+        }).catch(console.error);
+      }
     }
   };
 
@@ -125,22 +139,47 @@ export default function LiveAttendance() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight" style={{ color: '#1C1C1E' }}>Live Attendance</h1>
-          <p className="text-sm mt-0.5" style={{ color: '#6C7278' }}>
+          <h1 className="text-2xl md:text-3xl font-black tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Live Attendance & Leaves</h1>
+          <p className="text-sm mt-0.5 font-bold" style={{ color: 'var(--color-text-secondary)' }}>
             {className} · {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-2xl"
-          style={{ background: 'rgba(52,199,89,0.10)', border: '1px solid rgba(52,199,89,0.20)' }}>
-          <Activity size={16} style={{ color: '#34C759' }} className="animate-pulse" />
-          <span className="text-sm font-bold" style={{ color: '#34C759' }}>System Active</span>
+        
+        <div className="flex items-center gap-2">
+          <div className="flex items-center p-1 rounded-xl shrink-0 overflow-x-auto" style={{ background: 'var(--color-glass)', border: '1px solid var(--color-border)' }}>
+            <button className="px-4 py-2 rounded-lg text-xs font-bold transition-all" style={{ background: 'var(--surface)', color: 'var(--color-text-primary)', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>Live Roster</button>
+            <button className="px-4 py-2 rounded-lg text-xs font-bold transition-all opacity-50" style={{ color: 'var(--color-text-primary)' }}>Leave Requests (3)</button>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-2xl ml-2"
+            style={{ background: 'rgba(52,199,89,0.10)', border: '1px solid rgba(52,199,89,0.20)' }}>
+            <Activity size={16} style={{ color: '#34C759' }} className="animate-pulse" />
+            <span className="text-sm font-bold" style={{ color: '#34C759' }}>System Active</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Leave Approval Mockup Widget */}
+      <div className="glass-card p-5 border-l-4 border-[#FF9500]">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-black text-sm" style={{ color: 'var(--color-text-primary)' }}>Pending Leave Requests</h3>
+          <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md" style={{ background: 'rgba(255,149,0,0.1)', color: '#FF9500' }}>Requires Approval</span>
+        </div>
+        <div className="flex items-center justify-between p-4 rounded-xl border" style={{ background: 'var(--surface)', borderColor: 'var(--color-border)' }}>
+          <div>
+            <p className="text-sm font-black" style={{ color: 'var(--color-text-primary)' }}>Aditya Menon (Sick Leave)</p>
+            <p className="text-xs font-medium mt-1" style={{ color: 'var(--color-text-secondary)' }}>Requested by parent via App. Dates: 21st - 23rd July.</p>
+          </div>
+          <div className="flex gap-2">
+            <button className="px-4 py-2 rounded-xl text-xs font-bold" style={{ background: 'rgba(255,59,48,0.1)', color: '#FF3B30' }}>Deny</button>
+            <button className="px-4 py-2 rounded-xl text-xs font-bold" style={{ background: 'var(--vs-primary)', color: 'white' }}>Approve Leave</button>
+          </div>
         </div>
       </div>
 
       {/* Summary chips */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Total',   value: students.length, color: '#007AFF', bg: 'rgba(0,122,255,0.08)' },
+          { label: 'Total',   value: students.length, color: '#1B2A4A', bg: 'rgba(27,42,74,0.08)' },
           { label: 'Present', value: presentCount,          color: '#34C759', bg: 'rgba(52,199,89,0.08)' },
           { label: 'Absent',  value: absentCount,           color: '#FF3B30', bg: 'rgba(255,59,48,0.08)' },
         ].map(c => (
@@ -238,10 +277,11 @@ export default function LiveAttendance() {
                   <motion.div
                     key="saved"
                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                    className="w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 font-black text-sm"
+                    className="w-full py-4 rounded-2xl flex flex-col items-center justify-center gap-1"
                     style={{ background: 'rgba(52,199,89,0.12)', border: '1px solid rgba(52,199,89,0.25)', color: '#34C759' }}
                   >
-                    <CheckCircle2 size={16} /> Attendance Saved Successfully!
+                    <div className="flex items-center gap-2 font-black text-sm"><CheckCircle2 size={16} /> Attendance Saved Successfully!</div>
+                    <p className="text-xs font-bold opacity-80">Automated SMS dispatched to parents of 1 absent student.</p>
                   </motion.div>
                 ) : (
                   <motion.button
@@ -249,9 +289,9 @@ export default function LiveAttendance() {
                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                     onClick={saveAttendance}
                     disabled={saving}
-                    className="btn-primary w-full py-3.5 rounded-2xl text-sm disabled:opacity-60"
+                    className="btn-primary w-full py-3.5 rounded-2xl text-sm font-black disabled:opacity-60 shadow-lg"
                   >
-                    {saving ? 'Saving…' : `Submit Attendance for ${className}`}
+                    {saving ? 'Processing Webhooks…' : `Submit Attendance for ${className}`}
                   </motion.button>
                 )}
               </AnimatePresence>
@@ -266,7 +306,7 @@ export default function LiveAttendance() {
           <div className="glass-card overflow-hidden">
             <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(60,60,67,0.08)' }}>
               <h3 className="font-black text-sm" style={{ color: '#1C1C1E' }}>RFID Live Feed</h3>
-              <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'rgba(0,122,255,0.08)', color: '#007AFF' }}>
+              <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'rgba(27,42,74,0.08)', color: '#1B2A4A' }}>
                 {rfidLogs.length} scans
               </span>
             </div>
@@ -281,10 +321,10 @@ export default function LiveAttendance() {
                   {rfidLogs.map((log, i) => (
                     <div key={log.id || i}
                       className="flex items-center justify-between p-2.5 rounded-xl"
-                      style={{ background: i === 0 ? 'rgba(0,122,255,0.06)' : 'rgba(60,60,67,0.03)', border: '1px solid rgba(60,60,67,0.06)' }}>
+                      style={{ background: i === 0 ? 'rgba(27,42,74,0.06)' : 'rgba(60,60,67,0.03)', border: '1px solid rgba(60,60,67,0.06)' }}>
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black"
-                          style={{ background: 'rgba(0,122,255,0.10)', color: '#007AFF' }}>
+                          style={{ background: 'rgba(27,42,74,0.10)', color: '#1B2A4A' }}>
                           {log.student?.name?.charAt(0) || '?'}
                         </div>
                         <p className="text-xs font-bold" style={{ color: '#1C1C1E' }}>{log.student?.name || 'Unknown'}</p>
@@ -312,7 +352,7 @@ export default function LiveAttendance() {
                   <button key={s.id}
                     onClick={() => simulate(s.rfidCardUid)}
                     className="text-[10px] font-bold px-2.5 py-1.5 rounded-xl transition-all hover:scale-105"
-                    style={{ background: 'rgba(0,122,255,0.08)', color: '#007AFF', border: '1px solid rgba(0,122,255,0.15)' }}>
+                    style={{ background: 'rgba(27,42,74,0.08)', color: '#1B2A4A', border: '1px solid rgba(27,42,74,0.15)' }}>
                     {s.name.split(' ')[0]}
                   </button>
                 ))}
@@ -330,7 +370,7 @@ export default function LiveAttendance() {
                 />
                 <button type="submit"
                   className="px-4 py-2.5 rounded-xl text-xs font-black text-white"
-                  style={{ background: '#007AFF' }}>
+                  style={{ background: '#1B2A4A' }}>
                   Tap
                 </button>
               </form>

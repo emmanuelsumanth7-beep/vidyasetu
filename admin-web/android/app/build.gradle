@@ -18,10 +18,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile     file("../../../android/vidyasetu-upload.jks")
-            storePassword "VidyaSetu2025!"
-            keyAlias      "vidyasetu-upload-key"
-            keyPassword   "VidyaSetu2025!"
+            storeFile     file("release.keystore")
+            storePassword "android"
+            keyAlias      "vidyasetu"
+            keyPassword   "android"
         }
     }
     buildTypes {

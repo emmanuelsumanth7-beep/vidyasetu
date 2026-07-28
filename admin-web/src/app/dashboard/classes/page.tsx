@@ -16,7 +16,7 @@ const SUBJECT_COLORS = [
 ];
 
 function getSubjectColor(subject: string) {
-  if (!subject) return 'bg-gray-50 border-gray-200 text-gray-500';
+  if (!subject) return 'bg-black/5 dark:bg-white/5 border-[var(--color-border)] text-gray-500';
   let hash = 0;
   for (let i = 0; i < subject.length; i++) {
     hash = subject.charCodeAt(i) + ((hash << 5) - hash);
@@ -179,13 +179,13 @@ export default function ClassesTimetablePage() {
   // Component for rendering a single period block (used in both mobile and desktop)
   const PeriodBlock = ({ day, period }: { day: string, period: number }) => {
     const entry = getEntry(day, period);
-    const colorClass = entry ? getSubjectColor(entry.subject) : 'bg-transparent border-dashed border-gray-200 text-gray-400';
+    const colorClass = entry ? getSubjectColor(entry.subject) : 'bg-transparent border-dashed border-[var(--color-border)] text-gray-400';
     
     return (
       <motion.div
         whileHover={isEditing ? { scale: 0.98 } : {}}
         onClick={() => handleCellClick(day, period, entry)}
-        className={`h-full w-full rounded-xl border-2 flex flex-col justify-center p-3 transition-all ${isEditing ? 'cursor-pointer hover:border-interactive-blue shadow-sm' : ''} ${colorClass} ${!entry && isEditing ? 'hover:bg-blue-50/50 hover:text-interactive-blue hover:border-interactive-blue' : ''}`}
+        className={`h-full w-full rounded-xl border-2 flex flex-col justify-center p-3 transition-all ${isEditing ? 'cursor-pointer hover:border-blue-600 shadow-sm' : ''} ${colorClass} ${!entry && isEditing ? 'hover:bg-blue-50/50 hover:text-blue-600 hover:border-blue-600' : ''}`}
       >
         {entry ? (
           <>
@@ -212,13 +212,13 @@ export default function ClassesTimetablePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-ink-primary font-display tracking-tight">Class Timetables</h1>
-          <p className="text-ink-secondary mt-1">Manage weekly schedules with dynamic color mapping.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] font-display tracking-tight">Class Timetables</h1>
+          <p className="text-[var(--color-text-secondary)] mt-1">Manage weekly schedules with dynamic color mapping.</p>
         </div>
         {isAdmin && (
           <button 
             onClick={() => setIsEditing(!isEditing)}
-            className={`px-5 py-2.5 rounded-lg font-bold transition-all flex items-center justify-center gap-2 shadow-sm ${isEditing ? 'bg-ink-primary text-white scale-105' : 'bg-white border-2 border-gray-200 text-ink-primary hover:border-gray-300'}`}
+            className={`px-5 py-2.5 rounded-lg font-bold transition-all flex items-center justify-center gap-2 shadow-sm ${isEditing ? 'bg-ink-primary text-white scale-105' : 'glass-card border-2 border-[var(--color-border)] text-[var(--color-text-primary)] hover:border-gray-300'}`}
           >
             {isEditing ? <X size={18} /> : <Edit2 size={18} />}
             <span>{isEditing ? 'Exit Edit Mode' : 'Edit Timetable'}</span>
@@ -230,10 +230,10 @@ export default function ClassesTimetablePage() {
         
         {/* Sidebar: Class List */}
         <div className="w-full lg:w-72 shrink-0 sticky top-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-            <div className="p-5 border-b border-gray-100 bg-gray-50/50 space-y-4">
-              <h3 className="font-bold text-ink-primary flex items-center gap-2 text-sm uppercase tracking-wider">
-                <Users size={16} className="text-interactive-blue" />
+          <div className="glass-card rounded-2xl shadow-sm border border-[var(--color-border)] overflow-hidden flex flex-col">
+            <div className="p-5 border-b border-[var(--color-border)] bg-black/5 dark:bg-white/5/50 space-y-4">
+              <h3 className="font-bold text-[var(--color-text-primary)] flex items-center gap-2 text-sm uppercase tracking-wider">
+                <Users size={16} className="text-blue-600" />
                 Select Class
               </h3>
               <div className="relative">
@@ -243,13 +243,13 @@ export default function ClassesTimetablePage() {
                   placeholder="Search classes..."
                   value={classSearchQuery}
                   onChange={e => setClassSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-interactive-blue transition-colors"
+                  className="w-full pl-9 pr-4 py-2 glass-card border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:border-blue-600 transition-colors"
                 />
               </div>
             </div>
             <div className="p-2 max-h-[600px] overflow-y-auto">
               {filteredClasses.length === 0 && !loading ? (
-                <div className="p-8 text-center text-sm text-ink-secondary flex flex-col items-center gap-2">
+                <div className="p-8 text-center text-sm text-[var(--color-text-secondary)] flex flex-col items-center gap-2">
                   <Search size={24} className="opacity-20" />
                   <p>No classes match your search.</p>
                 </div>
@@ -259,7 +259,7 @@ export default function ClassesTimetablePage() {
                     <button
                       key={c.id}
                       onClick={() => handleClassSelect(c.id)}
-                      className={`w-full text-left px-4 py-3.5 rounded-xl font-medium transition-all flex items-center justify-between group ${selectedClassId === c.id ? 'bg-interactive-blue text-white shadow-md' : 'hover:bg-gray-50 border border-transparent hover:border-gray-100 text-ink-primary'}`}
+                      className={`w-full text-left px-4 py-3.5 rounded-xl font-medium transition-all flex items-center justify-between group ${selectedClassId === c.id ? 'bg-blue-600 text-white shadow-md' : 'hover:bg-black/5 dark:bg-white/5 border border-transparent hover:border-[var(--color-border)] text-[var(--color-text-primary)]'}`}
                     >
                       <span className="font-display font-semibold tracking-tight">{c.name}</span>
                       <ChevronRight size={16} className={selectedClassId === c.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-40 transition-opacity'} />
@@ -272,7 +272,7 @@ export default function ClassesTimetablePage() {
         </div>
 
         {/* Main Content: Timetable Grid & Mobile Day View */}
-        <div className="flex-1 w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
+        <div className="flex-1 w-full glass-card rounded-2xl shadow-sm border border-[var(--color-border)] overflow-hidden min-h-[600px] flex flex-col">
           
           {error && (
             <div className="m-5 bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl flex items-center gap-3">
@@ -282,17 +282,17 @@ export default function ClassesTimetablePage() {
           )}
 
           {activeClass && (
-            <div className="p-6 border-b border-gray-100 bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="p-6 border-b border-[var(--color-border)] bg-black/5 dark:bg-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-ink-primary font-display">{activeClass.name} Timetable</h2>
+                <h2 className="text-2xl font-bold text-[var(--color-text-primary)] font-display">{activeClass.name} Timetable</h2>
                 {isEditing && (
-                  <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-sm font-semibold text-interactive-blue mt-1">
+                  <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-sm font-semibold text-blue-600 mt-1">
                     Editing Mode Active — Click any cell to modify.
                   </motion.p>
                 )}
               </div>
               <div className="flex gap-3">
-                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-secondary bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
+                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] glass-card px-4 py-2 rounded-xl border border-[var(--color-border)] shadow-sm">
                   <Clock size={14} /> 6 Periods
                 </span>
               </div>
@@ -300,31 +300,31 @@ export default function ClassesTimetablePage() {
           )}
 
           {loading && timetable.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-12 text-ink-secondary">
-              <div className="w-12 h-12 border-4 border-interactive-blue/30 border-t-interactive-blue rounded-full animate-spin mb-4"></div>
+            <div className="flex-1 flex flex-col items-center justify-center p-12 text-[var(--color-text-secondary)]">
+              <div className="w-12 h-12 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin mb-4"></div>
               <p className="font-medium animate-pulse">Constructing schedule...</p>
             </div>
           ) : (
             <div className="flex-1 flex flex-col">
               
               {/* Mobile View: Day Tabs */}
-              <div className="md:hidden border-b border-gray-100 bg-white sticky top-0 z-10 flex overflow-x-auto snap-x hide-scrollbar">
+              <div className="md:hidden border-b border-[var(--color-border)] glass-card sticky top-0 z-10 flex overflow-x-auto snap-x hide-scrollbar">
                 {daysOfWeek.map(day => (
                   <button
                     key={day}
                     onClick={() => setSelectedDay(day)}
-                    className={`px-6 py-4 font-bold text-sm whitespace-nowrap snap-start transition-colors relative ${selectedDay === day ? 'text-interactive-blue' : 'text-ink-secondary hover:text-ink-primary'}`}
+                    className={`px-6 py-4 font-bold text-sm whitespace-nowrap snap-start transition-colors relative ${selectedDay === day ? 'text-blue-600' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`}
                   >
                     {day}
                     {selectedDay === day && (
-                      <motion.div layoutId="mobileTabIndicator" className="absolute bottom-0 left-0 right-0 h-1 bg-interactive-blue rounded-t-full" />
+                      <motion.div layoutId="mobileTabIndicator" className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />
                     )}
                   </button>
                 ))}
               </div>
 
               {/* Mobile View: Vertical Timeline */}
-              <div className="md:hidden p-4 space-y-3 bg-gray-50 flex-1 overflow-y-auto">
+              <div className="md:hidden p-4 space-y-3 bg-black/5 dark:bg-white/5 flex-1 overflow-y-auto">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={selectedDay}
@@ -336,9 +336,9 @@ export default function ClassesTimetablePage() {
                   >
                     {periods.map(p => (
                       <div key={p} className="flex gap-3 h-24">
-                        <div className="w-12 shrink-0 flex flex-col items-center justify-center border-r-2 border-dashed border-gray-200 pr-3">
-                          <span className="text-xs font-bold text-ink-secondary uppercase">Per</span>
-                          <span className="text-xl font-display font-bold text-ink-primary">{p}</span>
+                        <div className="w-12 shrink-0 flex flex-col items-center justify-center border-r-2 border-dashed border-[var(--color-border)] pr-3">
+                          <span className="text-xs font-bold text-[var(--color-text-secondary)] uppercase">Per</span>
+                          <span className="text-xl font-display font-bold text-[var(--color-text-primary)]">{p}</span>
                         </div>
                         <div className="flex-1">
                           <PeriodBlock day={selectedDay} period={p} />
@@ -356,7 +356,7 @@ export default function ClassesTimetablePage() {
                     <tr>
                       <th className="p-2 w-28"></th>
                       {periods.map(p => (
-                        <th key={p} className="p-3 text-center font-bold text-ink-secondary uppercase tracking-wider text-sm">
+                        <th key={p} className="p-3 text-center font-bold text-[var(--color-text-secondary)] uppercase tracking-wider text-sm">
                           Period {p}
                         </th>
                       ))}
@@ -370,11 +370,11 @@ export default function ClassesTimetablePage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.05 }}
                       >
-                        <td className="p-4 font-bold text-ink-secondary text-right align-middle text-sm uppercase tracking-wider border-r-2 border-gray-200 pr-6">
+                        <td className="p-4 font-bold text-[var(--color-text-secondary)] text-right align-middle text-sm uppercase tracking-wider border-r-2 border-[var(--color-border)] pr-6">
                           {day.substring(0, 3)}
                         </td>
                         {periods.map(p => (
-                          <td key={`${day}-${p}`} className="p-0 h-[120px] align-top bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+                          <td key={`${day}-${p}`} className="p-0 h-[120px] align-top glass-card rounded-2xl shadow-sm border border-[var(--color-border)] overflow-hidden hover:shadow-md transition-shadow">
                             <PeriodBlock day={day} period={p} />
                           </td>
                         ))}
@@ -400,37 +400,37 @@ export default function ClassesTimetablePage() {
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative z-10"
+              className="glass-card rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative z-10"
             >
-              <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50 shrink-0">
+              <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)] bg-black/5 dark:bg-white/5 shrink-0">
                 <div>
-                  <h3 className="font-bold text-xl text-ink-primary font-display">
+                  <h3 className="font-bold text-xl text-[var(--color-text-primary)] font-display">
                     {activeCell.day}
                   </h3>
-                  <p className="text-sm font-medium text-interactive-blue uppercase tracking-wider mt-1">Period {activeCell.period}</p>
+                  <p className="text-sm font-medium text-blue-600 uppercase tracking-wider mt-1">Period {activeCell.period}</p>
                 </div>
-                <button onClick={() => setActiveCell(null)} className="p-2 -mr-2 text-gray-400 hover:text-gray-900 bg-white rounded-full border border-gray-200 transition-colors shadow-sm">
+                <button onClick={() => setActiveCell(null)} className="p-2 -mr-2 text-gray-400 hover:text-gray-900 glass-card rounded-full border border-[var(--color-border)] transition-colors shadow-sm">
                   <X size={20} />
                 </button>
               </div>
               
               <div className="p-6 space-y-5">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-ink-primary">Subject Name</label>
+                  <label className="text-sm font-bold text-[var(--color-text-primary)]">Subject Name</label>
                   <input 
                     type="text" 
                     value={editSubject}
                     onChange={e => setEditSubject(e.target.value)}
                     placeholder="e.g. Mathematics"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-interactive-blue transition-colors font-medium text-ink-primary"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-[var(--color-border)] focus:outline-none focus:border-blue-600 transition-colors font-medium text-[var(--color-text-primary)]"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-ink-primary">Assigned Teacher</label>
+                  <label className="text-sm font-bold text-[var(--color-text-primary)]">Assigned Teacher</label>
                   <select 
                     value={editTeacherId}
                     onChange={e => setEditTeacherId(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-interactive-blue transition-colors font-medium text-ink-primary bg-white appearance-none cursor-pointer"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-[var(--color-border)] focus:outline-none focus:border-blue-600 transition-colors font-medium text-[var(--color-text-primary)] glass-card appearance-none cursor-pointer"
                   >
                     <option value="">Select a teacher...</option>
                     {teachers.map(t => (
@@ -440,7 +440,7 @@ export default function ClassesTimetablePage() {
                 </div>
               </div>
 
-              <div className="p-6 border-t border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">
+              <div className="p-6 border-t border-[var(--color-border)] bg-black/5 dark:bg-white/5 flex items-center justify-between shrink-0">
                 {activeCell.entry ? (
                   <button 
                     onClick={handleDeleteEntry} 
@@ -454,14 +454,14 @@ export default function ClassesTimetablePage() {
                 <div className="flex gap-3">
                   <button 
                     onClick={() => setActiveCell(null)} 
-                    className="px-5 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors bg-white border-2 border-gray-200"
+                    className="px-5 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors glass-card border-2 border-[var(--color-border)]"
                   >
                     Cancel
                   </button>
                   <button 
                     onClick={handleSaveEntry} 
                     disabled={isSaving || !editSubject || !editTeacherId}
-                    className="bg-interactive-blue hover:bg-blue-700 disabled:opacity-50 text-white px-8 py-3 rounded-xl font-bold transition-transform shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                    className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-8 py-3 rounded-xl font-bold transition-transform shadow-md hover:-translate-y-0.5 active:translate-y-0"
                   >
                     {isSaving ? 'Saving...' : 'Save'}
                   </button>

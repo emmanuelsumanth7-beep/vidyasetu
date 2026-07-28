@@ -51,9 +51,9 @@ let memoryTokenExpiry: number = 0;
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}, isFormData: boolean = false) {
   // Try to get the latest Firebase ID Token
   let token: string | null = null;
-  // 1. Check for Developer Bypass Token
+  // 1. Check for Developer Bypass or JWT Password Auth Token
   if (typeof window !== 'undefined') {
-    token = localStorage.getItem('DEV_BYPASS_TOKEN');
+    token = localStorage.getItem('DEV_BYPASS_TOKEN') || localStorage.getItem('AUTH_TOKEN');
   }
   
   // 2. Fallback to real Firebase Auth Token

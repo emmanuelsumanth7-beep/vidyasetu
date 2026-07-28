@@ -73,8 +73,8 @@ export default function ExpensesDashboard() {
     <div className="max-w-[1200px] mx-auto w-full animate-fade-in pb-20">
       <header className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold font-display text-ink-primary tracking-tight">Accounts & Expenses</h1>
-          <p className="text-sm font-medium text-ink-secondary mt-1">
+          <h1 className="text-4xl font-bold font-display text-[var(--color-text-primary)] tracking-tight">Accounts & Expenses</h1>
+          <p className="text-sm font-medium text-[var(--color-text-secondary)] mt-1">
             Track school maintenance, events, and utility costs.
           </p>
         </div>
@@ -87,44 +87,44 @@ export default function ExpensesDashboard() {
       </header>
 
       {loading ? (
-        <div className="h-64 bg-white rounded-[24px] shadow-sm border border-gray-100 animate-pulse" />
+        <div className="h-64 glass-card rounded-[24px] shadow-sm border border-[var(--color-border)] animate-pulse" />
       ) : (
         <div className="flex flex-col gap-6">
-          <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm flex items-center gap-8">
+          <div className="glass-card rounded-[32px] p-8 border border-[var(--color-border)] shadow-sm flex items-center gap-8">
             <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
               <TrendingUp size={32} />
             </div>
             <div>
-              <p className="text-sm font-bold text-ink-secondary uppercase tracking-widest">Total Expenses (All Time)</p>
-              <h2 className="text-5xl font-black font-display text-ink-primary mt-1 tracking-tight">₹{totalExpenses.toLocaleString()}</h2>
+              <p className="text-sm font-bold text-[var(--color-text-secondary)] uppercase tracking-widest">Total Expenses (All Time)</p>
+              <h2 className="text-5xl font-black font-display text-[var(--color-text-primary)] mt-1 tracking-tight">₹{totalExpenses.toLocaleString()}</h2>
             </div>
           </div>
 
-          <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
+          <div className="glass-card rounded-[24px] border border-[var(--color-border)] shadow-sm overflow-hidden">
             {expenses.length === 0 ? (
-              <div className="p-12 text-center text-ink-secondary">No expenses recorded yet.</div>
+              <div className="p-12 text-center text-[var(--color-text-secondary)]">No expenses recorded yet.</div>
             ) : (
               <table className="w-full text-left">
-                <thead className="bg-gray-50/50 border-b border-gray-100">
+                <thead className="bg-black/5 dark:bg-white/5/50 border-b border-[var(--color-border)]">
                   <tr>
-                    <th className="p-4 text-xs font-bold text-ink-secondary uppercase tracking-wider">Date</th>
-                    <th className="p-4 text-xs font-bold text-ink-secondary uppercase tracking-wider">Details</th>
-                    <th className="p-4 text-xs font-bold text-ink-secondary uppercase tracking-wider">Category</th>
-                    <th className="p-4 text-xs font-bold text-ink-secondary uppercase tracking-wider text-right">Amount</th>
+                    <th className="p-4 text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Date</th>
+                    <th className="p-4 text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Details</th>
+                    <th className="p-4 text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Category</th>
+                    <th className="p-4 text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider text-right">Amount</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {expenses.map(exp => (
-                    <tr key={exp.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="p-4 text-sm font-medium text-ink-secondary">
+                    <tr key={exp.id} className="hover:bg-black/5 dark:bg-white/5 transition-colors">
+                      <td className="p-4 text-sm font-medium text-[var(--color-text-secondary)]">
                         {new Date(exp.date).toLocaleDateString()}
                       </td>
                       <td className="p-4">
-                        <p className="font-bold text-sm text-ink-primary">{exp.title}</p>
-                        <p className="text-xs text-ink-secondary">By {exp.recordedBy.name}</p>
+                        <p className="font-bold text-sm text-[var(--color-text-primary)]">{exp.title}</p>
+                        <p className="text-xs text-[var(--color-text-secondary)]">By {exp.recordedBy.name}</p>
                       </td>
                       <td className="p-4">
-                        <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-full">
+                        <span className="px-3 py-1 bg-black/10 dark:bg-white/10 text-gray-700 text-xs font-bold rounded-full">
                           {exp.category}
                         </span>
                       </td>
@@ -148,16 +148,16 @@ export default function ExpensesDashboard() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-[32px] w-full max-w-md shadow-2xl overflow-hidden flex flex-col"
+              className="glass-card rounded-[32px] w-full max-w-md shadow-2xl overflow-hidden flex flex-col"
             >
-              <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-emerald-50/50">
+              <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between bg-emerald-50/50">
                 <div>
-                  <h3 className="text-xl font-bold font-display text-ink-primary">Record Expense</h3>
-                  <p className="text-sm font-medium text-ink-secondary mt-1">Log a new school expense</p>
+                  <h3 className="text-xl font-bold font-display text-[var(--color-text-primary)]">Record Expense</h3>
+                  <p className="text-sm font-medium text-[var(--color-text-secondary)] mt-1">Log a new school expense</p>
                 </div>
                 <button 
                   onClick={() => setShowModal(false)}
-                  className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-200 text-ink-secondary hover:text-ink-primary hover:bg-gray-50 transition-colors"
+                  className="w-10 h-10 flex items-center justify-center rounded-full glass-card border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-black/5 dark:bg-white/5 transition-colors"
                 >
                   <X size={20} />
                 </button>
@@ -166,19 +166,19 @@ export default function ExpensesDashboard() {
               <form onSubmit={handleRecord} className="flex flex-col flex-1 overflow-hidden">
                 <div className="p-6 flex flex-col gap-5 overflow-y-auto">
                   <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-ink-secondary uppercase tracking-widest">Description / Title</label>
+                    <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-widest">Description / Title</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g., Plumbing Repair in Block A"
-                      className="w-full bg-canvas border-2 border-border-draft rounded-2xl px-5 py-3 text-sm font-medium text-ink-primary focus:outline-none focus:border-emerald-400 transition-colors"
+                      className="w-full bg-canvas border-2 border-border-draft rounded-2xl px-5 py-3 text-sm font-medium text-[var(--color-text-primary)] focus:outline-none focus:border-emerald-400 transition-colors"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                     />
                   </div>
                   
                   <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-ink-secondary uppercase tracking-widest">Amount (₹)</label>
+                    <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-widest">Amount (₹)</label>
                     <input
                       type="number"
                       required
@@ -190,9 +190,9 @@ export default function ExpensesDashboard() {
                   </div>
                   
                   <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-ink-secondary uppercase tracking-widest">Category</label>
+                    <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-widest">Category</label>
                     <select
-                      className="w-full bg-canvas border-2 border-border-draft rounded-2xl px-5 py-3 text-sm font-medium text-ink-primary focus:outline-none focus:border-emerald-400 transition-colors appearance-none"
+                      className="w-full bg-canvas border-2 border-border-draft rounded-2xl px-5 py-3 text-sm font-medium text-[var(--color-text-primary)] focus:outline-none focus:border-emerald-400 transition-colors appearance-none"
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
                     >
@@ -206,10 +206,10 @@ export default function ExpensesDashboard() {
                   </div>
                 </div>
                 
-                <div className="p-6 border-t border-gray-100 flex items-center justify-end gap-3 bg-gray-50/50 mt-auto">
+                <div className="p-6 border-t border-[var(--color-border)] flex items-center justify-end gap-3 bg-black/5 dark:bg-white/5/50 mt-auto">
                   <button 
                     type="button" 
-                    className="px-6 py-3 rounded-full text-sm font-bold text-ink-secondary hover:text-ink-primary hover:bg-gray-200 transition-colors"
+                    className="px-6 py-3 rounded-full text-sm font-bold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-gray-200 transition-colors"
                     onClick={() => setShowModal(false)}
                   >
                     Cancel

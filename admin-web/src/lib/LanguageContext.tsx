@@ -67,7 +67,30 @@ const TRANSLATIONS = {
     mod_documents: 'Document Approvals',
     mod_chat: 'Chat / Connect',
     mod_notifications: 'Send Notification',
-    mod_suggestions: 'Suggestions'
+    mod_suggestions: 'Suggestions',
+
+    // Navigation
+    nav_home: 'Home',
+    nav_attendance: 'Attendance',
+    nav_students: 'Students',
+    nav_staff: 'Staff',
+    nav_fees: 'Fees',
+    nav_payroll: 'Payroll',
+    nav_expenses: 'Expenses',
+    nav_staff_leaves: 'Leaves',
+    nav_classes: 'Classes',
+    nav_notices: 'Notices',
+    nav_transport: 'Transport',
+    nav_analytics: 'Analytics',
+    nav_settings: 'Settings',
+    nav_approvals: 'Approvals',
+    nav_homework: 'Homework',
+    nav_diary: 'Diary',
+    nav_grades: 'Grades',
+    nav_messages: 'Messages',
+    nav_timetable: 'Timetable',
+    nav_more: 'More',
+    nav_all_modules: 'All Modules',
   },
   kn: {
     // Login
@@ -125,7 +148,30 @@ const TRANSLATIONS = {
     mod_documents: 'ದಾಖಲೆಗಳ ಅನುಮೋದನೆ',
     mod_chat: 'ಚಾಟ್ / ಸಂಪರ್ಕ',
     mod_notifications: 'ಸೂಚನೆ ಕಳುಹಿಸಿ',
-    mod_suggestions: 'ಸಲಹೆಗಳು'
+    mod_suggestions: 'ಸಲಹೆಗಳು',
+
+    // Navigation (Simple and understandable Kannada)
+    nav_home: 'ಮುಖಪುಟ',
+    nav_attendance: 'ಹಾಜರಾತಿ',
+    nav_students: 'ವಿದ್ಯಾರ್ಥಿಗಳು',
+    nav_staff: 'ಸಿಬ್ಬಂದಿ',
+    nav_fees: 'ಶುಲ್ಕ',
+    nav_payroll: 'ಸಂಬಳ',
+    nav_expenses: 'ಖರ್ಚು',
+    nav_staff_leaves: 'ರಜೆ',
+    nav_classes: 'ತರಗತಿಗಳು',
+    nav_notices: 'ಸೂಚನೆಗಳು',
+    nav_transport: 'ವಾಹನ',
+    nav_analytics: 'ವರದಿಗಳು',
+    nav_settings: 'ಸೆಟ್ಟಿಂಗ್ಸ್',
+    nav_approvals: 'ಅನುಮೋದನೆ',
+    nav_homework: 'ಹೋಮ್‌ವರ್ಕ್',
+    nav_diary: 'ಡೈರಿ',
+    nav_grades: 'ಅಂಕಗಳು',
+    nav_messages: 'ಸಂದೇಶಗಳು',
+    nav_timetable: 'ವೇಳಾಪಟ್ಟಿ',
+    nav_more: 'ಹೆಚ್ಚು',
+    nav_all_modules: 'ಎಲ್ಲಾ ಮಾಡ್ಯೂಲ್‌ಗಳು',
   }
 };
 

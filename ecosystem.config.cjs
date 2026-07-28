@@ -33,7 +33,7 @@ module.exports = {
     {
       "name": "cloudflare-tunnel",
       "script": "cloudflared",
-      "args": "tunnel run vidyasetu",
+      "args": "tunnel --protocol http2 run vidyasetu",
       "cwd": "./",
       "interpreter": "none"
     }

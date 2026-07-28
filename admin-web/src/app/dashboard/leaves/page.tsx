@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Calendar, CheckCircle, XCircle, Clock, Check, X, Plus, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { sendNotification } from '@/lib/notifications';
+import { readUserSession } from '@/lib/session';
 
 interface Leave {
   id: string;
@@ -37,8 +39,9 @@ export default function LeavesDashboard() {
   const [formErr, setFormErr] = useState('');
 
   useEffect(() => {
-    const u = JSON.parse(localStorage.getItem('user') || '{}');
-    setUser(u);
+    const { readUserSession } = require('@/lib/session');
+    const u = readUserSession();
+    if (u) setUser(u);
     fetchData();
   }, []);
 
@@ -88,6 +91,19 @@ export default function LeavesDashboard() {
       const updated = await api.put(`/leaves/${id}`, { status });
       setLeaves(leaves.map(l => l.id === id ? updated : l));
       setToast(`Leave ${status} successfully!`);
+      
+      const user = readUserSession();
+      if (user?.schoolId) {
+        sendNotification({
+          type: 'leave_status',
+          title: `Leave ${status === 'approved' ? 'Approved' : 'Rejected'}`,
+          body: `Your leave request has been ${status} by the principal.`,
+          createdBy: user.name || 'Principal',
+          schoolId: user.schoolId,
+          targetAudience: 'staff',
+        }).catch(console.error);
+      }
+
       setTimeout(() => setToast(''), 4000);
     } catch (e) {
       console.error(e);
@@ -103,8 +119,8 @@ export default function LeavesDashboard() {
     <div className="max-w-[1200px] mx-auto w-full animate-fade-in pb-20">
       <header className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold font-display text-ink-primary tracking-tight">Staff Leaves</h1>
-          <p className="text-sm font-medium text-ink-secondary mt-1">
+          <h1 className="text-4xl font-bold font-display text-[var(--color-text-primary)] tracking-tight">Staff Leaves</h1>
+          <p className="text-sm font-medium text-[var(--color-text-secondary)] mt-1">
             {isPrincipal ? 'Review and approve staff leave requests.' : 'Apply for leave and track your requests.'}
           </p>
         </div>
@@ -122,10 +138,10 @@ export default function LeavesDashboard() {
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
             style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
             <motion.div initial={{ opacity:0, y:40 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:40 }}
-              className="w-full max-w-md rounded-3xl overflow-hidden bg-white">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              className="w-full max-w-md rounded-3xl overflow-hidden glass-card">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border)]">
                 <h3 className="font-black text-gray-900">Apply for Leave</h3>
-                <button onClick={() => setShowForm(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                <button onClick={() => setShowForm(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-black/10 dark:bg-white/10">
                   <X size={16} className="text-gray-500" />
                 </button>
               </div>
@@ -135,24 +151,24 @@ export default function LeavesDashboard() {
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Reason</label>
                   <textarea value={reason} onChange={e => setReason(e.target.value)} rows={3} required
                     placeholder="Briefly describe your reason..."
-                    className="w-full px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none resize-none bg-gray-50 border border-gray-200 text-gray-800" />
+                    className="w-full px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none resize-none bg-black/5 dark:bg-white/5 border border-[var(--color-border)] text-gray-800" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">From</label>
                     <input type="date" value={startDate} onChange={e => setStart(e.target.value)} required
-                      className="w-full px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none bg-gray-50 border border-gray-200 text-gray-800" />
+                      className="w-full px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none bg-black/5 dark:bg-white/5 border border-[var(--color-border)] text-gray-800" />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">To</label>
                     <input type="date" value={endDate} onChange={e => setEnd(e.target.value)} required
-                      className="w-full px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none bg-gray-50 border border-gray-200 text-gray-800" />
+                      className="w-full px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none bg-black/5 dark:bg-white/5 border border-[var(--color-border)] text-gray-800" />
                   </div>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Leave Type</label>
                   <select value={leaveType} onChange={e => setType(e.target.value)}
-                    className="w-full px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none appearance-none bg-gray-50 border border-gray-200 text-gray-800">
+                    className="w-full px-4 py-3 rounded-2xl text-sm font-medium focus:outline-none appearance-none bg-black/5 dark:bg-white/5 border border-[var(--color-border)] text-gray-800">
                     <option value="CASUAL">Casual Leave</option>
                     <option value="SICK">Sick Leave</option>
                     <option value="EARNED">Earned Leave</option>
@@ -163,7 +179,7 @@ export default function LeavesDashboard() {
                 </div>
                 <div className="flex gap-3 pt-2">
                   <button type="button" onClick={() => setShowForm(false)}
-                    className="flex-1 py-3 rounded-2xl text-sm font-bold bg-gray-100 text-gray-600">Cancel</button>
+                    className="flex-1 py-3 rounded-2xl text-sm font-bold bg-black/10 dark:bg-white/10 text-gray-600">Cancel</button>
                   <button type="submit" disabled={applying}
                     className="flex-1 py-3 rounded-2xl text-sm font-black text-white bg-indigo-600 disabled:opacity-60">
                     {applying ? 'Submitting...' : 'Submit'}
@@ -176,28 +192,28 @@ export default function LeavesDashboard() {
       </AnimatePresence>
 
       {loading ? (
-        <div className="h-64 bg-white rounded-[24px] shadow-sm border border-gray-100 animate-pulse" />
+        <div className="h-64 glass-card rounded-[24px] shadow-sm border border-[var(--color-border)] animate-pulse" />
       ) : (
         <div className="flex flex-col gap-12">
           
           {/* Pending Approvals */}
           <section>
-            <h3 className="text-xl font-bold font-display text-ink-primary mb-4 flex items-center gap-2">
+            <h3 className="text-xl font-bold font-display text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
               <Clock className="text-orange-500" /> Pending Approvals
             </h3>
             
             {pendingLeaves.length === 0 ? (
-              <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm p-12 text-center text-ink-secondary">
+              <div className="glass-card rounded-[24px] border border-[var(--color-border)] shadow-sm p-12 text-center text-[var(--color-text-secondary)]">
                 No pending leave requests!
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {pendingLeaves.map(leave => (
-                  <div key={leave.id} className="bg-white rounded-[24px] border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
+                  <div key={leave.id} className="glass-card rounded-[24px] border border-[var(--color-border)] shadow-sm p-6 flex flex-col gap-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-bold text-lg text-ink-primary">{leave.staff.name}</p>
-                        <p className="text-xs font-bold text-ink-secondary uppercase tracking-wider">{leave.staff.role}</p>
+                        <p className="font-bold text-lg text-[var(--color-text-primary)]">{leave.staff.name}</p>
+                        <p className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">{leave.staff.role}</p>
                       </div>
                       <span className="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded-full border border-orange-200 uppercase tracking-widest">
                         Pending
@@ -205,15 +221,15 @@ export default function LeavesDashboard() {
                     </div>
                     
                     <div className="p-4 bg-orange-50/50 rounded-2xl border border-orange-100">
-                      <p className="text-sm text-ink-primary font-medium">"{leave.reason}"</p>
+                      <p className="text-sm text-[var(--color-text-primary)] font-medium">"{leave.reason}"</p>
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm font-bold text-ink-secondary">
+                    <div className="flex items-center gap-2 text-sm font-bold text-[var(--color-text-secondary)]">
                       <Calendar size={16} /> 
                       {new Date(leave.startDate).toLocaleDateString()} — {new Date(leave.endDate).toLocaleDateString()}
                     </div>
 
-                    <div className="flex items-center gap-3 mt-2 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-3 mt-2 pt-4 border-t border-[var(--color-border)]">
                       <button 
                         onClick={() => handleUpdateStatus(leave.id, 'approved')}
                         className="flex-1 py-2.5 bg-emerald-50 text-emerald-600 rounded-full text-sm font-bold hover:bg-emerald-600 hover:text-white transition-colors flex items-center justify-center gap-2"
@@ -235,31 +251,31 @@ export default function LeavesDashboard() {
 
           {/* Past Approvals */}
           <section>
-            <h3 className="text-xl font-bold font-display text-ink-primary mb-4 flex items-center gap-2">
-              <CheckCircle className="text-ink-secondary" /> History
+            <h3 className="text-xl font-bold font-display text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
+              <CheckCircle className="text-[var(--color-text-secondary)]" /> History
             </h3>
             
-            <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
+            <div className="glass-card rounded-[24px] border border-[var(--color-border)] shadow-sm overflow-hidden">
               {pastLeaves.length === 0 ? (
-                <div className="p-12 text-center text-ink-secondary">No leave history found.</div>
+                <div className="p-12 text-center text-[var(--color-text-secondary)]">No leave history found.</div>
               ) : (
                 <table className="w-full text-left">
-                  <thead className="bg-gray-50/50 border-b border-gray-100">
+                  <thead className="bg-black/5 dark:bg-white/5/50 border-b border-[var(--color-border)]">
                     <tr>
-                      <th className="p-4 text-xs font-bold text-ink-secondary uppercase tracking-wider">Staff</th>
-                      <th className="p-4 text-xs font-bold text-ink-secondary uppercase tracking-wider">Duration</th>
-                      <th className="p-4 text-xs font-bold text-ink-secondary uppercase tracking-wider">Status</th>
-                      <th className="p-4 text-xs font-bold text-ink-secondary uppercase tracking-wider text-right">Reviewed By</th>
+                      <th className="p-4 text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Staff</th>
+                      <th className="p-4 text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Duration</th>
+                      <th className="p-4 text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Status</th>
+                      <th className="p-4 text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider text-right">Reviewed By</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {pastLeaves.map(leave => (
-                      <tr key={leave.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={leave.id} className="hover:bg-black/5 dark:bg-white/5 transition-colors">
                         <td className="p-4">
-                          <p className="font-bold text-sm text-ink-primary">{leave.staff.name}</p>
-                          <p className="text-xs text-ink-secondary">{leave.reason}</p>
+                          <p className="font-bold text-sm text-[var(--color-text-primary)]">{leave.staff.name}</p>
+                          <p className="text-xs text-[var(--color-text-secondary)]">{leave.reason}</p>
                         </td>
-                        <td className="p-4 text-sm font-medium text-ink-secondary">
+                        <td className="p-4 text-sm font-medium text-[var(--color-text-secondary)]">
                           {new Date(leave.startDate).toLocaleDateString()} to {new Date(leave.endDate).toLocaleDateString()}
                         </td>
                         <td className="p-4">
@@ -273,7 +289,7 @@ export default function LeavesDashboard() {
                             </span>
                           )}
                         </td>
-                        <td className="p-4 text-sm font-medium text-ink-primary text-right">
+                        <td className="p-4 text-sm font-medium text-[var(--color-text-primary)] text-right">
                           {leave.reviewedBy?.name || 'System'}
                         </td>
                       </tr>
